@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, Marker, ZoomControl } from "react-leaflet";
-import "leaflet/dist/leaflet.css"; // Leaflet 기본 CSS
-import axios from "axios"; // API 호출 라이브러리
+import { useEffect, useState, useRef, useCallback } from "react"; // useCallback 추가
+import { MapContainer, TileLayer, Marker, ZoomControl, useMapEvents } from "react-leaflet"; // useMapEvents 추가
+import "leaflet/dist/leaflet.css";
+import axios from "axios";
 
 // Leaflet 마커 아이콘 깨짐 방지 (기존 코드 유지)
 import L from "leaflet";
@@ -21,28 +21,57 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// --- 클러스터링 관련 추가/수정 ---
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
-// --- 클러스터링 관련 추가/수정 끝 ---
 
-// 전역 스토어 임포트
 import useSidePanelStore from "../store/sidePanelStore";
+
+// 맵 이벤트 핸들러를 위한 별도 컴포넌트
+function MapEventHandler({ onViewportChange }) {
+  const map = useMapEvents({
+    moveend: () => {
+      // 맵 이동 또는 줌 변경이 끝났을 때
+      const bounds = map.getBounds();
+      onViewportChange(bounds);
+    },
+    // 초기 로드 시에도 데이터 불러오도록 설정
+    load: () => {
+      const bounds = map.getBounds();
+      onViewportChange(bounds);
+    }
+  });
+  return null;
+}
 
 function MapComponent() {
   const [culturalSites, setCulturalSites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const mapRef = useRef(null);
+  const [currentBounds, setCurrentBounds] = useState(null); // 현재 맵 뷰포트 경계를 저장
 
   const openSidePanel = useSidePanelStore((state) => state.openSidePanel);
 
+  // 뷰포트 변경 시 호출될 콜백 함수
+  const handleViewportChange = useCallback((bounds) => {
+    // Leaflet bounds 객체에서 좌표 추출 (southWest.lng, southWest.lat, northEast.lng, northEast.lat)
+    const newBounds = `${bounds.getSouthWest().lng},${bounds.getSouthWest().lat},${bounds.getNorthEast().lng},${bounds.getNorthEast().lat}`;
+    setCurrentBounds(newBounds);
+  }, []);
+
   useEffect(() => {
     const fetchLocations = async () => {
+      if (!currentBounds) { // 뷰포트 경계가 설정되기 전에는 요청하지 않음
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/v1/cultural-sites"
+          `http://localhost:5000/api/v1/cultural-sites?bounds=${currentBounds}` // bounds 쿼리 파라미터 추가
         );
         const culturalSitesArray = response.data.data.culturalSites;
         setCulturalSites(culturalSitesArray);
@@ -56,7 +85,7 @@ function MapComponent() {
       }
     };
     fetchLocations();
-  }, []);
+  }, [currentBounds]); // currentBounds가 변경될 때마다 데이터를 다시 불러옴
 
   if (loading && culturalSites.length === 0)
     return (
@@ -82,19 +111,21 @@ function MapComponent() {
         className="h-full w-full z-0"
         whenCreated={(mapInstance) => {
           mapRef.current = mapInstance;
+          // 초기 맵 로드 시에도 경계를 설정하여 데이터 로드 트리거
+          handleViewportChange(mapInstance.getBounds());
         }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <ZoomControl position="bottomright" /> {/* 줌 컨트롤 위치 조정 */}
+        <ZoomControl position="bottomright" />
 
-        {/* --- MarkerClusterGroup 추가 --- */}
+        {/* 맵 이벤트 핸들러 컴포넌트 추가 */}
+        <MapEventHandler onViewportChange={handleViewportChange} />
+
         <MarkerClusterGroup
-          chunkedLoading // 대량의 마커를 효율적으로 로드 (선택 사항이지만 권장)
-          // maxClusterRadius={80} // 클러스터링 반경 조정 (선택 사항)
-          // spiderfyOnMaxZoom={true} // 최대 줌에서 스파이더파이 (선택 사항)
+          chunkedLoading
         >
           {culturalSites.map((culturalSite) => (
             <Marker
@@ -107,12 +138,10 @@ function MapComponent() {
                 click: () => openSidePanel(culturalSite),
               }}
             >
-              {/* 마커 클릭 시 팝업을 표시하려면 여기에 Popup 컴포넌트를 추가할 수 있습니다. */}
               {/* <Popup>{culturalSite.name}</Popup> */}
             </Marker>
           ))}
         </MarkerClusterGroup>
-        {/* --- MarkerClusterGroup 끝 --- */}
       </MapContainer>
     </div>
   );
