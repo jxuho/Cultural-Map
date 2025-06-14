@@ -341,17 +341,42 @@ const getCulturalSiteById = asyncHandler(async (req, res, next) => {
 
     const culturalSite = await CulturalSite.aggregate(pipeline);
 
-    if (!culturalSite || culturalSite.length === 0) {
-        return next(new AppError('해당 ID를 가진 문화유산이 없습니다.', 404));
+   // --- 여기부터 백엔드 응답 직전 JavaScript를 이용한 데이터 후처리 ---
+   // reviews배열이 비어있을 경우, reviews: [user: {}]가 반환되는 문제 해결하기 위함.
+   // aggregation pipeline으로 해결하려 했으나, 실패함. 아래 js를 통해 조작하는 방법은 차선책.
+    let finalCulturalSite = culturalSite[0];
+
+    // 1. reviews 배열 필터링: _id가 없거나 user._id가 없는 리뷰 제거
+    // reviews: [{ user: {} }] 와 같은 형태를 걸러냅니다.
+    if (finalCulturalSite.reviews && finalCulturalSite.reviews.length > 0) {
+        finalCulturalSite.reviews = finalCulturalSite.reviews.filter(review =>
+            review && review._id && review.user && review.user._id // 리뷰 객체, 리뷰 _id, user 객체, user _id 모두 유효해야 함
+        );
+    } else {
+        // reviews 배열 자체가 없거나 비어있는 경우를 대비 (null 대신 빈 배열로 초기화)
+        finalCulturalSite.reviews = [];
     }
+
+    // 2. 필터링된 reviews 배열을 기반으로 averageRating 및 reviewCount 재계산
+    if (finalCulturalSite.reviews.length > 0) {
+        const totalRating = finalCulturalSite.reviews.reduce((sum, review) => sum + review.rating, 0);
+        finalCulturalSite.averageRating = parseFloat((totalRating / finalCulturalSite.reviews.length).toFixed(1));
+        finalCulturalSite.reviewCount = finalCulturalSite.reviews.length;
+    } else {
+        finalCulturalSite.averageRating = 0;
+        finalCulturalSite.reviewCount = 0;
+    }
+    // --- 후처리 끝 ---
 
     res.status(200).json({
         status: 'success',
         data: {
-            culturalSite: culturalSite[0] // aggregate는 배열을 반환하므로 첫 번째 요소 사용
+            culturalSite: finalCulturalSite  // aggregate는 배열을 반환하므로 첫 번째 요소 사용
         }
     });
 })
+
+
 
 const updateCulturalSiteById = asyncHandler(async (req, res, next) => {
     // 1. 관리자 권한 확인
