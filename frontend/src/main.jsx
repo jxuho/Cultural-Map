@@ -25,12 +25,8 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      {/* QueryClientProvider로 App 컴포넌트를 감싸줍니다 */}
       <QueryClientProvider client={queryClient}>
         <App />
-        {/* 개발 환경에서만 보이는 React Query 개발 도구 (선택 사항) */}
-        {/* 개발 중에는 유용하지만, 배포 시에는 제거하거나 환경 변수로 제어하는 것이 좋습니다. */}
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
       </QueryClientProvider>
     </BrowserRouter>
   </StrictMode>
