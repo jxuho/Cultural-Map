@@ -1,21 +1,21 @@
 // SidePanel.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import useSidePanelStore from "../../store/sidePanelStore";
 import useViewport from "../../hooks/useViewPort";
 import useAuthStore from "../../store/authStore";
 import StarIcon from '../StarIcon';
 import ReviewForm from '../Review/ReviewForm';
 import ReviewDisplay from '../Review/ReviewDisplay';
+import useUiStore from "../../store/uiStore";
 
 const SidePanel = () => {
-  const isSidePanelOpen = useSidePanelStore((state) => state.isSidePanelOpen);
-  const selectedPlace = useSidePanelStore((state) => state.selectedPlace);
-  const closeSidePanel = useSidePanelStore((state) => state.closeSidePanel);
-  const sidePanelWidth = useSidePanelStore(
+  const isSidePanelOpen = useUiStore((state) => state.isSidePanelOpen);
+  const selectedPlace = useUiStore((state) => state.selectedPlace);
+  const closeSidePanel = useUiStore((state) => state.closeSidePanel);
+  const sidePanelWidth = useUiStore(
     (state) => state.sidePanelWidth
   );
-  const setSidePanelWidth = useSidePanelStore(
+  const setSidePanelWidth = useUiStore(
     (state) => state.setSidePanelWidth
   );
   const { width: viewportWidth } = useViewport();
