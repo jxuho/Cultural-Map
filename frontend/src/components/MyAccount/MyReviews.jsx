@@ -1,5 +1,5 @@
 // src/components/Review/MyReview.jsx
-import { useState, useCallback, useRef, useEffect } from "react"; // useRef, useEffect 임포트 추가
+import { useState, useCallback, useRef, useEffect } from "react";
 import StarIcon from "../StarIcon";
 import ReviewForm from "../Review/ReviewForm";
 import useAuthStore from "../../store/authStore";
@@ -62,21 +62,25 @@ const MyReviews = () => {
   // 스크롤 영역의 최대 높이를 동적으로 계산
   useEffect(() => {
     const calculateMaxHeight = () => {
-      if (scrollContainerRef.current && headerRef.current) {
+      // Capture current ref values
+      const currentScrollContainer = scrollContainerRef.current;
+      const currentHeader = headerRef.current;
+
+      if (currentScrollContainer && currentHeader) {
         // 이 컴포넌트의 전체 높이를 가져옵니다. (p-6 bg-white rounded-lg shadow-md div)
-        const parentTotalHeight = scrollContainerRef.current.parentElement.clientHeight;
-        
+        const parentTotalHeight = currentScrollContainer.parentElement.clientHeight;
+
         // 제목 섹션의 높이
-        const headerHeight = headerRef.current.offsetHeight;
-        
+        const headerHeight = currentHeader.offsetHeight;
+
         // 컴포넌트의 패딩 (p-6은 상하 24px * 2 = 48px)
-        const componentPaddingY = 48; 
-        
+        const componentPaddingY = 48;
+
         // 실제 스크롤 가능한 영역의 높이 계산
         // 전체 높이 - (제목 높이 + 컴포넌트 자체 상하 패딩 + (옵션: 기타 고정 요소 높이))
         // 리뷰 항목 내부의 확장되는 높이는 flex-grow로 조절되므로, 여기서는 고정된 요소만 고려합니다.
         const calculatedHeight = parentTotalHeight - headerHeight - componentPaddingY;
-        
+
         setScrollAreaMaxHeight(`${calculatedHeight}px`);
       }
     };
@@ -86,21 +90,25 @@ const MyReviews = () => {
     // 윈도우 리사이즈 시 높이 재계산
     window.addEventListener('resize', calculateMaxHeight);
 
-    // 확장/축소 시에도 높이 재계산 (ReviewForm의 높이가 동적으로 변할 경우)
-    // reviews 배열이나 expandedReviewId가 변경될 때마다 재계산 (성능 고려하여 debounce 필요할 수도)
-    // setTimeout을 사용하여 DOM 업데이트 후 높이 계산을 지연시키는 것이 안전합니다.
-    const resizeObserver = new ResizeObserver(() => {
-      setTimeout(calculateMaxHeight, 0); // DOM 업데이트 후 비동기적으로 계산
-    });
+    // Capture the current parent element for ResizeObserver
+    const observedElement = scrollContainerRef.current?.parentElement;
+    let resizeObserver;
 
-    if (scrollContainerRef.current) {
-      resizeObserver.observe(scrollContainerRef.current.parentElement);
+    // ResizeObserver를 사용하여 DOM 크기 변경 감지 (예: 항목 확장/축소)
+    if (observedElement) {
+      resizeObserver = new ResizeObserver(() => {
+        // DOM 업데이트 후 높이 계산을 지연시키는 것이 안전합니다.
+        // requestAnimationFrame을 사용하면 브라우저의 다음 리페인트 전에 실행됩니다.
+        requestAnimationFrame(calculateMaxHeight); // setTimeout 대신 requestAnimationFrame 사용 권장
+      });
+      resizeObserver.observe(observedElement);
     }
 
     return () => {
       window.removeEventListener('resize', calculateMaxHeight);
-      if (scrollContainerRef.current && scrollContainerRef.current.parentElement) {
-        resizeObserver.unobserve(scrollContainerRef.current.parentElement);
+      // Use the captured 'observedElement' for unobserving
+      if (resizeObserver && observedElement) {
+        resizeObserver.unobserve(observedElement);
       }
     };
   }, [reviews, expandedReviewId]); // expandedReviewId를 의존성 배열에 추가하여 항목 확장 시 재계산
@@ -213,7 +221,7 @@ const MyReviews = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md flex flex-col h-full"> {/* h-full과 flex-col 추가 */}
+    <div className="p-6 bg-white rounded-lg shadow-md flex flex-col h-full">
       {/* 제목 섹션 - Ref 연결 */}
       <div ref={headerRef}>
         <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
@@ -222,7 +230,6 @@ const MyReviews = () => {
       </div>
 
       {/* 스크롤 가능한 리뷰 목록 영역 - Ref 연결 및 동적 maxHeight 적용 */}
-      {/* flex-grow를 추가하여 남은 공간을 차지하도록 함 */}
       <div
         ref={scrollContainerRef}
         className="overflow-y-auto pr-2 flex-grow"
