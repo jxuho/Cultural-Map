@@ -97,11 +97,11 @@ export const useReviewMutation = () => {
         queryClient.invalidateQueries({ queryKey: ['culturalSite', variables.placeId] });
       }
 
-      alert("리뷰가 성공적으로 처리되었습니다!");
+      alert("Review is processed successfully!");
     },
     onError: (error) => {
-      console.error("리뷰 액션 실패:", error);
-      alert(`리뷰 처리 실패: ${error.message || "알 수 없는 오류"}`);
+      console.error("Review action fail:", error);
+      alert(`Review process fail: ${error.message || "Unknown error"}`);
     },
   });
 };
@@ -135,8 +135,8 @@ export const useFavoriteMutation = () => {
             queryClient.invalidateQueries({ queryKey: ['culturalSite', variables.culturalSiteId] });
         },
         onError: (error) => {
-            console.error("즐겨찾기 액션 실패:", error);
-            alert(`즐겨찾기 처리 실패: ${error.message || "알 수 없는 오류"}`);
+            console.error("Favorite action fail:", error);
+            alert(`Favorite process fail: ${error.message || "Unknown error"}`);
         },
     });
 };
