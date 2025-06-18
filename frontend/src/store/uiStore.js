@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware'
+import { queryClient } from '../config/reactQueryConfig'; // 수정된 경로로 queryClient 임포트!
 
 const useUiStore = create(devtools((set) => ({
   // modal
@@ -15,7 +16,7 @@ const useUiStore = create(devtools((set) => ({
 
   // side panel
   isSidePanelOpen: false,
-  selectedPlace: null, 
+  selectedPlace: null,
   sidePanelWidth: 360,
   setSidePanelWidth: (width) => set({sidePanelWidth: width}),
   openSidePanel: (placeInfo) => set({ isSidePanelOpen: true, selectedPlace: placeInfo }),
@@ -54,11 +55,29 @@ const useUiStore = create(devtools((set) => ({
     isSidePanelOpen: true,
     isUpdateFormOpen: true,
     updateFormData: data,
-    selectedPlace: null
+    selectedPlace: data, // Keep selectedPlace for update form to reflect the item being updated
   }),
-  closeUpdateForm: () => set({isUpdateFormOpen: false, updateFormData: null})
+  closeUpdateForm: () => set({isUpdateFormOpen: false, updateFormData: null}),
 
-
+  // --- NEW: Centralized Close and Cancel Logic ---
+  handleCloseAndCancel: (queryKeyToCancel) => {
+    set({
+      isSidePanelOpen: false,
+      nearbySites: [],
+      nearbySitesLoading: false,
+      nearbySitesError: null,
+      selectedPlace: null, // Clear selected place
+      isCreateFormOpen: false,
+      createFormData: null,
+      isUpdateFormOpen: false,
+      updateFormData: null,
+    });
+    if (queryKeyToCancel) {
+      console.log(`Cancelling query with key: ${queryKeyToCancel}`);
+      // Use the imported queryClient to cancel queries
+      queryClient.cancelQueries({ queryKey: [queryKeyToCancel] });
+    }
+  },
 })));
 
 export default useUiStore;
