@@ -59,7 +59,7 @@ const useUiStore = create(devtools((set) => ({
   }),
   closeUpdateForm: () => set({isUpdateFormOpen: false, updateFormData: null}),
 
-  // --- NEW: Centralized Close and Cancel Logic ---
+  // Centralized Close and Cancel Logic ---
   handleCloseAndCancel: (queryKeyToCancel) => {
     set({
       isSidePanelOpen: false,
