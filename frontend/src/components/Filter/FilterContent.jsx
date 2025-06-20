@@ -1,7 +1,7 @@
 // components/FilterContent.jsx
 import React, { useMemo } from 'react';
-import useFilterStore from '../store/filterStore';
-import { CULTURAL_CATEGORY } from '../config/culturalSiteConfig';
+import useFilterStore from '../../store/filterStore';
+import { CULTURAL_CATEGORY } from '../../config/culturalSiteConfig';
 import debounce from 'lodash.debounce';
 
 // Floating UI의 floatingStyles를 props로 받도록 변경

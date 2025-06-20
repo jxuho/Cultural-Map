@@ -1,6 +1,6 @@
 import MapComponent from "../components/Map/MapComponent.jsx";
 import SidePanel from "../components/SidePanel/SidePanel.jsx";
-import FilterPanel from "../components/FilterPanel.jsx";
+import FilterPanel from "../components/Filter/FilterPanel.jsx";
 import MapContextMenu from "../components/Map/MapContextMenu.jsx";
 
 

@@ -1,7 +1,7 @@
 // FilterPanel.jsx
 import { useState, useMemo } from "react";
-import useFilterStore from "../store/filterStore";
-import { CULTURAL_CATEGORY } from "../config/culturalSiteConfig";
+import useFilterStore from "../../store/filterStore";
+import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
 import debounce from "lodash.debounce";
 
 const FilterPanel = () => {
