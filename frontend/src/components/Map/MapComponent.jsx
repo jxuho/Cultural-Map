@@ -19,6 +19,7 @@ import { useAllCulturalSites } from "../../hooks/useCulturalSitesQueries";
 import CurrentLocationButton from "./CurrentLocationButton";
 
 import CulturalSiteMarkers from "./CulturalSiteMarkers";
+import useViewport from "../../hooks/useViewPort";
 
 // MapEventsHandler 컴포넌트
 const MapEventsHandler = () => {
@@ -42,6 +43,7 @@ const MapCenterUpdater = () => {
   const clearJumpToPlace = useUiStore((state) => state.clearJumpToPlace);
   const sidePanelWidth = useUiStore((state) => state.sidePanelWidth);
   const isSidePanelOpen = useUiStore((state) => state.isSidePanelOpen);
+  const { width: viewportWidth } = useViewport();
 
   // jumpToPlace에 따라 지도 중심 이동
   useEffect(() => {
@@ -54,16 +56,24 @@ const MapCenterUpdater = () => {
       });
 
       // 마커로 이동 후, sidebar 고려해서 중심으로 이동
-      if (isSidePanelOpen && sidePanelWidth > 0) {
+      if (isSidePanelOpen && sidePanelWidth > 0 && viewportWidth > 450) {
+        console.log("trigger");
+
         setTimeout(() => {
           let offsetX = sidePanelWidth / 2 - 20;
           map.panBy([offsetX, 0], { animate: true, duration: 0.5 });
         }, 1700);
-
-        clearJumpToPlace();
       }
+      clearJumpToPlace();
     }
-  }, [jumpToPlace, clearJumpToPlace, map, sidePanelWidth, isSidePanelOpen]);
+  }, [
+    jumpToPlace,
+    clearJumpToPlace,
+    map,
+    sidePanelWidth,
+    isSidePanelOpen,
+    viewportWidth,
+  ]);
 
   return null;
 };
