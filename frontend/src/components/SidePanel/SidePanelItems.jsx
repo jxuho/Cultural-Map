@@ -1,3 +1,4 @@
+// src/components/SidePanel/SidePanelItems.jsx
 import StarIcon from "../StarIcon";
 import ReviewForm from "../Review/ReviewForm";
 import ReviewDisplay from "../Review/ReviewDisplay";
@@ -19,6 +20,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
   const currentUser = useAuthStore((state) => state.user);
   const uiSelectedPlace = useUiStore((state) => state.selectedPlace);
   const closeSidePanel = useUiStore((state) => state.closeSidePanel);
+  const setJumpToPlace = useUiStore((state) => state.setJumpToPlace); // setJumpToPlace 액션 추가
 
   // --- TanStack Query: Data Fetching Hooks (Local to SidePanelItems) ---
   // SidePanel에서 이미 로딩/에러를 처리했으므로, 여기서는 데이터 자체에 집중합니다.
@@ -85,6 +87,12 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
     },
     [reviewMutation, uiSelectedPlace?._id, userReview, currentUser]
   );
+  
+  const handleNameClick = useCallback(() => {
+    if (selectedPlaceData) {
+      setJumpToPlace(selectedPlaceData); 
+    }
+  }, [selectedPlaceData, setJumpToPlace]);
 
   // --- Loading / Error / No Data Handling (within SidePanelItems) ---
   // SidePanel에서 이미 초기 로딩/에러/선택된 장소 없음 상태를 처리했으므로,
@@ -114,7 +122,10 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
             {isSelectedPlaceFavorite ? <BsStarFill /> : <BsStar />}
           </button>
         )}
-        <h2 className="text-2xl font-bold text-gray-800 break-words pr-2">
+        <h2
+          className="text-2xl font-bold text-gray-800 break-words pr-2 cursor-pointer hover:underline" // Add cursor-pointer and hover:underline for visual cue
+          onClick={handleNameClick} // Add onClick handler
+        >
           {selectedPlaceData.name}
         </h2>
         <button

@@ -9,8 +9,6 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-import L from "leaflet";
-
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
@@ -97,33 +95,37 @@ const MapComponent = () => {
     state.searchQuery.toLowerCase()
   );
 
-
   // address 등 모든 정보 포함하기
-const memoizedFilteredSites = useMemo(() => {
-  return culturalSites.filter((site) => {
-    const matchesCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(site.category);
+  const memoizedFilteredSites = useMemo(() => {
+    return culturalSites.filter((site) => {
+      const matchesCategory =
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(site.category);
 
-    // 검색어가 비어있으면 모든 항목을 일치시킵니다.
-    if (!searchQuery) {
-      return matchesCategory;
-    }
+      // 검색어가 비어있으면 모든 항목을 일치시킵니다.
+      if (!searchQuery) {
+        return matchesCategory;
+      }
 
-    const lowerCaseSearchQuery = searchQuery.toLowerCase();
+      const lowerCaseSearchQuery = searchQuery.toLowerCase();
 
-    // 각 필드를 검색어와 비교합니다.
-    const matchesSearch =
-      site.name.toLowerCase().includes(lowerCaseSearchQuery) ||
-      (site.description && site.description.toLowerCase().includes(lowerCaseSearchQuery)) ||
-      (site.category && site.category.toLowerCase().includes(lowerCaseSearchQuery)) ||
-      (site.address && site.address.toLowerCase().includes(lowerCaseSearchQuery)) ||
-      (site.website && site.website.toLowerCase().includes(lowerCaseSearchQuery)) ||
-      (site.sourceId && String(site.sourceId).toLowerCase().includes(lowerCaseSearchQuery)); // sourceId는 숫자일 수 있으므로 문자열로 변환
-      
-    return matchesCategory && matchesSearch;
-  });
-}, [culturalSites, selectedCategories, searchQuery]);
+      // 각 필드를 검색어와 비교합니다.
+      const matchesSearch =
+        site.name.toLowerCase().includes(lowerCaseSearchQuery) ||
+        (site.description &&
+          site.description.toLowerCase().includes(lowerCaseSearchQuery)) ||
+        (site.category &&
+          site.category.toLowerCase().includes(lowerCaseSearchQuery)) ||
+        (site.address &&
+          site.address.toLowerCase().includes(lowerCaseSearchQuery)) ||
+        (site.website &&
+          site.website.toLowerCase().includes(lowerCaseSearchQuery)) ||
+        (site.sourceId &&
+          String(site.sourceId).toLowerCase().includes(lowerCaseSearchQuery)); // sourceId는 숫자일 수 있으므로 문자열로 변환
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [culturalSites, selectedCategories, searchQuery]);
 
   if (isLoading) {
     return (
