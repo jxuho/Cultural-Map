@@ -38,7 +38,7 @@ const MyReviews = () => {
       const oldRatingOfTargetReview = targetReview?.rating; // Get old rating directly from the fetched review
 
       if (!placeIdForAction) {
-        alert("문화재 정보를 찾을 수 없습니다.");
+        alert("Can't get cultural site data.");
         return;
       }
 
@@ -119,7 +119,7 @@ const MyReviews = () => {
       return (
         <div className="text-center flex-grow flex items-center justify-center flex-col">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">리뷰를 불러오는 중입니다...</p>
+          <p className="text-gray-600">Loading reviews...</p>
         </div>
       );
     }
@@ -128,7 +128,7 @@ const MyReviews = () => {
       return (
         <div className="text-center flex-grow flex items-center justify-center flex-col">
           <p className="text-red-600">
-            리뷰를 불러오는 중 오류가 발생했습니다: {reviewsError.message}
+            An error occured: {reviewsError.message}
           </p>
         </div>
       );
@@ -138,10 +138,10 @@ const MyReviews = () => {
       return (
         <div className="text-center flex-grow flex items-center justify-center flex-col">
           <p className="text-gray-600 text-lg">
-            아직 작성된 리뷰가 없습니다.
+            There's no review
           </p>
           <p className="text-gray-500 text-sm mt-2">
-            새로운 리뷰를 작성해보세요!
+            Write down your review!
           </p>
         </div>
       );
@@ -193,7 +193,7 @@ const MyReviews = () => {
                 </p>
               )}
               <p className="text-gray-500 text-xs mt-2 text-right">
-                {new Date(review.createdAt).toLocaleDateString("ko-KR", {
+                {new Date(review.createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -225,7 +225,7 @@ const MyReviews = () => {
       {/* 제목 섹션 - Ref 연결 */}
       <div ref={headerRef}>
         <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
-          내가 작성한 리뷰
+          My Reviews
         </h2>
       </div>
 

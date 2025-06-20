@@ -7,10 +7,10 @@ const ReviewDisplay = ({ reviews, currentUser }) => {
   // 리뷰가 없는 경우 메시지 분기 처리
   if (reviews.length === 0) {
     if (currentUser) {
-      return <p className="text-gray-600 text-center py-4">아직 다른 사용자의 리뷰가 없습니다.</p>;
+      return <p className="text-gray-600 text-center py-4">No reviews from the other users.</p>;
     } else {
       // 이 경우는 ReviewForm이 표시되지 않을 때만 발생합니다.
-      return <p className="text-gray-600 text-center py-4">아직 작성된 리뷰가 없습니다.</p>;
+      return <p className="text-gray-600 text-center py-4">No reviews yet.</p>;
     }
   }
 
@@ -30,7 +30,7 @@ const ReviewDisplay = ({ reviews, currentUser }) => {
               />
             )}
             <p className="font-semibold text-gray-800 mr-2 flex-grow">
-              {review.user?.username || "익명 사용자"}
+              {review.user?.username || "Unknown user"}
             </p>
             <div className="flex text-yellow-500 text-sm">
               {[...Array(5)].map((_, i) => (
@@ -51,7 +51,7 @@ const ReviewDisplay = ({ reviews, currentUser }) => {
           )}
           <p className="text-gray-500 text-xs mt-2 text-right">
             {new Date(review.createdAt).toLocaleDateString(
-              "ko-KR",
+              "en-US",
               {
                 year: "numeric",
                 month: "long",

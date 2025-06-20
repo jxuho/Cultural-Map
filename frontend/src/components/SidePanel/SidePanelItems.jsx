@@ -55,7 +55,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
   const handleFavoriteChange = useCallback(
     async (newStatus) => {
       if (!currentUser) {
-        alert("로그인 후 즐겨찾기를 사용할 수 있습니다.");
+        alert("You can add favorite after sign in.");
         return;
       }
       // favoriteMutation 훅 내부에서 에러 처리 및 캐시 업데이트가 이루어짐
@@ -99,7 +99,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
   // 여기 `SidePanelItems`는 `selectedPlaceData`가 유효하다는 전제 하에 렌더링됩니다.
   // 그럼에도 불구하고 방어적인 코딩을 위해 `!selectedPlaceData` 체크는 유지합니다.
   if (!selectedPlaceData) {
-    return <ErrorMessage message="선택된 장소 데이터를 찾을 수 없습니다." />;
+    return <ErrorMessage message="Can't get data from the place." />;
   }
 
   return (
@@ -188,7 +188,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
           ) : (
             <div className="p-4 bg-white border-b border-gray-200">
               <p className="text-gray-700 text-center font-medium">
-                리뷰를 작성하려면 로그인해주세요.
+                Please Sign in to write down review
               </p>
             </div>
           )}
@@ -197,18 +197,18 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
               ReviewDisplay 내부에서 자체적으로 처리하도록 유도할 수 있습니다. 
               여기서는 SidePanelItems에서 직접 처리하는 방식으로 유지합니다. */}
           {loadingReviews && (
-            <div className="p-4 text-center text-gray-500">리뷰 로딩 중...</div>
+            <div className="p-4 text-center text-gray-500">Loading reviews...</div>
           )}
           {reviewFetchError && (
             <ErrorMessage
               message={
-                reviewsError?.message || "리뷰를 불러오는데 실패했습니다."
+                reviewsError?.message || "Failed to fetch reviews."
               }
             />
           )}
           {!loadingReviews && !reviewFetchError && reviews.length === 0 && (
             <p className="p-4 text-center text-gray-500">
-              아직 작성된 리뷰가 없습니다.
+              No reviews yet.
             </p>
           )}
           <ReviewDisplay
@@ -234,7 +234,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
           {/* Basic Info Section */}
           <div className="mb-6">
             <p className="text-sm text-gray-500 mb-1">
-              <span className="font-semibold text-gray-700">카테고리:</span>{" "}
+              <span className="font-semibold text-gray-700">Category:</span>{" "}
               {selectedPlaceData.category
                 ?.replace(/_/g, " ")
                 .split(" ")
@@ -243,26 +243,26 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
             </p>
             {selectedPlaceData.address && (
               <p className="text-gray-700 mb-1">
-                <span className="font-semibold">주소:</span>{" "}
+                <span className="font-semibold">Address:</span>{" "}
                 {selectedPlaceData.address}
               </p>
             )}
             {selectedPlaceData.website && (
               <p className="text-gray-700 mb-1">
-                <span className="font-semibold">웹사이트:</span>{" "}
+                <span className="font-semibold">Website:</span>{" "}
                 <a
                   href={selectedPlaceData.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline"
                 >
-                  방문하기
+                  Visit
                 </a>
               </p>
             )}
             {selectedPlaceData.openingHours && (
               <p className="text-gray-700 mb-1">
-                <span className="font-semibold">영업 시간:</span>{" "}
+                <span className="font-semibold">Opening Hours:</span>{" "}
                 {selectedPlaceData.openingHours}
               </p>
             )}
@@ -271,7 +271,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
           {/* Description Section */}
           {selectedPlaceData.description && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">설명</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Description</h3>
               <p className="text-gray-700 leading-relaxed">
                 {selectedPlaceData.description}
               </p>
@@ -284,7 +284,7 @@ const SidePanelItems = ({ isReviewsExpanded, toggleReviewsExpansion }) => {
             !selectedPlaceData.openingHours &&
             selectedPlaceData.reviewCount === 0 && (
               <p className="text-gray-600 text-center py-8">
-                추가 정보가 없습니다.
+                No additional info.
               </p>
             )}
         </div>
