@@ -1,7 +1,8 @@
 // FilterPanel.jsx
-import { useState } from "react";
+import { useState, useMemo } from "react"; // useMemo를 import 합니다.
 import useFilterStore from "../store/filterStore";
 import { CULTURAL_CATEGORY } from "../config/culturalSiteConfig";
+import debounce from "lodash.debounce"; // lodash.debounce를 import 합니다.
 
 const FilterPanel = () => {
   const selectedCategories = useFilterStore(
@@ -12,8 +13,40 @@ const FilterPanel = () => {
   const setSearchQuery = useFilterStore((state) => state.setSearchQuery);
   const [isOpen, setIsOpen] = useState(false);
 
+  // 로컬 상태를 사용하여 input의 현재 값을 제어합니다.
+  // 이는 debounce가 적용된 setSearchQuery 호출이 약간 지연될 수 있기 때문에
+  // input 필드에 즉각적인 피드백을 제공하기 위함입니다.
+  const [localSearchInput, setLocalSearchInput] = useState(searchQuery);
+
+  // searchQuery가 외부에서 변경될 때 (예: 필터 패널이 닫히거나 초기화될 때),
+  // localSearchInput도 업데이트되도록 useEffect를 사용합니다.
+  // useEffect(() => {
+  //   setLocalSearchInput(searchQuery);
+  // }, [searchQuery]); // 이 부분은 현재 setup에서는 필수는 아니지만, 외부 동기화가 필요할 때 유용합니다.
+
   const handleToggle = () => {
     setIsOpen(!isOpen);
+  };
+
+  // setSearchQuery를 디바운스 처리합니다.
+  // useMemo를 사용하여 컴포넌트가 리렌더링될 때마다 새로운 디바운스 함수가 생성되지 않도록 합니다.
+  const debouncedSetSearchQuery = useMemo(
+    () => debounce((value) => {
+      setSearchQuery(value);
+    }, 300), // 원하는 디바운스 지연 시간 (밀리초)
+    [setSearchQuery] // setSearchQuery 함수가 변경될 때만 debounced 함수를 다시 생성합니다.
+  );
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setLocalSearchInput(value); // input 필드에 즉시 반영
+    debouncedSetSearchQuery(value); // 디바운스된 함수 호출
+  };
+
+  const handleClearSearch = () => {
+    setLocalSearchInput(""); // 로컬 상태도 초기화
+    setSearchQuery(""); // Zustand 상태도 초기화
+    debouncedSetSearchQuery.cancel(); // 진행 중인 debounce 호출이 있다면 취소
   };
 
   return (
@@ -79,15 +112,35 @@ const FilterPanel = () => {
             ))}
           </div>
 
-          {/* 검색 입력 필드 추가 */}
-          <div className="p-2">
+          <div className="p-2 relative">
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localSearchInput} // localSearchInput 사용
+              onChange={handleSearchInputChange} // 새로운 핸들러 사용
               placeholder="Search by name or description..."
-              className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10"
             />
+            {localSearchInput && ( // localSearchInput을 기준으로 버튼 표시
+              <button
+                onClick={handleClearSearch}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                aria-label="Clear search"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       </div>
