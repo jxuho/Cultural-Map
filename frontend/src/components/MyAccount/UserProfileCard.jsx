@@ -16,13 +16,14 @@ const UserProfileCard = ({ user }) => {
 
   return (
     <div className="max-w-full sm:max-w-xl mx-auto bg-white shadow-lg rounded-lg p-4 sm:p-7 mt-4 sm:mt-6 border border-gray-200">
-      <div className="flex items-center space-x-3 sm:space-x-5 border-b pb-3 sm:pb-5 mb-3 sm:mb-5">
+      <div className="flex flex-wrap items-center space-x-3 sm:space-x-5 border-b pb-3 sm:pb-5 mb-3 sm:mb-5"> {/* Added flex-wrap here */}
         <img
           src={profileImage || defaultProfileImg}
           alt={`${username}'s profile`}
           className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-blue-400 shadow-sm flex-shrink-0"
         />
-        <div>
+        {/* Added a div to contain the text elements, so they wrap together */}
+        <div className="flex-grow min-w-0"> {/* flex-grow allows it to take available space, min-w-0 helps with wrapping long words */}
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1 break-words">
             {username}
           </h2>

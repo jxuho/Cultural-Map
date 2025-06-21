@@ -7,7 +7,7 @@ import {
 } from "../../hooks/useCulturalSitesQueries";
 import ErrorMessage from "../ErrorMessage";
 import StarIcon from "../StarIcon";
-import BackButton from "../BackButton"; 
+import BackButton from "../BackButton";
 
 const FavoriteSites = () => {
   const currentUser = useAuthStore((state) => state.user);
@@ -130,7 +130,7 @@ const FavoriteSites = () => {
                 {site.averageRating !== undefined &&
                   site.averageRating !== null &&
                   site.reviewCount > 0 && (
-                    <div className="flex items-center mb-1">
+                    <div className="flex flex-wrap items-center mb-1"> {/* Added flex-wrap here */}
                       <span className="font-semibold mr-2">Rating:</span>
                       <div className="flex text-yellow-500 text-base mr-2">
                         {[...Array(5)].map((_, i) => (
@@ -216,7 +216,7 @@ const FavoriteSites = () => {
     <div className="p-6 bg-white rounded-lg shadow-md flex flex-col h-full">
       {/* Add BackButton here, usually at the top or next to the title */}
       <div className="flex justify-start mb-4">
-          <BackButton />
+        <BackButton />
       </div>
 
       <div>

@@ -113,7 +113,7 @@ const MyReviews = () => {
                     className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200"
                   />
                 )} */}
-                <p className="font-semibold text-gray-800 mr-2 flex-grow">
+                <p className="font-semibold text-gray-800 mr-2 flex-grow break-all">
                   {review.culturalSite.name || "Unknown"}
                 </p>
                 <div className="flex text-yellow-500 text-sm">
@@ -168,7 +168,6 @@ const MyReviews = () => {
         <BackButton />
       </div>
 
-      {/* 제목 섹션 - Ref 연결 */}
       <div>
         <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3">
           My Reviews

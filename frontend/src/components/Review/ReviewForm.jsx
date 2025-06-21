@@ -25,7 +25,7 @@ const ReviewForm = ({
 
   const handleStarClick = useCallback((clickedIndex) => {
     if (!currentUser) {
-      alert("Please signin to write down a review!");
+      alert("Please sign in to write down a review!");
       return;
     }
     setRating(clickedIndex + 1);
@@ -85,14 +85,14 @@ const ReviewForm = ({
         </h3>
       ) : (
         <h3 className="text-lg font-semibold text-gray-600 mb-3">
-          Please signin to write down a review.
+          Please sign in to write down a review.
         </h3>
       )}
 
       {/* `submitError` prop을 사용하여 에러 메시지 표시 */}
       {submitError && <p className="text-red-600 text-sm mb-3">{submitError}</p>}
 
-      <div className="flex items-center mb-3">
+      <div className="flex flex-wrap items-center mb-3"> {/* Added flex-wrap here */}
         <span className="font-medium text-gray-700 mr-2">Rating:</span>
         <div className="flex">
           {[...Array(5)].map((_, i) => (

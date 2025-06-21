@@ -56,7 +56,7 @@ const UsersManagementPage = () => {
             className="bg-white rounded-lg shadow-md p-4 sm:p-6 flex flex-col" // Adjusted padding for card
           >
             <div className="flex items-center justify-between flex-wrap sm:flex-nowrap gap-4"> {/* Added flex-wrap for smaller screens */}
-              <div className="flex items-center space-x-3 sm:space-x-4 flex-grow"> {/* Adjusted spacing */}
+              <div className="flex items-center space-x-3 sm:space-x-4 flex-grow break-all"> {/* Adjusted spacing */}
                 <img
                   src={user.profileImage || defaultProfileImg}
                   alt={`${user.username}'s profile`}
