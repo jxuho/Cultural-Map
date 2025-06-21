@@ -21,7 +21,9 @@ import {
   rejectProposal,
   deleteMyAccount,
   fetchUserById,
-  fetchAllUsers
+  fetchAllUsers,
+  updateUserRoleApi,
+  fetchMyProposals
 } from '../api/culturalSitesApi'; // API 함수 임포트
 
 // 모든 문화재 목록 가져오기
@@ -313,5 +315,47 @@ export const useAllUsers = () => {
     queryKey: ['users'],
     queryFn: fetchAllUsers,
     staleTime: 1000 * 60 * 5, // 5분 동안 캐싱
+  });
+};
+
+export const useUpdateUserRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, newRole }) => updateUserRoleApi(userId, newRole),
+    onSuccess: (data) => {
+      // Invalidate queries that might be affected by a role change
+      // For example, if you have a list of all users, you'd invalidate that.
+      // You might also want to update a specific user's cache if you're viewing their profile.
+      queryClient.invalidateQueries({ queryKey: ['users'] }); // Assuming you have a 'users' query
+      queryClient.invalidateQueries({ queryKey: ['user', data.data.user._id] }); // Invalidate specific user cache
+
+      console.log('User role updated successfully:', data.message);
+      // You might want to show a success toast/notification here
+    },
+    onError: (error) => {
+      console.error('Error updating user role:', error);
+      // You might want to show an error toast/notification here
+      alert(`역할 변경 실패: ${error}`); // Basic alert for demonstration
+    },
+    // Optional: onSettled runs regardless of success or error
+    // onSettled: (data, error, variables, context) => {
+    //   console.log('Mutation settled');
+    // },
+  });
+};
+
+
+export const useMyProposals = () => {
+  return useQuery({
+    queryKey: ['myProposals'], // 고유한 쿼리 키
+    queryFn: fetchMyProposals,
+    staleTime: 5 * 60 * 1000, // 5분 동안 fresh 상태 유지 (선택 사항)
+    cacheTime: 10 * 60 * 1000, // 10분 동안 캐시 유지 (선택 사항)
+    onError: (error) => {
+      console.error('Failed to fetch my proposals:', error);
+      // 사용자에게 에러 메시지를 표시하는 로직 추가 가능
+    },
+    // select: (data) => data.filter(proposal => proposal.status === 'pending'), // 특정 상태만 필터링하는 예시 (선택 사항)
   });
 };

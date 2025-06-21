@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react"; // Added useMemo
 import { BsStarFill } from "react-icons/bs";
 import useAuthStore from "../../store/authStore";
 import {
@@ -12,6 +12,8 @@ import BackButton from "../BackButton";
 const FavoriteSites = () => {
   const currentUser = useAuthStore((state) => state.user);
   const [expandedSiteId, setExpandedSiteId] = useState(null);
+  const [sortBy, setSortBy] = useState("name"); // Default sort by name
+  const [sortOrder, setSortOrder] = useState("asc"); // Default sort order
 
   const {
     data: myFavorites,
@@ -46,6 +48,62 @@ const FavoriteSites = () => {
 
   const handleSiteClick = (siteId) => {
     setExpandedSiteId((prevId) => (prevId === siteId ? null : siteId));
+  };
+
+  // Memoize the sorted favorite sites list
+  const sortedFavorites = useMemo(() => {
+    if (!myFavorites || myFavorites.length === 0) return [];
+
+    const sortableFavorites = [...myFavorites];
+
+    sortableFavorites.sort((a, b) => {
+      let valA, valB;
+
+      switch (sortBy) {
+        case "name":
+          valA = a.name || "";
+          valB = b.name || "";
+          break;
+        case "averageRating":
+          valA = a.averageRating || 0; // Treat undefined/null as 0 for sorting
+          valB = b.averageRating || 0;
+          break;
+        case "reviewCount":
+          valA = a.reviewCount || 0;
+          valB = b.reviewCount || 0;
+          break;
+        default: // Default to name
+          valA = a.name || "";
+          valB = b.name || "";
+          break;
+      }
+
+      if (typeof valA === "string" && typeof valB === "string") {
+        return sortOrder === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      } else {
+        // For numbers (ratings, review counts)
+        return sortOrder === "asc" ? valA - valB : valB - valA;
+      }
+    });
+    return sortableFavorites;
+  }, [myFavorites, sortBy, sortOrder]); // Re-run memoization when these dependencies change
+
+  const handleSortChange = (criteria) => {
+    if (sortBy === criteria) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc"); // Toggle order if same criteria
+    } else {
+      setSortBy(criteria);
+      setSortOrder("asc"); // Default to ascending for new criteria
+    }
+  };
+
+  const getSortIndicator = (criteria) => {
+    if (sortBy === criteria) {
+      return sortOrder === "asc" ? " ↑" : " ↓";
+    }
+    return "";
   };
 
   // --- Loading/Error/Empty Favorites State Handling ---
@@ -84,11 +142,11 @@ const FavoriteSites = () => {
       );
     }
 
-    if (!myFavorites || myFavorites.length === 0) {
+    if (!sortedFavorites || sortedFavorites.length === 0) { // Check sortedFavorites for empty state
       return (
         <div className="flex-grow flex items-center justify-center flex-col">
           <p className="text-gray-600 text-lg text-center">
-            There's no favorite site.
+            There are no favorite sites.
           </p>
           <p className="text-gray-500 text-sm mt-2 text-center">
             Explore the map and add your favorite sites!
@@ -100,7 +158,7 @@ const FavoriteSites = () => {
     // Actual favorite sites list
     return (
       <ul className="space-y-4">
-        {myFavorites.map((site) => (
+        {sortedFavorites.map((site) => ( // Use sortedFavorites here
           <li
             key={site._id}
             className="flex flex-col bg-gray-50 rounded-lg border border-gray-200 hover:shadow-sm transition-shadow duration-200 overflow-hidden"
@@ -130,7 +188,7 @@ const FavoriteSites = () => {
                 {site.averageRating !== undefined &&
                   site.averageRating !== null &&
                   site.reviewCount > 0 && (
-                    <div className="flex flex-wrap items-center mb-1"> {/* Added flex-wrap here */}
+                    <div className="flex flex-wrap items-center mb-1">
                       <span className="font-semibold mr-2">Rating:</span>
                       <div className="flex text-yellow-500 text-base mr-2">
                         {[...Array(5)].map((_, i) => (
@@ -214,7 +272,6 @@ const FavoriteSites = () => {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md flex flex-col h-full">
-      {/* Add BackButton here, usually at the top or next to the title */}
       <div className="flex justify-start mb-4">
         <BackButton />
       </div>
@@ -224,6 +281,29 @@ const FavoriteSites = () => {
           My Favorites
         </h2>
       </div>
+
+      {/* Sort Buttons for FavoriteSites */}
+      <div className="mb-6 flex flex-wrap gap-2 sm:gap-4 justify-start">
+        <button
+          onClick={() => handleSortChange("name")}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "name" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+        >
+          Sort by Name{getSortIndicator("name")}
+        </button>
+        <button
+          onClick={() => handleSortChange("averageRating")}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "averageRating" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+        >
+          Sort by Average Rating{getSortIndicator("averageRating")}
+        </button>
+        <button
+          onClick={() => handleSortChange("reviewCount")}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "reviewCount" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+        >
+          Sort by Review Count{getSortIndicator("reviewCount")}
+        </button>
+      </div>
+      {/* End Sort Buttons */}
 
       <div
         className="overflow-y-auto pr-2 flex-grow"

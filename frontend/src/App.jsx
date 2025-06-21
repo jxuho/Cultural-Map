@@ -16,6 +16,7 @@ import Proposals from "./components/MyAccount/Proposals";
 import DeleteAccount from "./components/MyAccount/DeleteAccount";
 import ListPage from "./pages/ListPage";
 import UsersManagementPage from "./components/MyAccount/UsersManagementPage";
+import MyProposalsList from "./components/MyAccount/MyProposalsList";
 
 const App = () => {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
@@ -47,6 +48,7 @@ const App = () => {
               <Route path="proposals" element={<Proposals />} />
               <Route path="delete-account" element={<DeleteAccount />} />
               <Route path="users" element={<UsersManagementPage />} />
+              <Route path="my-proposals" element={<MyProposalsList />} />
             </Route>
           </Route>
         </Route>

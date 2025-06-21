@@ -4,13 +4,14 @@ import {
   PiTrashThin,
   PiMapPinLineThin,
   PiChatCircleTextThin,
-  PiClipboardTextThin, 
-  PiUsersThreeThin, 
+  PiClipboardTextThin,
+  PiUsersThreeThin,
+  PiFileTextThin, // 새로운 아이콘 추가: PiFileTextThin
 } from "react-icons/pi";
 import useAuthStore from "../../store/authStore";
 import useUiStore from "../../store/uiStore";
 import defaultProfileImg from "../../assets/profile_image.svg";
-import { Link } from 'react-router'; 
+import { Link } from 'react-router';
 
 const ProfileView = () => {
   const user = useAuthStore((state) => state.user);
@@ -189,6 +190,44 @@ const ProfileView = () => {
         </div>
       </div>
 
+      {/* ✨ NEW: My Proposals Card (Conditionally Rendered for 'user' role) */}
+      {user.role === 'user' && (
+        <div
+          className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
+          style={{
+            boxShadow:
+              "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+          }}
+        >
+          <div className="flex flex-col items-center justify-between h-full mt-4">
+            <div className="flex flex-col items-center">
+              <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
+                My Proposals
+              </div>
+              <PiFileTextThin // 새로운 아이콘 사용
+                className="text-light-text"
+                size={"60px"}
+              />
+              <p className="py-3 text-center">
+                View the proposals you have submitted.
+              </p>
+            </div>
+            <Link
+              className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
+              to="my-proposals" // 백엔드 라우트와 일치하는 프론트엔드 라우트
+            >
+              <span className="uppercase max-[400px]:text-sm" title="view my proposals">
+                View My Proposals
+              </span>
+              <span>
+                <MdKeyboardArrowRight size={"22px"} />
+              </span>
+            </Link>
+          </div>
+        </div>
+      )}
+
+
       {/* Admin: View Proposals Card (Conditionally Rendered) */}
       {user.role === 'admin' && (
         <div
@@ -203,7 +242,7 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 View Proposals
               </div>
-              <PiClipboardTextThin // Using the new icon
+              <PiClipboardTextThin
                 className="text-light-text"
                 size={"60px"}
               />
@@ -213,7 +252,7 @@ const ProfileView = () => {
             </div>
             <Link
               className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
-              to="proposals" // Link to the new proposals route
+              to="proposals"
             >
               <span className="uppercase max-[400px]:text-sm" title="view proposals">
                 View Proposals
@@ -226,7 +265,7 @@ const ProfileView = () => {
         </div>
       )}
 
-      {/* ✨ NEW: Admin: Check Users Card (Conditionally Rendered) */}
+      {/* Admin: Check Users Card (Conditionally Rendered) */}
       {user.role === 'admin' && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
@@ -240,7 +279,7 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 Check Users
               </div>
-              <PiUsersThreeThin // Using the new icon
+              <PiUsersThreeThin
                 className="text-light-text"
                 size={"60px"}
               />
@@ -250,7 +289,7 @@ const ProfileView = () => {
             </div>
             <Link
               className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
-              to="users" // Link to the new users route (e.g., /profile/users)
+              to="users"
             >
               <span className="uppercase max-[400px]:text-sm" title="check users">
                 Check Users

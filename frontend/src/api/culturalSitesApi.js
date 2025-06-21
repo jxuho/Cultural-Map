@@ -308,3 +308,29 @@ export const fetchAllUsers = async () => {
     throw error.response?.data?.message || "Failed to fetch users";
   }
 };
+
+export const updateUserRoleApi = async (userId, newRole) => {
+  try {
+    const response = await axios.patch(`${API_BASE_URL}/users/updateRole/${userId}`, { newRole }, {
+      withCredentials: true, 
+    });
+    return response.data; // Assuming your backend returns { status: 'success', message: ..., data: { user: ... } }
+  } catch (error) {
+    // It's good to re-throw the error so the hook can catch it
+    throw error.response?.data?.message || error.message || 'Failed to update user role.';
+  }
+};
+
+export const fetchMyProposals = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/proposals/my-proposals`,{
+      withCredentials: true, 
+    });
+    console.log(response);
+    
+    return response.data.data.proposals;
+  } catch (error) {
+    console.error('Error fetching my proposals:', error);
+    throw error;
+  }
+};

@@ -1,5 +1,5 @@
 // src/components/Review/MyReview.jsx
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react"; // Added useMemo
 import StarIcon from "../StarIcon";
 import ReviewForm from "../Review/ReviewForm";
 import useAuthStore from "../../store/authStore";
@@ -14,6 +14,8 @@ const MyReviews = () => {
   const currentUser = useAuthStore((state) => state.user);
 
   const [expandedReviewId, setExpandedReviewId] = useState(null);
+  const [sortBy, setSortBy] = useState("createdAt"); // Default sort by creation date
+  const [sortOrder, setSortOrder] = useState("desc"); // Default sort order (most recent first)
 
   const {
     data: reviews = [],
@@ -54,6 +56,59 @@ const MyReviews = () => {
     [reviewMutation, expandedReviewId, reviews]
   );
 
+  // Memoize the sorted reviews list
+  const sortedReviews = useMemo(() => {
+    if (!reviews || reviews.length === 0) return [];
+
+    const sortableReviews = [...reviews];
+
+    sortableReviews.sort((a, b) => {
+      let valA, valB;
+
+      switch (sortBy) {
+        case "culturalSiteName":
+          valA = a.culturalSite?.name || "";
+          valB = b.culturalSite?.name || "";
+          break;
+        case "rating":
+          valA = a.rating;
+          valB = b.rating;
+          break;
+        case "createdAt":
+        default: // Default to createdAt
+          valA = new Date(a.createdAt).getTime();
+          valB = new Date(b.createdAt).getTime();
+          break;
+      }
+
+      if (typeof valA === "string" && typeof valB === "string") {
+        return sortOrder === "asc"
+          ? valA.localeCompare(valB)
+          : valB.localeCompare(valA);
+      } else {
+        // For numbers (ratings, dates converted to timestamps)
+        return sortOrder === "asc" ? valA - valB : valB - valA;
+      }
+    });
+    return sortableReviews;
+  }, [reviews, sortBy, sortOrder]); // Re-run memoization when these dependencies change
+
+  const handleSortChange = (criteria) => {
+    if (sortBy === criteria) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc"); // Toggle order if same criteria
+    } else {
+      setSortBy(criteria);
+      setSortOrder("asc"); // Default to ascending for new criteria
+    }
+  };
+
+  const getSortIndicator = (criteria) => {
+    if (sortBy === criteria) {
+      return sortOrder === "asc" ? " ↑" : " ↓";
+    }
+    return "";
+  };
+
   // --- 로딩/에러/빈 리뷰 상태 처리 ---
   const renderContent = () => {
     if (loadingReviews) {
@@ -69,17 +124,17 @@ const MyReviews = () => {
       return (
         <div className="text-center flex-grow flex items-center justify-center flex-col">
           <p className="text-red-600">
-            An error occured: {reviewsError.message}
+            An error occurred: {reviewsError.message}
           </p>
         </div>
       );
     }
 
-    if (reviews.length === 0) {
+    if (sortedReviews.length === 0) { // Check sortedReviews for empty state
       return (
         <div className="text-center flex-grow flex items-center justify-center flex-col">
           <p className="text-gray-600 text-lg">
-            There's no review
+            There are no reviews.
           </p>
           <p className="text-gray-500 text-sm mt-2">
             Write down your review!
@@ -91,7 +146,7 @@ const MyReviews = () => {
     // 실제 리뷰 목록
     return (
       <div className="space-y-4">
-        {reviews.map((review) => (
+        {sortedReviews.map((review) => ( // Use sortedReviews here
           <div
             key={review._id}
             className="bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-100"
@@ -106,13 +161,6 @@ const MyReviews = () => {
               }
             >
               <div className="flex items-center mb-2">
-                {/* {review.culturalSite.imageUrl && (
-                  <img
-                    src={review.culturalSite.imageUrl}
-                    alt={`${review.culturalSite.name}'s image`}
-                    className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200"
-                  />
-                )} */}
                 <p className="font-semibold text-gray-800 mr-2 flex-grow break-all">
                   {review.culturalSite.name || "Unknown"}
                 </p>
@@ -163,7 +211,6 @@ const MyReviews = () => {
 
   return (
     <div className="p-6 rounded-lg shadow-md flex flex-col h-full">
-      {/* Add BackButton here */}
       <div className="flex justify-start mb-4">
         <BackButton />
       </div>
@@ -173,6 +220,29 @@ const MyReviews = () => {
           My Reviews
         </h2>
       </div>
+
+      {/* Sort Buttons for MyReviews */}
+      <div className="mb-6 flex flex-wrap gap-2 sm:gap-4 justify-start">
+        <button
+          onClick={() => handleSortChange("createdAt")}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "createdAt" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+        >
+          Sort by Date{getSortIndicator("createdAt")}
+        </button>
+        <button
+          onClick={() => handleSortChange("rating")}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "rating" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+        >
+          Sort by Rating{getSortIndicator("rating")}
+        </button>
+        <button
+          onClick={() => handleSortChange("culturalSiteName")}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "culturalSiteName" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"}`}
+        >
+          Sort by Site Name{getSortIndicator("culturalSiteName")}
+        </button>
+      </div>
+      {/* End Sort Buttons */}
 
       <div
         className="overflow-y-auto pr-2 flex-grow"

@@ -1,6 +1,10 @@
 import defaultProfileImg from "../../assets/profile_image.svg";
+import useUiStore from "../../store/uiStore";
+import { ChangeRoleModalContent } from "./ChangeRoleModalContent"; // We'll create this next
 
 const UserProfileCard = ({ user }) => {
+  const { openModal } = useUiStore();
+
   const {
     username = "N/A",
     email = "N/A",
@@ -14,16 +18,20 @@ const UserProfileCard = ({ user }) => {
     __v,
   } = user;
 
+  const handleRoleClick = () => {
+    // Open the modal with the ChangeRoleModalContent component
+    openModal(<ChangeRoleModalContent user={user} />);
+  };
+
   return (
     <div className="max-w-full sm:max-w-xl mx-auto bg-white shadow-lg rounded-lg p-4 sm:p-7 mt-4 sm:mt-6 border border-gray-200">
-      <div className="flex flex-wrap items-center space-x-3 sm:space-x-5 border-b pb-3 sm:pb-5 mb-3 sm:mb-5"> {/* Added flex-wrap here */}
+      <div className="flex flex-wrap items-center space-x-3 sm:space-x-5 border-b pb-3 sm:pb-5 mb-3 sm:mb-5">
         <img
           src={profileImage || defaultProfileImg}
           alt={`${username}'s profile`}
           className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-blue-400 shadow-sm flex-shrink-0"
         />
-        {/* Added a div to contain the text elements, so they wrap together */}
-        <div className="flex-grow min-w-0"> {/* flex-grow allows it to take available space, min-w-0 helps with wrapping long words */}
+        <div className="flex-grow min-w-0">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1 break-words">
             {username}
           </h2>
@@ -45,7 +53,13 @@ const UserProfileCard = ({ user }) => {
         <div className="space-y-1.5 sm:space-y-2 text-sm sm:text-md text-gray-700">
           <p>
             <strong>Role: </strong>
-            <span className="capitalize text-blue-600 font-medium">{role}</span>
+            {/* Make the role text clickable */}
+            <span
+              className="capitalize text-blue-600 font-medium cursor-pointer hover:underline"
+              onClick={handleRoleClick}
+            >
+              {role}
+            </span>
           </p>
           <p>
             <strong>Status: </strong>
@@ -57,7 +71,6 @@ const UserProfileCard = ({ user }) => {
           </p>
           <p>
             <strong>Registered On: </strong>
-
             {createdAt
               ? new Date(createdAt).toLocaleDateString("en-US", {
                   year: "numeric",
