@@ -22,6 +22,8 @@ router.get('/me', userController.getMe);
 router.patch('/updateMe', userController.updateMe);
 // 계정 삭제
 router.delete('/deleteMe', userController.deleteMe);
+// 사용자 정보 가지고오기
+router.get('/:userId', userController.getUserById)
 
 
 

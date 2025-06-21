@@ -155,6 +155,26 @@ const deleteMe = asyncHandler(async (req, res, next) => {
     }
 });
 
+// 사용자 가지고 오기(GET /api/v1/users/:userId)
+const getUserById = asyncHandler(async (req, res, next) => {
+    const { userId } = req.params;
+
+    // 원하는 필드만 선택
+    const user = await User.findById(userId).select('_id username email profileImage bio');
+
+    if (!user) {
+        return next(new AppError('해당 ID를 가진 사용자를 찾을 수 없습니다.', 404));
+    }
+
+    res.status(200).json({
+        status: 'success',
+        data: {
+            user
+        }
+    });
+});
+
+
 
 
 
@@ -450,6 +470,7 @@ module.exports = {
     getMe,
     updateMe,
     deleteMe,
+    getUserById,
     addFavoriteSite,
     removeFavoriteSite,
     getFavoriteSites,
