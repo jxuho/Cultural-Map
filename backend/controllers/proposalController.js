@@ -428,7 +428,26 @@ const createProposal = asyncHandler(async (req, res, next) => {
     });
 });
 
+// user 본인이 작성한 proposals 가지고오기
+const getProposalsByUserId = asyncHandler(async (req, res, next) => {
+    const userId = req.user.id; // 현재 로그인한 사용자의 ID를 가져옵니다.
 
+    const proposals = await Proposal.find({ proposedBy: userId })
+        .populate('culturalSite', 'name description category address website imageUrl openingHours') // 관련 문화유산 정보 포함
+        .populate('proposedBy', 'name email') // 제안한 사용자 정보 포함
+        .sort('-createdAt'); // 최신순으로 정렬
+
+    res.status(200).json({
+        status: 'success',
+        results: proposals.length,
+        data: {
+            proposals
+        }
+    });
+});
+
+
+// 모든 proposals 조회
 const getAllProposals = asyncHandler(async (req, res, next) => {
     // 쿼리 파라미터로 필터링 (선택 사항: status, type 등)
     const filter = {};
@@ -613,6 +632,7 @@ const rejectProposal = asyncHandler(async (req, res, next) => {
 
 module.exports = {
     createProposal,
+    getProposalsByUserId,
     getAllProposals,
     getProposalById,
     acceptProposal,

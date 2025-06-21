@@ -105,31 +105,33 @@ const logout = (req, res) => {
 
 // Admin only: Change user roles
 const updateUserRole = asyncHandler(async (req, res, next) => {
-    // This function should be protected by restrictTo('admin') on the route
     const { userId } = req.params;
     const { newRole } = req.body;
 
-    if (!['user', 'admin'].includes(newRole)) { // Allow 'admin' as a possible new role for flexibility
-        return next(new AppError('유효하지 않은 역할입니다. user, admin 중 하나를 선택해주세요.', 400));
+    // 1. Prevent self role update
+    if (req.user.id === userId) {
+        return next(new AppError('You cannot change yourself.', 403));
     }
 
+    // 2. Validate new role
+    if (!['user', 'admin'].includes(newRole)) {
+        return next(new AppError('Not valid. please choose one of user, admin', 400));
+    }
+
+    // 3. Find user to update
     const user = await User.findById(userId);
-
     if (!user) {
-        return next(new AppError('해당 ID를 가진 사용자가 없습니다.', 404));
+        return next(new AppError('There is no user who has the id.', 404));
     }
 
+    // 4. Update role
     user.role = newRole;
-    // Set validateBeforeSave to false if you are not updating password fields
-    // This prevents triggering pre-save hooks related to password hashing if unnecessary.
     await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
         status: 'success',
-        message: `사용자 ${user.username}의 역할이 ${newRole}으로 변경되었습니다.`,
-        data: {
-            user
-        }
+        message: `User ${user.username} role changed into ${newRole}.`,
+        data: { user }
     });
 });
 

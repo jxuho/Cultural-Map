@@ -9,6 +9,8 @@ const router = express.Router();
 router.use(authController.protect);
 
 
+router.get('/my-proposals', proposalController.getProposalsByUserId)
+
 // create, update, delete 제안 등록
 // POST /api/v1/proposals
 router.route('/')

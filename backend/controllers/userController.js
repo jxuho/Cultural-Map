@@ -174,7 +174,18 @@ const getUserById = asyncHandler(async (req, res, next) => {
     });
 });
 
+// 모든 사용자 목록 조회 (GET /api/v1/users)
+const getAllUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find();
 
+  res.status(200).json({
+    status: 'success',
+    results: users.length,
+    data: {
+      users
+    }
+  });
+});
 
 
 
@@ -471,6 +482,7 @@ module.exports = {
     updateMe,
     deleteMe,
     getUserById,
+    getAllUsers,
     addFavoriteSite,
     removeFavoriteSite,
     getFavoriteSites,

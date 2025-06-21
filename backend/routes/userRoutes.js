@@ -23,8 +23,9 @@ router.patch('/updateMe', userController.updateMe);
 // 계정 삭제
 router.delete('/deleteMe', userController.deleteMe);
 // 사용자 정보 가지고오기
-router.get('/:userId', userController.getUserById)
-
+router.get('/:userId', userController.getUserById);
+// 모든 사용자 정보 가지고오기
+router.get('/', authController.restrictTo('admin'), userController.getAllUsers);
 
 
 // 즐겨찾기 조회 (사용자 프로필에서 즐겨찾기 목록을 볼 때)
