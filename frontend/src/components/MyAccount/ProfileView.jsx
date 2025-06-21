@@ -11,7 +11,7 @@ import {
 import useAuthStore from "../../store/authStore";
 import useUiStore from "../../store/uiStore";
 import defaultProfileImg from "../../assets/profile_image.svg";
-import { Link } from 'react-router';
+import { Link } from "react-router";
 
 const ProfileView = () => {
   const user = useAuthStore((state) => state.user);
@@ -77,10 +77,18 @@ const ProfileView = () => {
               {user.username ?? user.email}
             </div>
             <div className="font-normal mb-2">{user.email}</div>
+            {user.bio && (
+              <div className="text-center text-gray-600 mt-4 px-2 text-sm italic">
+                <p>{user.bio}</p>
+              </div>
+            )}
           </div>
         </div>
 
-        <button onClick={signOutHandler} className="flex justify-center border-t pt-3 font-medium border-bg-border text-chemnitz-blue hover:cursor-pointer hover:underline">
+        <button
+          onClick={signOutHandler}
+          className="flex justify-center border-t pt-3 font-medium border-bg-border text-chemnitz-blue hover:cursor-pointer hover:underline"
+        >
           Sign out
         </button>
       </div>
@@ -110,7 +118,10 @@ const ProfileView = () => {
             className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
             to="update-profile"
           >
-            <span className="uppercase max-[400px]:text-sm" title="update profile">
+            <span
+              className="uppercase max-[400px]:text-sm"
+              title="update profile"
+            >
               Update Profile
             </span>
             <span>
@@ -145,7 +156,10 @@ const ProfileView = () => {
             className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
             to="favorite-sites"
           >
-            <span className="uppercase max-[400px]:text-sm" title="go to favorites">
+            <span
+              className="uppercase max-[400px]:text-sm"
+              title="go to favorites"
+            >
               Go to favorites
             </span>
             <span>
@@ -165,22 +179,23 @@ const ProfileView = () => {
       >
         <div className="flex flex-col items-center justify-between h-full mt-4">
           <div className="flex flex-col items-center">
-            <div className="text-2xl font-normal pb-4 max-[400px]:text-lg" >
+            <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
               Reviews
             </div>
             <PiChatCircleTextThin
               className="text-light-text scale-x-[-1]"
               size={"60px"}
             />
-            <p className="py-3 text-center">
-              Check your reviews
-            </p>
+            <p className="py-3 text-center">Check your reviews</p>
           </div>
           <Link
             className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
             to="reviews"
           >
-            <span className="uppercase max-[400px]:text-sm" title="check reviews">
+            <span
+              className="uppercase max-[400px]:text-sm"
+              title="check reviews"
+            >
               Check reviews
             </span>
             <span>
@@ -191,7 +206,7 @@ const ProfileView = () => {
       </div>
 
       {/* ✨ NEW: My Proposals Card (Conditionally Rendered for 'user' role) */}
-      {user.role === 'user' && (
+      {user.role === "user" && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
           style={{
@@ -216,7 +231,10 @@ const ProfileView = () => {
               className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
               to="my-proposals" // 백엔드 라우트와 일치하는 프론트엔드 라우트
             >
-              <span className="uppercase max-[400px]:text-sm" title="view my proposals">
+              <span
+                className="uppercase max-[400px]:text-sm"
+                title="view my proposals"
+              >
                 View My Proposals
               </span>
               <span>
@@ -227,9 +245,8 @@ const ProfileView = () => {
         </div>
       )}
 
-
       {/* Admin: View Proposals Card (Conditionally Rendered) */}
-      {user.role === 'admin' && (
+      {user.role === "admin" && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
           style={{
@@ -242,10 +259,7 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 View Proposals
               </div>
-              <PiClipboardTextThin
-                className="text-light-text"
-                size={"60px"}
-              />
+              <PiClipboardTextThin className="text-light-text" size={"60px"} />
               <p className="py-3 text-center">
                 Review and manage user-submitted proposals.
               </p>
@@ -254,7 +268,10 @@ const ProfileView = () => {
               className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
               to="proposals"
             >
-              <span className="uppercase max-[400px]:text-sm" title="view proposals">
+              <span
+                className="uppercase max-[400px]:text-sm"
+                title="view proposals"
+              >
                 View Proposals
               </span>
               <span>
@@ -266,7 +283,7 @@ const ProfileView = () => {
       )}
 
       {/* Admin: Check Users Card (Conditionally Rendered) */}
-      {user.role === 'admin' && (
+      {user.role === "admin" && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
           style={{
@@ -279,10 +296,7 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 Check Users
               </div>
-              <PiUsersThreeThin
-                className="text-light-text"
-                size={"60px"}
-              />
+              <PiUsersThreeThin className="text-light-text" size={"60px"} />
               <p className="py-3 text-center">
                 View and manage all registered users.
               </p>
@@ -291,7 +305,10 @@ const ProfileView = () => {
               className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
               to="users"
             >
-              <span className="uppercase max-[400px]:text-sm" title="check users">
+              <span
+                className="uppercase max-[400px]:text-sm"
+                title="check users"
+              >
                 Check Users
               </span>
               <span>
@@ -328,11 +345,14 @@ const ProfileView = () => {
             className="font-medium text-alert-error flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t "
             to="delete-account"
           >
-            <span className="uppercase max-[400px]:text-xs" title="delete account">
+            <span
+              className="uppercase max-[400px]:text-xs"
+              title="delete account"
+            >
               Delete Account
             </span>
             <span>
-                <MdKeyboardArrowRight size={"22px"} />
+              <MdKeyboardArrowRight size={"22px"} />
             </span>
           </Link>
         </div>

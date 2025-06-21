@@ -3,10 +3,11 @@ import { useState } from "react";
 import L from "leaflet";
 import { MdMyLocation } from "react-icons/md";
 
-const CurrentLocationButton = () => {
+const CurrentLocationButton = ({ maxBounds }) => {
   const map = useMap();
   const [locMarker, setLocMarker] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLocationOutsideBounds, setIsLocationOutsideBounds] = useState(false);
 
   const handleClick = () => {
     if (!navigator.geolocation) {
@@ -15,10 +16,23 @@ const CurrentLocationButton = () => {
     }
 
     setIsLoading(true);
+    setIsLocationOutsideBounds(false); // Reset the flag on new attempt
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const currentLatLng = L.latLng(latitude, longitude);
+
+        const bounds = L.latLngBounds(maxBounds[0], maxBounds[1]);
+
+        if (!bounds.contains(currentLatLng)) {
+          setIsLocationOutsideBounds(true);
+          alert(
+            "Your current location is outside the map's allowed boundaries."
+          );
+          setIsLoading(false);
+          return;
+        }
 
         map.setView([latitude, longitude], 16);
 
@@ -33,8 +47,9 @@ const CurrentLocationButton = () => {
         setLocMarker(marker);
         setIsLoading(false);
       },
-      () => {
-        alert("Failed to get your location.");
+      (error) => {
+        console.error("Error getting current location:", error);
+        alert("Failed to get your location. Please ensure location services are enabled.");
         setIsLoading(false);
       },
       {
@@ -48,7 +63,7 @@ const CurrentLocationButton = () => {
   return (
     <button
       onClick={handleClick}
-      disabled={isLoading}
+      disabled={isLoading || isLocationOutsideBounds}
       className="absolute bottom-4 right-4 z-[1000] bg-white shadow px-3 py-2 rounded text-sm cursor-pointer flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
     >
       {isLoading ? (
@@ -74,6 +89,11 @@ const CurrentLocationButton = () => {
             />
           </svg>
           Checking Location...
+        </>
+      ) : isLocationOutsideBounds ? (
+        <>
+          <MdMyLocation className="text-lg" />
+          Out of Bounds
         </>
       ) : (
         <>

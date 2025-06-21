@@ -78,8 +78,15 @@ const AccountManager = () => {
           {isAuthenticated ? (
             <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[1fr_3fr] leading-normal items-stretch h-full text-black">
               <div className="col-start-1 col-end-2 self-center text-sm px-4">
-                Welcome!
+                {user.role === 'admin' ? (
+                  <span className="bg-chemnitz-blue text-white px-2 py-1 rounded-md font-bold text-xs shadow-md">
+                    ADMIN ACCOUNT
+                  </span>
+                ) : (
+                  "Welcome!"
+                )}
               </div>
+
               <div className="col-start-1 col-end-4 min-h-[132px self-center] flex">
                 <div className="w-20 h-20 m-5  overflow-hidden rounded-full">
                   {user.profileImage ? (

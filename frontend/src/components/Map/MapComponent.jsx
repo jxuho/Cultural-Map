@@ -154,6 +154,10 @@ const MapComponent = () => {
   }
 
   const initialPosition = [50.8303, 12.91895]; // Chemnitz Lat, Lng
+  const mapMaxBounds = [
+    [50.7, 12.7],
+    [50.95, 13.1],
+  ];
 
   return (
     <div className="h-full w-full relative">
@@ -161,10 +165,7 @@ const MapComponent = () => {
         center={initialPosition}
         zoom={14}
         minZoom={13}
-        maxBounds={[
-          [50.7, 12.7],
-          [50.95, 13.1],
-        ]}
+        maxBounds={mapMaxBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
         className="h-full w-full z-0"
@@ -173,7 +174,7 @@ const MapComponent = () => {
         }}
         zoomControl={false}
       >
-        <CurrentLocationButton />
+        <CurrentLocationButton maxBounds={mapMaxBounds} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -192,163 +193,3 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
-
-// import React, { useRef, useMemo, useEffect } from "react";
-// import {
-//   MapContainer,
-//   TileLayer,
-//   Marker, // Marker는 이제 selectedPlace를 위한 별도 렌더링에 사용하지 않습니다.
-//   ZoomControl,
-//   useMapEvents,
-// } from "react-leaflet";
-// import "leaflet/dist/leaflet.css";
-
-// import L from "leaflet";
-
-// import "leaflet.markercluster/dist/MarkerCluster.css";
-// import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-
-// import useFilterStore from "../../store/filterStore";
-// import useUiStore from "../../store/uiStore";
-
-// import { useAllCulturalSites } from "../../hooks/useCulturalSitesQueries";
-// import CurrentLocationButton from "./CurrentLocationButton";
-
-// // ReactDOMServer와 FaMapMarkerAlt는 이제 MapComponent에서 필요 없습니다.
-// // import ReactDOMServer from 'react-dom/server';
-// // import { FaMapMarkerAlt } from 'react-icons/fa';
-
-// import CulturalSiteMarkers from "./CulturalSiteMarkers";
-
-// // MapEventsHandler 컴포넌트 (동일)
-// const MapEventsHandler = () => {
-//   const openContextMenu = useUiStore((state) => state.openContextMenu);
-//   const setSelectedLatLng = useUiStore((state) => state.setSelectedLatLng);
-//   useMapEvents({
-//     contextmenu: (e) => {
-//       console.log(e.latlng);
-//       e.originalEvent.preventDefault();
-//       openContextMenu();
-//       setSelectedLatLng(e.latlng);
-//     },
-//   });
-//   return null;
-// };
-
-// // Selected Place를 위한 별도의 빨간색 마커 아이콘 생성 함수는 더 이상 필요 없습니다.
-// // const createSelectedPlaceIcon = () => { /* ... */ };
-
-// // MapComponent
-// const MapComponent = () => {
-//   const mapRef = useRef(null);
-
-//   const openSidePanel = useUiStore((state) => state.openSidePanel);
-//   const selectedCategories = useFilterStore(
-//     (state) => state.selectedCategories
-//   );
-//   const selectedPlace = useUiStore((state) => state.selectedPlace);
-
-//   const jumpToPlace = useUiStore((state) => state.jumpToPlace);
-//   const clearJumpToPlace = useUiStore((state) => state.clearJumpToPlace);
-
-//   const {
-//     data: culturalSites = [],
-//     isLoading,
-//     isError,
-//     error,
-//   } = useAllCulturalSites();
-
-//   // console.log("MapComponent 재렌더링됨");
-
-//   const memoizedFilteredSites = useMemo(() => {
-//     // console.log("filteredSites 재계산됨");
-//     return culturalSites.filter((site) => {
-//       if (selectedCategories.length === 0) {
-//         return true;
-//       }
-//       return selectedCategories.includes(site.category);
-//     });
-//   }, [culturalSites, selectedCategories]);
-
-//   useEffect(() => {
-//     if (jumpToPlace && mapRef.current) {
-//       console.log("trigger");
-
-//       const lat = jumpToPlace.location.coordinates[1];
-//       const lng = jumpToPlace.location.coordinates[0];
-//       mapRef.current.setView([lat, lng], 18); // 원하는 zoom 값으로 설정
-//       clearJumpToPlace(); // 한 번만 실행되도록 플래그 클리어
-//     }
-//   }, [jumpToPlace, clearJumpToPlace]);
-
-//   if (isLoading) {
-//     return (
-//       <div className="h-full w-full flex items-center justify-center text-gray-600">
-//         Loading the Map...
-//       </div>
-//     );
-//   }
-
-//   if (isError) {
-//     return (
-//       <div className="h-full w-full flex items-center justify-center text-red-600">
-//         Failed to load map data: {error.message}
-//       </div>
-//     );
-//   }
-
-//   const initialPosition = [50.8303, 12.91895]; // Chemnitz Lat, Lng
-
-//   return (
-//     <div className="h-full w-full relative">
-//       <MapContainer
-//         center={initialPosition}
-//         zoom={14}
-//         minZoom={13}
-//         maxBounds={[
-//           [50.7, 12.7],
-//           [50.95, 13.1],
-//         ]}
-//         maxBoundsViscosity={1.0}
-//         scrollWheelZoom={true}
-//         className="h-full w-full z-0"
-//         whenCreated={(mapInstance) => {
-//           mapRef.current = mapInstance;
-//         }}
-//         zoomControl={false}
-//       >
-//         <CurrentLocationButton />
-//         <TileLayer
-//           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-//           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-//         />
-//         <ZoomControl position="bottomleft" />
-//         <MapEventsHandler />
-
-//         {/* CulturalSiteMarkers에 selectedPlace를 prop으로 전달 */}
-//         <CulturalSiteMarkers
-//           sites={memoizedFilteredSites}
-//           openSidePanel={openSidePanel}
-//           selectedPlace={selectedPlace} // 이 부분 추가
-//         />
-
-//         {/* selectedPlace가 있을 경우 빨간색 마커 렌더링 부분 제거 */}
-//         {/* {selectedPlace && (
-//                     <Marker
-//                         position={[
-//                             selectedPlace.location.coordinates[1],
-//                             selectedPlace.location.coordinates[0],
-//                         ]}
-//                         icon={createSelectedPlaceIcon()}
-//                         zIndexOffset={1000}
-//                         eventHandlers={{
-//                             click: () => openSidePanel(selectedPlace),
-//                         }}
-//                     />
-//                 )} */}
-//       </MapContainer>
-//     </div>
-//   );
-// };
-
-// export default MapComponent;
