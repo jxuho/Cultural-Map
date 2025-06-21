@@ -7,11 +7,10 @@ import useAuthStore from "../../store/authStore";
 import { useCallback } from "react";
 import {
   useCulturalSiteDetail,
-  useFavoriteMutation,
-  useMyFavorites,
-  usePlaceReviews,
-  useReviewMutation,
 } from "../../hooks/useCulturalSitesQueries";
+import {  useFavoriteMutation,
+  useMyFavorites} from "../../hooks/useFavoriteQuery"
+import { usePlaceReviews, useReviewMutation } from "../../hooks/useReviewQueries";
 import useUiStore from "../../store/uiStore";
 import ErrorMessage from "../ErrorMessage"; // ErrorDisplay 대신 ErrorMessage 사용
 

@@ -7,7 +7,7 @@ import useAuthStore from "../../store/authStore";
 import {
   useMyReviews,
   useReviewMutation,
-} from "../../hooks/useCulturalSitesQueries";
+} from "../../hooks/useReviewQueries";
 import BackButton from "../BackButton";
 
 const MyReviews = () => {

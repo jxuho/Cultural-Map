@@ -1,4 +1,4 @@
-import { useAllUsers } from "../../hooks/useCulturalSitesQueries";
+import { useAllUsers } from "../../hooks/useUserQueries";
 import defaultProfileImg from "../../assets/profile_image.svg";
 import UserProfileCard from "./UserProfileCard";
 import { useState, useMemo } from "react"; // Added useMemo

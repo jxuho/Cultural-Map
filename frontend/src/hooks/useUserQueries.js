@@ -1,5 +1,5 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateProfileApi } from '../api/userApi'; 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { deleteMyAccount, fetchAllUsers, fetchUserById, updateProfileApi, updateUserRoleApi } from '../api/userApi'; 
 
 // 프로필 업데이트를 위한 useMutation 훅
 export const useUpdateProfile = () => {
@@ -24,4 +24,77 @@ export const useUpdateProfile = () => {
             throw error; // 컴포넌트에서 에러를 catch할 수 있도록 다시 던집니다.
         },
     });
+};
+
+
+export const useDeleteMyAccount = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: deleteMyAccount,
+    onSuccess: (data) => {
+      console.log("Account deleted successfully!", data);
+      // Invalidate all queries related to the user, as their data is no longer valid.
+      // This is a broad invalidation, consider more specific ones if needed.
+      queryClient.invalidateQueries({ queryKey: ['myReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['myFavorites'] });
+      queryClient.invalidateQueries({ queryKey: ['userProfile'] }); // Assuming you have a user profile query
+
+      alert("Your account has been successfully deleted.");
+
+      // After successful deletion, you might want to redirect the user
+      // For example, to the logout page or home page.
+      // import { useNavigate } from 'react-router-dom';
+      // const navigate = useNavigate();
+      // navigate('/logout'); or navigate('/');
+    },
+    onError: (error) => {
+      console.error("Error deleting account:", error);
+      alert(`Failed to delete account: ${error.message || "Unknown error"}`);
+    },
+  });
+};
+
+// 특정 사용자 정보를 가져오는 훅 (ex. 프로필 조회용)
+export const useUserById = (userId) => {
+  return useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUserById(userId),
+    enabled: !!userId, // userId가 존재할 때만 실행
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐싱
+  });
+};
+
+export const useAllUsers = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: fetchAllUsers,
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐싱
+  });
+};
+
+export const useUpdateUserRole = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, newRole }) => updateUserRoleApi(userId, newRole),
+    onSuccess: (data) => {
+      // Invalidate queries that might be affected by a role change
+      // For example, if you have a list of all users, you'd invalidate that.
+      // You might also want to update a specific user's cache if you're viewing their profile.
+      queryClient.invalidateQueries({ queryKey: ['users'] }); // Assuming you have a 'users' query
+      queryClient.invalidateQueries({ queryKey: ['user', data.data.user._id] }); // Invalidate specific user cache
+
+      console.log('User role updated successfully:', data.message);
+      // You might want to show a success toast/notification here
+    },
+    onError: (error) => {
+      console.error('Error updating user role:', error);
+      // You might want to show an error toast/notification here
+      alert(`Failed to change the role: ${error}`); // Basic alert for demonstration
+    },
+    // Optional: onSettled runs regardless of success or error
+    // onSettled: (data, error, variables, context) => {
+    //   console.log('Mutation settled');
+    // },
+  });
 };

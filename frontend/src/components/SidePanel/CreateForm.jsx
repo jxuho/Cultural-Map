@@ -4,9 +4,9 @@ import useUiStore from "../../store/uiStore";
 // useAuthStore를 임포트하여 사용자의 역할을 가져옵니다.
 import useAuthStore from "../../store/authStore";
 import {
-  useSubmitProposal,
   useCreateCulturalSite,
 } from "../../hooks/useCulturalSitesQueries";
+import { useSubmitProposal } from "../../hooks/useProposalQuery";
 import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
 
 const CreateForm = () => {

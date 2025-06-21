@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import useUiStore from "../../store/uiStore";
 import useAuthStore from "../../store/authStore";
 import {
-  useSubmitProposal,
   useUpdateCulturalSite,
 } from "../../hooks/useCulturalSitesQueries";
+import { useSubmitProposal } from "../../hooks/useProposalQuery";
 import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
 
 const UpdateForm = () => {

@@ -1,5 +1,5 @@
 import defaultProfileImg from "../../assets/profile_image.svg"; // Adjust path as needed
-import { useUserById } from "../../hooks/useCulturalSitesQueries";
+import { useUserById } from "../../hooks/useUserQueries";
 import useUiStore from "../../store/uiStore";
 import { FaArrowLeft } from 'react-icons/fa';
 

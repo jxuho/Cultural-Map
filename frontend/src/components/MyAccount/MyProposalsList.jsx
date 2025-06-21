@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useMyProposals } from "../../hooks/useCulturalSitesQueries";
+import { useMyProposals } from "../../hooks/useProposalQuery";
 import BackButton from "../BackButton";
 
 const MyProposalsList = () => {
