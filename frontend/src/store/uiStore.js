@@ -22,6 +22,10 @@ const useUiStore = create(devtools((set) => ({
   openSidePanel: (placeInfo) => set({ isSidePanelOpen: true, selectedPlace: placeInfo }),
   closeSidePanel: () => set({ isSidePanelOpen: false, selectedPlace: null }),
   clearSelectedPlace: () => set({ selectedPlace: null }),
+  isUserProfileOpen: false,
+  userProfileId: null,
+  openUserProfile: (userId) => set({isUserProfileOpen: true, userProfileId: userId}),
+  closeUserProfile: () => set({isUserProfileOpen: false, userProfileId: null}),
 
 
   // context menu
@@ -77,6 +81,8 @@ const useUiStore = create(devtools((set) => ({
       createFormData: null,
       isUpdateFormOpen: false,
       updateFormData: null,
+      isUserProfileOpen: false,
+      userProfileId: null
     });
     if (queryKeyToCancel) {
       console.log(`Cancelling query with key: ${queryKeyToCancel}`);

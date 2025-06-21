@@ -275,3 +275,23 @@ export const deleteMyAccount = async () => {
     throw error.response?.data?.message || 'Failed to delete account';
   }
 };
+
+export const fetchUserById = async (userId) => {
+  if (!userId) {
+    const error = new Error("User ID is required to fetch user data.");
+    console.error(error.message);
+    throw error;
+  }
+
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/${userId}`, {
+      withCredentials: true, 
+    });
+
+    // 원하는 필드만 전달된다고 가정: _id, username, email, profileImage, bio
+    return response.data.data.user || null;
+  } catch (error) {
+    console.error(`Error fetching user by ID ${userId}:`, error);
+    throw error.response?.data?.message || 'Failed to fetch user';
+  }
+};

@@ -15,7 +15,8 @@ const SidePanelButtons = () => {
     isCreateFormOpen,
     isUpdateFormOpen,
     selectedPlace: uiSelectedPlace, // Use a distinct name to avoid confusion with selectedPlaceData
-    handleCloseAndCancel // Action from store
+    handleCloseAndCancel, // Action from store
+    isUserProfileOpen
   } = useUiStore();
 
   const deleteCulturalSiteMutation = useDeleteCulturalSite();
@@ -90,7 +91,7 @@ const SidePanelButtons = () => {
   };
 
   // Only show these buttons if no form (create/update) is open
-  const showButtons = selectedPlaceData && !isCreateFormOpen && !isUpdateFormOpen;
+  const showButtons = selectedPlaceData && !isCreateFormOpen && !isUpdateFormOpen && !isUserProfileOpen;
 
   if (!showButtons) {
     return null;

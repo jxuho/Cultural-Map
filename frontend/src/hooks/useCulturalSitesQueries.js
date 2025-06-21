@@ -19,7 +19,8 @@ import {
   fetchAllProposals,
   acceptProposal,
   rejectProposal,
-  deleteMyAccount
+  deleteMyAccount,
+  fetchUserById
 } from '../api/culturalSitesApi'; // API 함수 임포트
 
 // 모든 문화재 목록 가져오기
@@ -293,5 +294,15 @@ export const useDeleteMyAccount = () => {
       console.error("Error deleting account:", error);
       alert(`Failed to delete account: ${error.message || "Unknown error"}`);
     },
+  });
+};
+
+// 특정 사용자 정보를 가져오는 훅 (ex. 프로필 조회용)
+export const useUserById = (userId) => {
+  return useQuery({
+    queryKey: ['user', userId],
+    queryFn: () => fetchUserById(userId),
+    enabled: !!userId, // userId가 존재할 때만 실행
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐싱
   });
 };

@@ -9,6 +9,7 @@ import NearbySitesList from "./NearbySitesList";
 import SidePanelItems from "./SidePanelItems";
 import CreateForm from "./CreateForm";
 import UpdateForm from "./UpdateForm";
+import UserProfileDisplay from './UserProfileDisplay';
 
 const SidePanelContent = () => {
   // Directly access UI state from store
@@ -19,6 +20,7 @@ const SidePanelContent = () => {
   const nearbySitesError = useUiStore((state) => state.nearbySitesError);
   const uiSelectedPlace = useUiStore((state) => state.selectedPlace);
   const handleCloseAndCancel = useUiStore((state) => state.handleCloseAndCancel); // Action from store
+  const isUserProfileOpen = useUiStore(state => state.isUserProfileOpen)
 
   // Local state for reviews expansion
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
@@ -37,7 +39,13 @@ const SidePanelContent = () => {
     panelContent = <CreateForm />;
   } else if (isUpdateFormOpen) {
     panelContent = <UpdateForm />;
-  } else if (nearbySitesLoading) {
+  } 
+
+   else if (isUserProfileOpen) { // ✨ Handle User Profile display first
+    panelContent = <UserProfileDisplay />;
+  } 
+
+  else if (nearbySitesLoading) {
     panelContent = (
       <SidePanelSkeleton onClose={() => handleCloseAndCancel("nearbyOsm")} />
     );

@@ -1,15 +1,24 @@
-import StarIcon from '../StarIcon';
+import StarIcon from "../StarIcon";
+import useUiStore from "../../store/uiStore"; // Import useUiStore
 
 const ReviewDisplay = ({ reviews, currentUser }) => {
-  // ReviewDisplay는 이제 로딩과 에러 상태를 직접 처리하지 않습니다.
-  // 이 상태들은 상위 컴포넌트(SidePanelItems)에서 이미 관리되고 있습니다.
+  const openUserProfile = useUiStore((state) => state.openUserProfile);
 
-  // 리뷰가 없는 경우 메시지 분기 처리
+  // Handler for clicking on user info
+  const handleUserClick = (user) => {
+    console.log('trigger');
+    
+    openUserProfile(user._id);
+  };
+
   if (reviews.length === 0) {
     if (currentUser) {
-      return <p className="text-gray-600 text-center py-4">No reviews from the other users.</p>;
+      return (
+        <p className="text-gray-600 text-center py-4">
+          No reviews from the other users.
+        </p>
+      );
     } else {
-      // 이 경우는 ReviewForm이 표시되지 않을 때만 발생합니다.
       return <p className="text-gray-600 text-center py-4">No reviews yet.</p>;
     }
   }
@@ -22,14 +31,20 @@ const ReviewDisplay = ({ reviews, currentUser }) => {
           className="bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-100"
         >
           <div className="flex items-center mb-2">
+            {/* Make profile image clickable */}
             {review.user?.profileImage && (
               <img
                 src={review.user.profileImage}
                 alt={`${review.user.username}'s profile`}
-                className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200"
+                className="w-8 h-8 rounded-full object-cover mr-2 border border-gray-200 cursor-pointer"
+                onClick={() => handleUserClick(review.user)} // Add onClick
               />
             )}
-            <p className="font-semibold text-gray-800 mr-2 flex-grow">
+            {/* Make username clickable */}
+            <p
+              className="font-semibold text-gray-800 mr-2 flex-grow cursor-pointer hover:underline" // Add cursor-pointer and hover:underline
+              onClick={() => handleUserClick(review.user)} // Add onClick
+            >
               {review.user?.username || "Unknown user"}
             </p>
             <div className="flex text-yellow-500 text-sm">
@@ -45,19 +60,14 @@ const ReviewDisplay = ({ reviews, currentUser }) => {
             </div>
           </div>
           {review.comment && (
-            <p className="text-gray-700 text-sm italic">
-              "{review.comment}"
-            </p>
+            <p className="text-gray-700 text-sm italic">"{review.comment}"</p>
           )}
           <p className="text-gray-500 text-xs mt-2 text-right">
-            {new Date(review.createdAt).toLocaleDateString(
-              "en-US",
-              {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              }
-            )}
+            {new Date(review.createdAt).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
           </p>
         </div>
       ))}
