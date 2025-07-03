@@ -29,7 +29,7 @@ const loadChemnitzBoundary = () => {
             }
         } catch (error) {
             console.error('Error loading Chemnitz boundary GeoJSON:', error);
-            throw new Error('Chemnitz 시 경계 정보를 로드하는 데 실패했습니다.');
+            throw new Error('Failed to load Chemnitz boundary data.');
         }
     }
 };

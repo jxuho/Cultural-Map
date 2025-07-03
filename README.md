@@ -1,13 +1,13 @@
 # How to initialize Database and Application
 
-### 1. Create `.env` file at `/backend`
+### 1. Create `.env` file at `/backend` directory
 
 ##### .env example
 
 ```
 MONGO_URI=mongodb+srv://id:password@cluster0.ssh0lrs.mongodb.net/dbw
-GOOGLE_CLIENT_ID=12345678900-examplevalue.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-Gm2r-examplevalue
+GOOGLE_CLIENT_ID=12345678900-EXAMPLE_VALUE.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-Gm2r-EXAMPLE_VALUE
 
 PORT=5000
 GOOGLE_CALLBACK_URL=/api/v1/auth/google/callback
@@ -18,10 +18,21 @@ NODE_ENV=dev
 ```
 ##### **Note**
 - `MONGO_URI`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` must be changed to own value.
-- You need to configure MongoDB to get the `MONGO_URI`.
-- To obtain `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, you need to access https://console.cloud.google.com/ and configure OAuth.
+- To obtain the `MONGO_URI`, you need to configure MongoDB
+    - Given that MongoDB transactions are being utilized, in a local environment, it is necessary to configure your MongoDB instance as a replica set. Or opt for a cloud-hosted MongoDB service such as MongoDB Atlas (**recommended**).
 
-### 2. Initialize the Database
+- To obtain `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, you need to access https://console.cloud.google.com/ and create OAuth 2.0 client in a project.
+    - The authorized JavaScript origin should be set to http://localhost:3000 (set in `/frontend/vite.config.js`), and the authorized redirect URI should be http://localhost:5000/api/v1/auth/google/callback (set in `/backend/.env` PORT and GOOGLE_CALLBACK_URL).
+    - If you change the URIs above, you need to be careful about dependencies.
+
+### 2. Install Packages
+
+1. Move to `/frontend` 
+2. Run `npm install`
+3. Move to `/backend`
+4. Run `npm install`
+
+### 3. Initialize the Database
 
 A script to initialize the database is located in the source code.
 The explanation below assumes use of a CLI and assumes a MongoDB database exist.
@@ -29,7 +40,6 @@ The explanation below assumes use of a CLI and assumes a MongoDB database exist.
 1.  Move to `/backend`
 
 2.  Run `node scripts/fetchAndSaveCulturalSites.js`
-
     - This script fetch cultural site data from Overpass API.
     - Data will be saved in `/backend/data`
 
@@ -40,14 +50,9 @@ The explanation below assumes use of a CLI and assumes a MongoDB database exist.
     importGeojson.js basically performs reverse-geocoding using the Nominatim API for any of the hundreds of items in the geojson that do not have an addr tag specified. This process can take several minutes.
     This process had to be done because the address field in culturalSiteSchema (/backend/models/CulturalSite.js) was set to `required: true`.
     However, for faster database setup, `required: true` is currently commented out.
-    For faster database setup, you can run `node scrips/importGeojson.js --no-reverse-geocode`. This script loads the geojson file into the database without performing reverse geocoding.
+    For faster database setup, you can run `node scripts/importGeojson.js --no-reverse-geocode`. This script loads the geojson file into the database without performing reverse geocoding.
 
-### 3. Install Packages
 
-1. Move to `/frontend` 
-2. Run `npm install`
-3. Move to `/backend`
-4. Run `npm install`
 
 ### 4. Run Servers
 1. Move to `/frontend` 
