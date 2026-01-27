@@ -10,22 +10,50 @@ const signToken = (id) => {
     });
 };
 
-// JWT를 쿠키에 담아 전송하는 함수
+// // JWT를 쿠키에 담아 전송하는 함수
+// const createSendToken = (user, statusCode, res) => { 
+//     const token = signToken(user._id); // signToken 함수는 정의되어 있어야 합니다.
+
+//     const cookieOptions = {
+//         expires: new Date(
+//             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+//         ),
+//         httpOnly: true,
+//         secure: process.env.NODE_ENV === 'production', // 운영 환경에서는 true, 개발 환경에서는 false 또는 환경 변수 사용
+//         sameSite: 'Lax', // 이전에 확인한 쿠키의 sameSite와 일치해야 합니다.
+//         path: '/'
+//     };
+
+//     res.cookie('jwt', token, cookieOptions);
+// };
 const createSendToken = (user, statusCode, res) => { 
-    const token = signToken(user._id); // signToken 함수는 정의되어 있어야 합니다.
+    const token = signToken(user._id);
+
+    const isProduction = process.env.NODE_ENV === 'production';
 
     const cookieOptions = {
         expires: new Date(
             Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
         ),
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production', // 운영 환경에서는 true, 개발 환경에서는 false 또는 환경 변수 사용
-        sameSite: 'Lax', // 이전에 확인한 쿠키의 sameSite와 일치해야 합니다.
+        // 1. 배포 환경에서는 반드시 true여야 합니다. (Render는 HTTPS를 제공함)
+        secure: isProduction || res.req.headers['x-forwarded-proto'] === 'https',
+        // 2. 크로스 도메인 간 쿠키 전송을 위해 'none'으로 설정합니다.
+        sameSite: isProduction ? 'none' : 'Lax', 
         path: '/'
     };
 
     res.cookie('jwt', token, cookieOptions);
+    
+    // 응답 보내는 부분도 잊지 마세요!
+    res.status(statusCode).json({
+        status: 'success',
+        token,
+        data: { user }
+    });
 };
+
+
 
 // Google OAuth 콜백 처리
 const googleAuthCallback = asyncHandler(async (req, res, next) => {
