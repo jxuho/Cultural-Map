@@ -1,18 +1,11 @@
 import axios, { AxiosError } from "axios";
 import { User } from "../types/user";
+import { ApiResponse } from "@/types/api";
 
 const API_BASE_URL = import.meta.env.PROD
   ? "https://chemnitz-cultural-sites-map.onrender.com/api/v1"
   : "http://localhost:5000/api/v1";
 
-// 공통 응답 구조 정의 (백엔드 JSend 규격 반영)
-interface ApiResponse<T> {
-  status: string;
-  message?: string;
-  data: {
-    user: T;
-  };
-}
 
 interface AllUsersResponse {
   status: string;

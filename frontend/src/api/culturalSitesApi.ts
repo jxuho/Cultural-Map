@@ -1,15 +1,11 @@
 import axios, { AxiosError } from 'axios';
 import { Place } from '../types/place';
+import { ApiResponse } from '@/types/api';
 
 const API_BASE_URL = import.meta.env.PROD 
   ? "https://chemnitz-cultural-sites-map.onrender.com/api/v1" 
   : "http://localhost:5000/api/v1";
 
-// JSend 규격에 맞춘 공통 응답 인터페이스
-interface ApiResponse<T> {
-  status: string;
-  data: T;
-}
 
 // 1. 모든 문화재 정보를 가져오는 함수
 export const fetchAllCulturalSites = async (params: Record<string, any> = {}): Promise<Place[]> => {
