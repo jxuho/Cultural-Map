@@ -1,9 +1,20 @@
-// src/store/filterStore.js
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-// 필터 및 정렬 관련 상태를 관리하는 스토어 생성
-const useFilterStore = create(devtools((set) => ({
+
+interface FilterState {
+  selectedCategories: string[];
+  searchQuery: string;
+  sortBy: 'alphabetical' | 'favorites' | 'reviews'; 
+  
+  toggleCategory: (category: string) => void;
+  setSearchQuery: (query: string) => void;
+  setSortBy: (sortOption: 'alphabetical' | 'favorites' | 'reviews') => void;
+  resetFilters: () => void;
+}
+
+// Create a store to manage filter and sort-related state
+const useFilterStore = create<FilterState>()(devtools((set) => ({
   selectedCategories: [],
   searchQuery: '',
   sortBy: 'alphabetical', 

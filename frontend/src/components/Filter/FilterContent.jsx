@@ -1,6 +1,6 @@
 // src/components/Filter/FilterContent.jsx
 import React, { useMemo } from "react";
-import useFilterStore from "../../store/filterStore";
+import useFilterStore from "../../store/filterStore.ts";
 import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
 import debounce from "lodash.debounce";
 import { categoryBorderColors } from "../../config/colors";

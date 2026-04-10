@@ -12,7 +12,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 
-import useFilterStore from "../../store/filterStore";
+import useFilterStore from "../../store/filterStore.ts";
 import useUiStore from "../../store/uiStore";
 
 import { useAllCulturalSites } from "../../hooks/data/useCulturalSitesQueries";
