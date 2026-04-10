@@ -1,19 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import axios from "axios";
-
-export interface User {
-  _id: string;
-  username?: string;
-  email: string;
-  googleId: string;
-  profileImage?: string;
-  role: "user" | "admin";
-  bio?: string;
-  favoriteSites: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { User } from "@/types/user";
 
 interface AuthState {
   user: User | null;
