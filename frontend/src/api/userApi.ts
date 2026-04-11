@@ -1,12 +1,9 @@
-import axios, { AxiosError } from "axios";
+import axiosInstance from "./axiosInstance";
 import { User } from "../types/user";
 import { ApiResponse } from "@/types/api";
+import { AxiosError } from "axios";
 
-const API_BASE_URL = import.meta.env.PROD
-  ? "https://chemnitz-cultural-sites-map.onrender.com/api/v1"
-  : "http://localhost:5000/api/v1";
-
-
+// interface for the response of fetching all users (Admin only)
 interface AllUsersResponse {
   status: string;
   results: number;
@@ -15,15 +12,16 @@ interface AllUsersResponse {
   };
 }
 
-// 사용자 프로필 업데이트 함수
+/**
+ * update user profile information (user only)
+ */
 export const updateProfileApi = async (
   updateData: Partial<User>,
 ): Promise<ApiResponse<User>> => {
   try {
-    const response = await axios.patch<ApiResponse<User>>(
-      `${API_BASE_URL}/users/updateMe`,
-      updateData,
-      { withCredentials: true },
+    const response = await axiosInstance.patch<ApiResponse<User>>(
+      "/users/updateMe",
+      updateData
     );
     return response.data;
   } catch (error) {
@@ -35,14 +33,16 @@ export const updateProfileApi = async (
   }
 };
 
+/**
+ * delete my account (user only)
+ */
 export const deleteMyAccount = async (): Promise<{
   status: string;
   message: string;
 }> => {
   try {
-    const response = await axios.delete<{ status: string; message: string }>(
-      `${API_BASE_URL}/users/deleteMe`,
-      { withCredentials: true },
+    const response = await axiosInstance.delete<{ status: string; message: string }>(
+      "/users/deleteMe"
     );
     return response.data;
   } catch (error) {
@@ -51,29 +51,29 @@ export const deleteMyAccount = async (): Promise<{
   }
 };
 
+/**
+ * fetch user information by user ID 
+ */
 export const fetchUserById = async (userId: string): Promise<User | null> => {
-  if (!userId) {
-    throw new Error("User ID is required to fetch user data.");
-  }
+  if (!userId) throw new Error("User ID is required.");
 
   try {
-    const response = await axios.get<ApiResponse<User>>(
-      `${API_BASE_URL}/users/${userId}`,
-      { withCredentials: true },
+    const response = await axiosInstance.get<ApiResponse<User>>(
+      `/users/${userId}`
     );
-    return response.data.data.user || null;
+    return response.data.data || null; 
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
     throw err.response?.data?.message || "Failed to fetch user";
   }
 };
 
+/**
+ * fetch all users (Admin only)
+ */
 export const fetchAllUsers = async (): Promise<User[]> => {
   try {
-    const response = await axios.get<AllUsersResponse>(
-      `${API_BASE_URL}/users`,
-      { withCredentials: true },
-    );
+    const response = await axiosInstance.get<AllUsersResponse>("/users");
     return response.data.data.users;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -81,15 +81,17 @@ export const fetchAllUsers = async (): Promise<User[]> => {
   }
 };
 
+/**
+ * update user role (Admin only)
+ */
 export const updateUserRoleApi = async (
   userId: string,
   newRole: "user" | "admin",
 ): Promise<ApiResponse<User>> => {
   try {
-    const response = await axios.patch<ApiResponse<User>>(
-      `${API_BASE_URL}/users/updateRole/${userId}`,
-      { newRole },
-      { withCredentials: true },
+    const response = await axiosInstance.patch<ApiResponse<User>>(
+      `/users/updateRole/${userId}`,
+      { newRole }
     );
     return response.data;
   } catch (error) {
