@@ -1,4 +1,3 @@
-// frontend/pages/NotFoundPage.jsx
 import { Link } from 'react-router';
 
 const NotFoundPage = () => {

@@ -1,17 +1,13 @@
-import googleImg from '../assets/googleLogo.png'
-
+import googleImg from '../assets/googleLogo.png';
+import apiClient from '../api/axiosInstance';
 
 const SignInPage = () => {
-
-
-const API_BASE_URL = import.meta.env.PROD 
-  ? "https://chemnitz-cultural-sites-map.onrender.com/api/v1" 
-  : "http://localhost:5000/api/v1";
+  
   const handleGoogleLogin = () => {
-  // 이미 위에서 정의한 API_BASE_URL을 사용합니다.
-  // API_BASE_URL이 "https://.../api/v1"이므로 뒤에 "/auth/google"만 붙여주면 됩니다.
-  window.location.replace(`${API_BASE_URL}/auth/google`);
-};
+    const googleLoginUrl = `${apiClient.defaults.baseURL}/auth/google`;
+    
+    window.location.replace(googleLoginUrl);
+  };
 
   return (
     <div className="absolute h-full w-full flex flex-col items-center justify-center bg-background ">
@@ -53,9 +49,6 @@ const API_BASE_URL = import.meta.env.PROD
             </button>
           </div>
         </div>
-
-
-
       </div>
     </div>
   );
