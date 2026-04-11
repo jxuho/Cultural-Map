@@ -17,19 +17,16 @@ interface AllUsersResponse {
  */
 export const updateProfileApi = async (
   updateData: Partial<User>,
-): Promise<ApiResponse<User>> => {
+): Promise<ApiResponse<{ user: User }>> => { 
   try {
-    const response = await axiosInstance.patch<ApiResponse<User>>(
+    const response = await axiosInstance.patch<ApiResponse<{ user: User }>>(
       "/users/updateMe",
       updateData
     );
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    throw (
-      err.response?.data?.message ||
-      "Failed to update profile. Please try again."
-    );
+    throw err.response?.data?.message || "Failed to update profile.";
   }
 };
 
@@ -87,9 +84,9 @@ export const fetchAllUsers = async (): Promise<User[]> => {
 export const updateUserRoleApi = async (
   userId: string,
   newRole: "user" | "admin",
-): Promise<ApiResponse<User>> => {
+): Promise<ApiResponse<{ user: User }>> => {
   try {
-    const response = await axiosInstance.patch<ApiResponse<User>>(
+    const response = await axiosInstance.patch<ApiResponse<{ user: User }>>(
       `/users/updateRole/${userId}`,
       { newRole }
     );
