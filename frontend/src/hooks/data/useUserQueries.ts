@@ -15,7 +15,7 @@ import { ApiResponse } from '@/types/api';
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient(); 
 
-  // useMutation<데이터타입, 에러타입, 변수타입>
+  // useMutation<return, error, mutation variables>
   return useMutation<ApiResponse<{ user: User }>, Error, Partial<User>>({
     mutationFn: updateProfileApi, 
     onSuccess: (response) => {

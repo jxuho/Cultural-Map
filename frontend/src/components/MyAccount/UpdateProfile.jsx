@@ -25,8 +25,8 @@ const UpdateProfile = () => {
         showNameMessage: false,
         showBioMessage: false,
         changeSuccess: false,
-        apiError: false, // ✨ API 오류 상태 추가
-        apiErrorMessage: "", // ✨ API 오류 메시지 추가
+        apiError: false, 
+        apiErrorMessage: "", 
     });
 
     // useUpdateProfile 훅 사용
@@ -126,7 +126,7 @@ const UpdateProfile = () => {
         }
 
         try {
-            // useMutation 훅을 통해 mutate 함수 호출
+            // useMutation 훅을 통해 mutate 함수 호출 
             const data = await updateProfileMutation.mutateAsync(updateData);
             updateUser(data.data.user); // Zustand 스토어 업데이트
             setShowMessage((prevState) => ({ ...prevState, changeSuccess: true, apiError: false }));
