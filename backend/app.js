@@ -74,9 +74,8 @@ app.use(cors({
   credentials: true
 }));
 app.use(cookieParser())
-// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(`${__dirname}/public`));
 app.use(passport.initialize());
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -92,16 +91,9 @@ app.use('/api/v1/proposals', proposalRoutes);
 const swaggerDocument = YAML.load(path.join(__dirname, 'public/openapi.yaml'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// app.get('/', (req, res) => {
-//   res.send('Message from the server: Server is Running!');
-// });
-app.use('/api', (req, res, next) => {
-  next(new AppError(`API endpoint ${req.originalUrl} not found`, 404));
+app.get('/', (req, res) => {
+  res.send('Message from the server: Server is Running!');
 });
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
-
 
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
