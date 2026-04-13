@@ -74,8 +74,9 @@ app.use(cors({
   credentials: true
 }));
 app.use(cookieParser())
-app.use(express.static(`${__dirname}/public`));
+// app.use(express.static(`${__dirname}/public`));
 app.use(passport.initialize());
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
@@ -91,9 +92,16 @@ app.use('/api/v1/proposals', proposalRoutes);
 const swaggerDocument = YAML.load(path.join(__dirname, 'public/openapi.yaml'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.get('/', (req, res) => {
-  res.send('Message from the server: Server is Running!');
+// app.get('/', (req, res) => {
+//   res.send('Message from the server: Server is Running!');
+// });
+app.use('/api', (req, res, next) => {
+  next(new AppError(`API endpoint ${req.originalUrl} not found`, 404));
 });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
+
 
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
@@ -116,20 +124,20 @@ mongoose.connect(MONGO_URI)
       // process.exit(1); // 치명적인 오류로 간주하고 앱 종료
     }
 
-    // // cron 스케줄러 실행
-    // cron.schedule('0 0 * * 0', async () => {
-    //   console.log('weekly Overpass data update task started...');
-    //   try {
-    //     await overpassUpdater();
-    //     console.log('weekly Overpass data update task completed successfully.');
-    //   } catch (error) {
-    //     console.error('Error during weekly Overpass data update task:', error);
-    //   }
-    // }, {
-    //   scheduled: true, // 스케줄을 즉시 활성화합니다.
-    //   timezone: "Europe/Berlin" // Chemnitz는 베를린 시간대이므로 명시적으로 지정합니다. 필요에 따라 변경.
-    // });
-    // console.log('Overpass data update scheduled for every Sunday 00:00.');
+    // cron 스케줄러 실행
+    cron.schedule('0 0 * * 0', async () => {
+      console.log('weekly Overpass data update task started...');
+      try {
+        await overpassUpdater();
+        console.log('weekly Overpass data update task completed successfully.');
+      } catch (error) {
+        console.error('Error during weekly Overpass data update task:', error);
+      }
+    }, {
+      scheduled: true, // 스케줄을 즉시 활성화합니다.
+      timezone: "Europe/Berlin" // Chemnitz는 베를린 시간대이므로 명시적으로 지정합니다. 필요에 따라 변경.
+    });
+    console.log('Overpass data update scheduled for every Sunday 00:00.');
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
