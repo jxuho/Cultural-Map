@@ -69,6 +69,7 @@ const protect = asyncHandler(async (req, res, next) => {
     let token;
 
     // Check if token exists in cookies (Priority 1)
+    //: req.cookies.jwt를 먼저 확인하는 것은 보안상 매우 좋은 선택입니다. 만약 해당 쿠키가 HttpOnly와 Secure 옵션으로 설정되어 있다면, XSS(교차 사이트 스크립팅) 공격으로부터 토큰을 안전하게 보호할 수 있다.
     if (req.cookies && req.cookies.jwt) {
         token = req.cookies.jwt;
     } 
