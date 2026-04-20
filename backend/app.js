@@ -59,7 +59,8 @@ app.use('/api', limiter); // /api로 시작하는 모든 라우트에 적용
 const allowedOrigins = [
   'https://chemnitz-cultural-sites.onrender.com',
   'http://localhost:5173', // Vite 기본 포트
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'https://cultural-heritage-map.vercel.app'
 ];
 
 app.use(express.json());
