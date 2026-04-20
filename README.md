@@ -91,7 +91,7 @@ Started as a university assignment but significantly extended beyond course requ
 - 🔄 **TypeScript Migration:** 60% complete - converting React components and Express routes for type safety and scalability
 - 🌍 **Berlin Support:** Extending geospatial architecture to support multiple German cities
 
-- 
+
 ---
 ## 🎯 Key Technical Learnings
 
