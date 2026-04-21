@@ -1,90 +1,152 @@
-### **Live Demo:** [Click here](https://chemnitz-cultural-sites.onrender.com/)
-> ⚠️ **Note:** The server is hosted on Render's free tier and may take **up to 1 minute to wake up** on the first load.
+# 🏛️ Cultural Heritage Map
 
+[![Vercel](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://cultural-heritage-map.vercel.app/)
+[![Render](https://img.shields.io/badge/Backend-Render-blue?style=for-the-badge&logo=render)](https://cultural-heritage-map.onrender.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-🚧 Ongoing Progress:
-Currently migrating the entire codebase to TypeScript and adding Berlin data support in the feature/typescript-migration branch.
+Discover and explore Chemnitz's cultural heritage sites with an interactive map. Built as a full-stack web application with user authentication, admin workflows(RBAC), and real-time data integration.
 
+---
+### 🔗 **[Live Demo](https://cultural-heritage-map.vercel.app/)**
 
-
-# How to initialize Database and Application
-
-### 1. Create `.env` file at `/backend` directory
-
-##### .env example
-
-```
-MONGO_URI=mongodb+srv://id:password@cluster0.ssh0lrs.mongodb.net/dbw
-GOOGLE_CLIENT_ID=12345678900-EXAMPLE_VALUE.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOCSPX-Gm2r-EXAMPLE_VALUE
-
-PORT=5000
-GOOGLE_CALLBACK_URL=/api/v1/auth/google/callback
-JWT_SECRET=your_jwt_secret_key_here
-JWT_EXPIRES_IN=90d
-JWT_COOKIE_EXPIRES_IN=90
-NODE_ENV=dev
-```
-##### **Note**
-- `MONGO_URI`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` must be changed to own value.
-- To obtain the `MONGO_URI`, you need to configure MongoDB
-    - Given that MongoDB transactions are being utilized, in a local environment, it is necessary to configure your MongoDB instance as a replica set. Or opt for a cloud-hosted MongoDB service such as MongoDB Atlas (**recommended**).
-
-- To obtain `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`, you need to access https://console.cloud.google.com/ and create OAuth 2.0 client in a project.
-    - The authorized JavaScript origin should be set to http://localhost:3000 (set in `/frontend/vite.config.js`), and the authorized redirect URI should be http://localhost:5000/api/v1/auth/google/callback (set in `/backend/.env` PORT and GOOGLE_CALLBACK_URL).
-    - If you change the URIs above, you need to be careful about dependencies.
-
-### 2. Install Packages
-
-1. Move to `/frontend` 
-2. Run `npm install`
-3. Move to `/backend`
-4. Run `npm install`
-
-### 3. Initialize the Database
-
-A script to initialize the database is located in the source code.
-The explanation below assumes use of a CLI and assumes a MongoDB database exist.
-
-1.  Move to `/backend`
-
-2.  Run `node scripts/fetchAndSaveCulturalSites.js`
-    - This script fetch cultural site data from Overpass API.
-    - Data will be saved in `/backend/data`
-
-3.  Run `node scripts/importGeojson.js --no-reverse-geocode` 
-    - This script import the newest `chemnitz_cultural_sites_[time].geojson` saved in `/backend/data` and convert it into CulturalSite schema, and load it into the database.
-    - Check culturalsites collection in your database.
-        
-    ##### **Note**
-    importGeojson.js basically performs reverse-geocoding using the Nominatim API for any of the hundreds of items in the geojson that do not have an addr tag specified. This process can take several minutes.
-    This process had to be done because the address field in culturalSiteSchema (`/backend/models/CulturalSite.js`) was set to `required: true`.
-    However, for faster database setup, `required: true` is currently commented out.
-    To perform reverse geocoding, you can run `node scripts/importGeojson.js`. This script loads the geojson file into the database with performing reverse geocoding, and this is the original logic of the app.
-
-
-
-### 4. Run Servers
-1. Move to `/frontend` 
-2. Run `npm run dev`
-3. Open a New Terminal
-4. Move to `/backend`
-5. Run `npm start`
-
-### 5. Access to the Browser
-1. Open a Browser
-2. Enter http://localhost:3000/ in the address bar.
-
-    ##### **Note**
-    When initially signing up via Google OAuth, the role is defaulted to 'user'. However, for a smoother functional review, it was temporarily set to 'admin'.
-    (`/backend/models/User.js` 'role' field default value was set to 'admin' currently.)
-    Since the app behaves differently when the role is 'user' and when it is 'admin' (my-account page, proposals), the case when the role is 'user' should also be checked. 
-    To do this, the role can be changed in another account with the role set to 'admin' to 'user' at http://localhost:3000/my-account/users, but there's simpler way to change the value of the role field in the database users collection to 'user' manually.
-    
-
+> ⚠️ **Note:** The backend is hosted on Render's free tier. If the site is idle, the server "sleeps." Please allow **30–60 seconds** for the initial load while the backend wakes up.
 
 ---
 
-# OpenAPI Specification
-- The OpenAPI Specification is located at `/backend/public/openapi.yaml`.
-- Since it is hosted in the backend by the swagger-ui-express library, you can access the OpenAPI document via http://localhost:5000/api-docs/.
+### Main Map View
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/c0940d74-3b77-4aca-adc2-e4e600b030be" /> 
+<br>
+<br>
+<br>
+<br>
+<details>
+<summary><b>📸 More Screenshots</b></summary>  
+  
+**Admin Dashboard**
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/f3827a95-f97f-44f8-8a46-b5e98e4f492e" />
+
+**User Management Panel (admin)**
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/ad95fb98-3b79-4b38-a7ef-06033aa58650" /> 
+
+**User Dashboard**
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/56fd43b2-ac40-40cc-b5a1-f2fc0c1cf25b" />
+
+**Suggest New Place (user)**
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/dc83060b-02a3-4361-8d20-e8a3fde27294" />
+<img width="960" height="540" alt="image" src="https://github.com/user-attachments/assets/50b90ace-81ab-4281-a7c5-5c3c2f6f2b0c" />
+
+**Manage Suggestion (admin)**
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/76b314c1-c88e-4d16-bd4d-55d5e4db3656" />
+
+
+**Mobile View**
+<img width="390" height="420" alt="image" src="https://github.com/user-attachments/assets/42141d64-9d47-468c-8573-254adbafca14" />
+
+</details>
+
+<br>
+<br>
+
+---
+
+## ✨ Key Features
+
+* 🗺️ **Explore Cultural Heritage** - Discover 500+ historic sites in Chemnitz with interactive mapping and real-time data from OpenStreetMap
+* 🔐 **Role-Based Access Control** - Different permissions for users and administrators to manage content safely
+* 👤 **Social Authentication** - Quick login with Google OAuth 2.0, no password needed
+* 📱 **Fully Responsive** - Works seamlessly on mobile, tablet, and desktop devices
+* ✅ **Auto-Updated Data** - Weekly automatic sync with OpenStreetMap keeps information current
+* 🎯 **Admin Dashboard** - Manage users, review proposals, and moderate site submissions
+
+---
+
+## 🛠️ Tech Stack
+
+### **Frontend**
+- React 18, Vite, TypeScript, TanStack Query, Zustand, Tailwind CSS, Leaflet
+
+### **Backend**
+- Node.js, Express, MongoDB Atlas, Passport.js (JWT + OAuth 2.0)
+
+### **Deployment**
+- Frontend: Vercel | Backend: Render | Database: MongoDB Atlas
+
+---
+## 📚 Project Context
+
+**TU Chemnitz "Datenbanken und Web-Techniken" Coursework (Grade: 1.0)** 
+
+Started as a university assignment but significantly extended beyond course requirements with:
+- **RBAC Implementation** - Multi-role permission system for users and administrators
+- **Production Deployment** - Full-stack setup with Vercel (Frontend) + Render (Backend)
+- **API Documentation** - OpenAPI/Swagger specification for all endpoints
+- **Advanced Authentication** - Secure JWT + OAuth 2.0 integration with httpOnly cookies
+- **Geospatial Integration** - Real-time data sync from Overpass API with batch processing
+- **Database Design** - MongoDB replica sets for transaction support in concurrent workflows
+
+---
+## 🚧 Current Development
+
+- 🔄 **TypeScript Migration:** 60% complete - converting React components and Express routes for type safety and scalability
+- 🌍 **Berlin Support:** Extending geospatial architecture to support multiple German cities
+
+
+---
+## 🎯 Key Technical Learnings
+
+- **GIS & Mapping:** Integrated Overpass API and Leaflet for efficient geospatial data handling
+- **Authentication:** Implemented JWT + OAuth 2.0 flow with security best practices (httpOnly cookies)
+- **Full-Stack Architecture:** Designed decoupled frontend/backend deployment for optimal user experience
+- **Database Design:** Used MongoDB replica sets for transaction support in multi-user workflows
+- **DevOps:** Automated data sync with cron jobs and implemented production monitoring
+
+---
+
+## 💻 Local Development
+
+<details>
+<summary>Click to expand setup instructions</summary>
+
+### 1. Environment Variables
+Create a `.env` file in the `/backend` directory:
+```env
+MONGO_URI=your_mongodb_atlas_uri
+GOOGLE_CLIENT_ID=your_id
+GOOGLE_CLIENT_SECRET=your_secret
+GOOGLE_CALLBACK_URL=/api/v1/auth/google/callback
+JWT_SECRET=your_jwt_secret
+PORT=5000
+NODE_ENV=dev
+```
+
+### 2. Installation
+```
+# Install frontend dependencies
+cd frontend && npm install
+
+# Install backend dependencies
+cd backend && npm install
+```
+
+### 3. Initialize Database
+```
+cd backend
+# Fetch data from Overpass API
+node scripts/fetchAndSaveCulturalSites.js
+# Import to MongoDB
+node scripts/importGeojson.js --no-reverse-geocode
+```
+### 4. Run Servers
+```
+# Frontend
+cd frontend && npm run dev (Runs on http://localhost:3000)
+
+# Backend
+cd backend && npm start (Runs on http://localhost:5000)
+```
+</details>
+
+## 📄 API Specification
+- **Interactive API Docs:** [Swagger UI](https://cultural-heritage-map.onrender.com/api-docs/)
+- **OpenAPI Spec:** Available at `/api-docs/` endpoint
