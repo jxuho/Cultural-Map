@@ -49,7 +49,7 @@ const ProfileView = () => {
     <div className="m-6 grid gap-12 grid-cols-1 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 xl:grid-cols-4">
       {/* Profile Card */}
       <div
-        className="min-[640px]:h-[600px] row-span-2 flex flex-col justify-between max-w-xs p-4 bg-white rounded"
+        className="min-[640px]:h-150 row-span-2 flex flex-col justify-between max-w-xs p-4 bg-white rounded"
         style={{
           boxShadow:
             "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",

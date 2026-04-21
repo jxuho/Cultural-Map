@@ -3,8 +3,8 @@ export type ProposalStatus = 'pending' | 'accepted' | 'rejected';
 
 export interface Proposal {
   _id: string;
-  culturalSite?: string; // create일 때는 없을 수 있음
-  proposedBy: string;    // User ID
+  culturalSite?: any; // create일 때는 없을 수 있음
+  proposedBy: any;    // User ID
   proposalType: ProposalType;
   
   // Mixed 타입을 위한 정의: 상황에 따라 다른 구조를 가짐

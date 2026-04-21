@@ -1,6 +1,6 @@
 export interface Review {
   _id: string;
-  culturalSite: string; // 혹은 populate 시 Place 객체
+  culturalSite: any; // 혹은 populate 시 Place 객체
   user: {
     _id: string;
     username: string;

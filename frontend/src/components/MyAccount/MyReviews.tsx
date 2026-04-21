@@ -1,9 +1,7 @@
-// src/components/Review/MyReview.jsx
 import { useState, useCallback, useMemo } from "react";
 import StarIcon from "../StarIcon";
 import ReviewForm from "../Review/ReviewForm";
 import useAuthStore from "../../store/authStore";
-// Import custom TanStack Query hooks
 import {
   useMyReviews,
   useReviewMutation,
@@ -13,25 +11,32 @@ import BackButton from "../BackButton";
 const MyReviews = () => {
   const currentUser = useAuthStore((state) => state.user);
 
-  const [expandedReviewId, setExpandedReviewId] = useState(null);
-  const [sortBy, setSortBy] = useState("createdAt"); // Default sort by creation date
-  const [sortOrder, setSortOrder] = useState("desc"); // Default sort order (most recent first)
+  const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<
+    "createdAt" | "culturalSiteName" | "rating"
+  >("createdAt"); // Default sort by creation date
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc"); // Default sort order (most recent first)
 
   const {
     data: reviews = [],
     isLoading: loadingReviews,
     isError: reviewFetchError,
     error: reviewsError,
-  } = useMyReviews(); 
-  
+  } = useMyReviews();
+
   const reviewMutation = useReviewMutation(); // Call the custom hook
 
   const handleReviewActionCompleted = useCallback(
-    async (actionType, newRating, comment) => {
+    async (
+      actionType: "create" | "update" | "delete",
+      newRating: number | null,
+      oldRating: number | null,
+      comment?: string,
+    ) => {
       // Find the current review being acted upon to get its culturalSite._id
       const targetReview = reviews.find((r) => r._id === expandedReviewId);
       const placeIdForAction = targetReview?.culturalSite._id;
-      const reviewIdForAction = expandedReviewId;
+      const reviewIdForAction = expandedReviewId ?? undefined;
 
       if (!placeIdForAction) {
         alert("Can't get cultural site data.");
@@ -45,13 +50,13 @@ const MyReviews = () => {
         reviewData:
           actionType === "delete"
             ? undefined
-            : { rating: newRating, comment: comment },
+            : { rating: newRating ?? 0, comment: comment ?? "" },
       });
 
       // This state update should remain in the component, not in the generic hook
       setExpandedReviewId(null); // Close the form on successful review action
     },
-    [reviewMutation, expandedReviewId, reviews]
+    [reviewMutation, expandedReviewId, reviews],
   );
 
   // Memoize the sorted reviews list
@@ -91,16 +96,16 @@ const MyReviews = () => {
     return sortableReviews;
   }, [reviews, sortBy, sortOrder]); // Re-run memoization when these dependencies change
 
-  const handleSortChange = (criteria) => {
+  const handleSortChange = (criteria: string) => {
     if (sortBy === criteria) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc"); // Toggle order if same criteria
     } else {
-      setSortBy(criteria);
+      setSortBy(criteria as "createdAt" | "culturalSiteName" | "rating");
       setSortOrder("asc"); // Default to ascending for new criteria
     }
   };
 
-  const getSortIndicator = (criteria) => {
+  const getSortIndicator = (criteria: string) => {
     if (sortBy === criteria) {
       return sortOrder === "asc" ? " ↑" : " ↓";
     }
@@ -111,7 +116,7 @@ const MyReviews = () => {
   const renderContent = () => {
     if (loadingReviews) {
       return (
-        <div className="text-center flex-grow flex items-center justify-center flex-col">
+        <div className="text-center grow flex items-center justify-center flex-col">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading reviews...</p>
         </div>
@@ -120,7 +125,7 @@ const MyReviews = () => {
 
     if (reviewFetchError) {
       return (
-        <div className="text-center flex-grow flex items-center justify-center flex-col">
+        <div className="text-center grow flex items-center justify-center flex-col">
           <p className="text-red-600">
             An error occurred: {reviewsError.message}
           </p>
@@ -128,15 +133,12 @@ const MyReviews = () => {
       );
     }
 
-    if (sortedReviews.length === 0) { // Check sortedReviews for empty state
+    if (sortedReviews.length === 0) {
+      // Check sortedReviews for empty state
       return (
-        <div className="text-center flex-grow flex items-center justify-center flex-col">
-          <p className="text-gray-600 text-lg">
-            There are no reviews.
-          </p>
-          <p className="text-gray-500 text-sm mt-2">
-            Write down your review!
-          </p>
+        <div className="text-center grow flex items-center justify-center flex-col">
+          <p className="text-gray-600 text-lg">There are no reviews.</p>
+          <p className="text-gray-500 text-sm mt-2">Write down your review!</p>
         </div>
       );
     }
@@ -144,65 +146,72 @@ const MyReviews = () => {
     // 실제 리뷰 목록
     return (
       <div className="space-y-4">
-        {sortedReviews.map((review) => ( // Use sortedReviews here
-          <div
-            key={review._id}
-            className="bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-100"
-          >
-            {/* Main review content (clickable to expand/collapse) */}
+        {sortedReviews.map(
+          (
+            review, // Use sortedReviews here
+          ) => (
             <div
-              className="cursor-pointer"
-              onClick={() =>
-                setExpandedReviewId(
-                  expandedReviewId === review._id ? null : review._id
-                )
-              }
+              key={review._id}
+              className="bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-100"
             >
-              <div className="flex items-center mb-2">
-                <p className="font-semibold text-gray-800 mr-2 flex-grow break-all">
-                  {review.culturalSite.name || "Unknown"}
-                </p>
-                <div className="flex text-yellow-500 text-sm">
-                  {[...Array(5)].map((_, i) => (
-                    <StarIcon
-                      key={i}
-                      rating={review.rating}
-                      index={i}
-                      className="w-4 h-4"
-                      displayMode="reviewForm"
-                    />
-                  ))}
-                </div>
-              </div>
-              {review.comment && (
-                <p className="text-gray-700 text-sm italic">
-                  "{review.comment}"
-                </p>
-              )}
-              <p className="text-gray-500 text-xs mt-2 text-right">
-                {new Date(review.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </p>
-            </div>
-
-            {/* Conditionally render ReviewForm if this review is expanded */}
-            {expandedReviewId === review._id && (
+              {/* Main review content (clickable to expand/collapse) */}
               <div
-                className="mt-4 border-t pt-4 border-gray-200"
-                onClick={(e) => e.stopPropagation()} // IMPORTANT: Stop propagation here to prevent re-collapsing when clicking inside the form
+                className="cursor-pointer"
+                onClick={() =>
+                  setExpandedReviewId(
+                    expandedReviewId === review._id ? null : review._id,
+                  )
+                }
               >
-                <ReviewForm
-                  userReview={review} // Pass the specific review object to the form for editing
-                  onReviewActionCompleted={handleReviewActionCompleted}
-                  currentUser={currentUser}
-                />
+                <div className="flex items-center mb-2">
+                  <p className="font-semibold text-gray-800 mr-2 grow break-all">
+                    {review.culturalSite.name || "Unknown"}
+                  </p>
+                  <div className="flex text-yellow-500 text-sm">
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon
+                        key={i}
+                        rating={review.rating}
+                        index={i}
+                        className="w-4 h-4"
+                        displayMode="reviewForm"
+                      />
+                    ))}
+                  </div>
+                </div>
+                {review.comment && (
+                  <p className="text-gray-700 text-sm italic">
+                    "{review.comment}"
+                  </p>
+                )}
+                <p className="text-gray-500 text-xs mt-2 text-right">
+                  {new Date(review.createdAt).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </p>
               </div>
-            )}
-          </div>
-        ))}
+
+              {/* Conditionally render ReviewForm if this review is expanded */}
+              {expandedReviewId === review._id && (
+                <div
+                  className="mt-4 border-t pt-4 border-gray-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ReviewForm
+                    placeId={review.culturalSite._id}
+                    userReview={review}
+                    onReviewActionCompleted={handleReviewActionCompleted}
+                    currentUser={currentUser}
+                    isSubmitting={reviewMutation.isPending} 
+                    submitError={reviewMutation.error?.message || null}
+                  />
+                </div>
+              )}
+            </div>
+          ),
+        )}
       </div>
     );
   };
@@ -241,11 +250,7 @@ const MyReviews = () => {
         </button>
       </div>
 
-      <div
-        className="overflow-y-auto pr-2 flex-grow"
-      >
-        {renderContent()}
-      </div>
+      <div className="overflow-y-auto pr-2 grow">{renderContent()}</div>
     </div>
   );
 };

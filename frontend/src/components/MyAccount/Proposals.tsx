@@ -1,13 +1,22 @@
 import { useState, useMemo } from "react";
-import { useMyProposals } from "../../hooks/data/useProposalQueries";
+import {
+  useProposalModeration,
+} from "../../hooks/data/useProposalQueries";
+import { useProposals } from "../../hooks/data/useProposalQueries";
 import BackButton from "../BackButton";
 
-const MyProposalsList = () => {
-  // We'll keep sorting for the user's view, allowing them to sort by status or date
-  const [sortOption, setSortOption] = useState("-createdAt"); // Default sort: Newest first
+const Proposals = () => {
+  const [sortOption, setSortOption] = useState<string>("-createdAt"); // 기본 정렬: 최신 순
+  // adminNote를 각 proposal._id에 매핑하여 저장하는 객체 상태로 변경
+  const [adminComment, setadminComment] = useState<{ [key: string]: string }>({});
 
-  // Use the custom hook for fetching user's proposals
-  const { data: proposals = [], isLoading, isError, error } = useMyProposals();
+  const { data: proposals = [], isLoading, isError, error } = useProposals();
+  const {
+    mutate: moderateProposal,
+    isPending: isModerationPending,
+    isError: isModerationError,
+    error: moderationError,
+  } = useProposalModeration();
 
   const sortedProposals = useMemo(() => {
     if (!proposals.length) return [];
@@ -19,10 +28,22 @@ const MyProposalsList = () => {
 
       switch (sortOption) {
         case "-createdAt":
-          comparison = new Date(b.createdAt) - new Date(a.createdAt);
+          comparison = new Date(b.createdAt).getDate() - new Date(a.createdAt).getDate();
           break;
         case "createdAt":
-          comparison = new Date(a.createdAt) - new Date(b.createdAt);
+          comparison = new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate();
+          break;
+        case "-reviewedAt":
+          if (!a.reviewedAt && !b.reviewedAt) comparison = 0;
+          else if (!a.reviewedAt) comparison = 1;
+          else if (!b.reviewedAt) comparison = -1;
+          else comparison = new Date(b.reviewedAt).getDate() - new Date(a.reviewedAt).getDate();
+          break;
+        case "reviewedAt":
+          if (!a.reviewedAt && !b.reviewedAt) comparison = 0;
+          else if (!a.reviewedAt) comparison = -1;
+          else if (!b.reviewedAt) comparison = 1;
+          else comparison = new Date(a.reviewedAt).getDate() - new Date(b.reviewedAt).getDate();
           break;
         case "status":
           comparison = a.status.localeCompare(b.status);
@@ -31,7 +52,7 @@ const MyProposalsList = () => {
           comparison = b.status.localeCompare(a.status);
           break;
         default:
-          comparison = new Date(b.createdAt) - new Date(a.createdAt);
+          comparison = new Date(b.createdAt).getDate() - new Date(a.createdAt).getDate();
       }
       return comparison;
     });
@@ -39,8 +60,36 @@ const MyProposalsList = () => {
     return sortableProposals;
   }, [proposals, sortOption]);
 
-  // Helper function to safely render values from proposedChanges (copied from Proposals for consistency)
-  const renderProposedValue = (key, value, proposalType) => {
+  // 각 proposal의 adminNote를 업데이트하는 헬퍼 함수
+  const handleAdminNoteChange = (proposalId: string, note: string) => {
+    setadminComment((prevNotes) => ({
+      ...prevNotes,
+      [proposalId]: note,
+    }));
+  };
+
+  // 제안 승인 핸들러
+  const handleAccept = (proposalId: string) => {
+    const note = adminComment[proposalId] || "";
+    if (!note.trim()) {
+      alert("note must be entered upon approval.");
+      return;
+    }
+    moderateProposal({ proposalId, actionType: "accept", adminComment: note });
+  };
+
+  // 제안 거절 핸들러
+  const handleReject = (proposalId: string) => {
+    const note = adminComment[proposalId] || "";
+    if (!note.trim()) {
+      alert("note must be entered upon rejection.");
+      return;
+    }
+    moderateProposal({ proposalId, actionType: "reject", adminComment: note });
+  };
+
+  // Helper function to safely render values from proposedChanges
+  const renderProposedValue = (key: string, value: any, proposalType: string) => {
     if (
       key === "location" &&
       typeof value === "object" &&
@@ -76,15 +125,14 @@ const MyProposalsList = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="text-center p-6 text-xl">Loading your proposals...</div>
-    );
+    return <div className="text-center p-6 text-xl">Loading proposals...</div>;
   }
 
   if (isError) {
     return (
       <div className="text-center p-6 text-xl text-red-600">
-        Error loading your proposals: {error.message}
+        <BackButton />
+        Error loading proposals: {error.message}
       </div>
     );
   }
@@ -92,7 +140,8 @@ const MyProposalsList = () => {
   if (!sortedProposals.length) {
     return (
       <div className="text-center p-6 text-xl text-gray-600">
-        You haven't submitted any proposals yet.
+        <BackButton />
+        No proposals found.
       </div>
     );
   }
@@ -104,30 +153,40 @@ const MyProposalsList = () => {
         <BackButton />
       </div>
 
-      <h2 className="text-3xl font-bold mb-6 text-center">
-        My Submitted Proposals
-      </h2>
+      <h2 className="text-3xl font-bold mb-6 text-center">All Proposals</h2>
 
       {/* Sorting Controls */}
       <div className="mb-6 flex justify-end">
         <label
-          htmlFor="sort-my-proposals"
+          htmlFor="sort-proposals"
           className="mr-2 text-gray-700 font-medium"
         >
           Sort By:
         </label>
         <select
-          id="sort-my-proposals"
+          id="sort-proposals"
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value)}
           className="p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="-createdAt">Created (Newest First)</option>
           <option value="createdAt">Created (Oldest First)</option>
+          <option value="-reviewedAt">Reviewed (Newest First)</option>
+          <option value="reviewedAt">Reviewed (Oldest First)</option>
           <option value="status">Status (A-Z)</option>
           <option value="-status">Status (Z-A)</option>
         </select>
       </div>
+
+      {/* Global moderation status, if any, can still be displayed here */}
+      {isModerationPending && (
+        <p className="text-blue-600 mt-2 text-center">Processing...</p>
+      )}
+      {isModerationError && (
+        <p className="text-red-600 mt-2 text-center">
+          Error: {moderationError.message}
+        </p>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {sortedProposals.map((proposal) => (
@@ -136,9 +195,7 @@ const MyProposalsList = () => {
             className="bg-white p-6 rounded-lg shadow-md border border-gray-200"
           >
             <h3 className="text-xl font-semibold mb-2">
-              {proposal.proposalType === "create"
-                ? "New Site Proposal"
-                : "Update Proposal"}
+              {proposal.proposalType}
             </h3>
             <p className="text-gray-700 mb-1">
               <strong>Status: </strong>
@@ -154,16 +211,15 @@ const MyProposalsList = () => {
                 {proposal.status}
               </span>
             </p>
-            {/* Cultural Site details for 'update' and 'delete' proposals */}
             {proposal.culturalSite && (
               <>
                 <p className="text-gray-700 mb-1">
-                  <strong>Cultural Site:</strong>
+                  <strong>Cultural Site: </strong>
                   {proposal.culturalSite.name || "N/A"}
                 </p>
                 {proposal.culturalSite.description && (
                   <p className="text-gray-700 mb-1">
-                    <strong>Description:</strong>
+                    <strong>Description: </strong>
                     {proposal.culturalSite.description}
                   </p>
                 )}
@@ -196,21 +252,24 @@ const MyProposalsList = () => {
                 )}
                 {proposal.culturalSite.openingHours && (
                   <p className="text-gray-700 mb-1">
-                    <strong>Opening Hours:</strong>
+                    <strong>Opening Hours: </strong>
                     {proposal.culturalSite.openingHours}
                   </p>
                 )}
               </>
             )}
 
-            {/* Proposal Message */}
+            <p className="text-gray-700 mb-1">
+              <strong>Proposed By: </strong>
+              {proposal.proposedBy?.email || "N/A"}
+            </p>
+
             {proposal.proposalMessage && (
               <p className="text-gray-700 mb-1">
-                <strong>Your Message:</strong> {proposal.proposalMessage}
+                <strong>Proposal Message:</strong> {proposal.proposalMessage}
               </p>
             )}
 
-            {/* Proposed Changes */}
             {proposal.proposedChanges && (
               <div className="mt-2">
                 <strong>Proposed Details:</strong>
@@ -222,7 +281,7 @@ const MyProposalsList = () => {
                           proposal.proposalType === "create" &&
                           key === "originalTags"
                         )
-                    ) // Filter out originalTags for 'create' proposals
+                    )
                     .map(([key, value]) => (
                       <li key={key}>
                         {key}:
@@ -233,24 +292,23 @@ const MyProposalsList = () => {
               </div>
             )}
 
-            {/* Admin Comment (if reviewed) */}
             {proposal.adminComment && (
-              <div className="mt-2 p-3 border rounded-md bg-gray-50">
-                <p className="text-gray-700">
-                  <strong>Admin Comment:</strong> {proposal.adminComment}
-                </p>
-              </div>
+              <p className="text-gray-700 mt-2">
+                <strong>Admin Comment:</strong> {proposal.adminComment}
+              </p>
             )}
             <p className="text-sm text-gray-500 mt-2">
-              Submitted: {new Date(proposal.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+              Created:
+              {new Date(proposal.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
             </p>
             {proposal.reviewedAt && (
               <p className="text-sm text-gray-500">
-                Reviewed: {new Date(proposal.reviewedAt).toLocaleDateString("en-US", {
+                Reviewed: Created:
+                {new Date(proposal.reviewedAt).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -258,6 +316,49 @@ const MyProposalsList = () => {
               </p>
             )}
 
+            {/* 관리자 메모 입력 필드 (각 카드 내부) */}
+            {proposal.status === "pending" && (
+              <div className="mt-4 p-3 border rounded-md bg-gray-50">
+                <label
+                  htmlFor={`adminComment-${proposal._id}`}
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Admin Notes:
+                </label>
+                <textarea
+                  id={`adminComment-${proposal._id}`}
+                  value={adminComment[proposal._id] || ""}
+                  onChange={(e) =>
+                    handleAdminNoteChange(proposal._id, e.target.value)
+                  }
+                  rows={2}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  placeholder="Write down accept or reject message"
+                ></textarea>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => handleAccept(proposal._id)}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    // 해당 제안의 메모가 없거나, 처리 중일 경우 비활성화
+                    disabled={
+                      isModerationPending || !adminComment[proposal._id]?.trim()
+                    }
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleReject(proposal._id)}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    // 해당 제안의 메모가 없거나, 처리 중일 경우 비활성화
+                    disabled={
+                      isModerationPending || !adminComment[proposal._id]?.trim()
+                    }
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -265,4 +366,4 @@ const MyProposalsList = () => {
   );
 };
 
-export default MyProposalsList;
+export default Proposals;

@@ -46,7 +46,7 @@ const ReviewDisplay = ({
             )}
             {/* Make username clickable */}
             <p
-              className="font-semibold text-gray-800 mr-2 flex-grow cursor-pointer hover:underline" // Add cursor-pointer and hover:underline
+              className="font-semibold text-gray-800 mr-2 grow cursor-pointer hover:underline" // Add cursor-pointer and hover:underline
               onClick={() => handleUserClick(review.user)} // Add onClick
             >
               {review.user?.username || "Unknown user"}

@@ -1,18 +1,17 @@
-// src/components/ChangeRoleModalContent.jsx
 import React, { useState } from 'react';
 import useUiStore from '../../store/uiStore'; 
 import { useUpdateUserRole } from '../../hooks/data/useUserQueries';
 
-export const ChangeRoleModalContent = ({ user }) => {
+export const ChangeRoleModalContent = ({ user }: { user: any }) => {
   const { closeModal } = useUiStore();
   const [selectedRole, setSelectedRole] = useState(user.role);
   const updateUserRoleMutation = useUpdateUserRole();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (selectedRole === user.role) {
-      alert("역할이 변경되지 않았습니다.");
+      alert("role is not changed.");
       closeModal();
       return;
     }
@@ -23,11 +22,8 @@ export const ChangeRoleModalContent = ({ user }) => {
         newRole: selectedRole,
       });
       // If mutation is successful, it will invalidate queries and update UI automatically.
-      // We can close the modal here or let the success message/toast handle it.
       closeModal();
     } catch (error) {
-      // The onError in useUpdateUserRole hook will show an alert.
-      // You can add more specific error handling here if needed.
       console.error("Failed to change role in modal:", error);
     }
   };

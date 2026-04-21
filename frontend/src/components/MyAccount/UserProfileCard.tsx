@@ -2,7 +2,7 @@ import defaultProfileImg from "../../assets/profile_image.svg";
 import useUiStore from "../../store/uiStore";
 import { ChangeRoleModalContent } from "./ChangeRoleModalContent"; 
 
-const UserProfileCard = ({ user }) => {
+const UserProfileCard = ({ user }: { user: any }) => {
   const { openModal } = useUiStore();
 
   const {
@@ -16,7 +16,6 @@ const UserProfileCard = ({ user }) => {
     favoriteSites = [],
     createdAt,
     updatedAt,
-    __v,
   } = user;
 
   const handleRoleClick = () => {

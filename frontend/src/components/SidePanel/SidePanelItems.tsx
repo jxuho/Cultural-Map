@@ -154,7 +154,7 @@ const SidePanelItems = ({
           </button>
         )}
         <h2
-          className="text-2xl font-bold text-gray-800 break-words pr-2 cursor-pointer hover:underline break-all"
+          className="text-2xl font-bold text-gray-800 wrap-break-words pr-2 cursor-pointer hover:underline break-all"
           onClick={handleNameClick}
         >
           {selectedPlaceData.name}
@@ -173,7 +173,7 @@ const SidePanelItems = ({
           className="flex items-center justify-between p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors duration-200 mx-4 my-2"
           onClick={toggleReviewsExpansion}
         >
-          <h3 className="text-lg font-semibold text-blue-800 flex-grow">
+          <h3 className="text-lg font-semibold text-blue-800 grow">
             {selectedPlaceData.reviewCount === 1 ? "Review" : "Reviews"} (
             {selectedPlaceData.reviewCount || 0})
           </h3>
@@ -206,7 +206,7 @@ const SidePanelItems = ({
 
       {/* Panel Content - Conditional Rendering based on isReviewsExpanded */}
       {isReviewsExpanded ? (
-        <div className="flex-grow overflow-y-auto">
+        <div className="grow overflow-y-auto">
           {currentUser ? (
             <ReviewForm
               placeId={selectedPlaceData._id}
@@ -242,7 +242,7 @@ const SidePanelItems = ({
           <ReviewDisplay reviews={otherReviews} currentUser={currentUser} />
         </div>
       ) : (
-        <div className="flex-grow p-4 overflow-y-auto">
+        <div className="grow p-4 overflow-y-auto">
           {/* Photos section - currently commented out */}
           {/* {selectedPlaceData.imageUrl && (
             <div className="mb-4">
