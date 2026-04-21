@@ -1,13 +1,13 @@
 import { useMap } from "react-leaflet";
 import { useState } from "react";
-import L from "leaflet";
+import L, { CircleMarker, LatLngTuple } from "leaflet";
 import { MdMyLocation } from "react-icons/md";
 
-const CurrentLocationButton = ({ maxBounds }) => {
+const CurrentLocationButton = ({ maxBounds }: { maxBounds: [LatLngTuple, LatLngTuple] }) => {
   const map = useMap();
-  const [locMarker, setLocMarker] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLocationOutsideBounds, setIsLocationOutsideBounds] = useState(false);
+  const [locMarker, setLocMarker] = useState<CircleMarker | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLocationOutsideBounds, setIsLocationOutsideBounds] = useState<boolean>(false);
 
   const handleClick = () => {
     if (!navigator.geolocation) {
@@ -64,7 +64,7 @@ const CurrentLocationButton = ({ maxBounds }) => {
     <button
       onClick={handleClick}
       disabled={isLoading || isLocationOutsideBounds}
-      className="absolute bottom-4 right-4 z-[1000] bg-white shadow px-3 py-2 rounded text-sm cursor-pointer flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+      className="absolute bottom-4 right-4 z-1000 bg-white shadow px-3 py-2 rounded text-sm cursor-pointer flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
     >
       {isLoading ? (
         <>

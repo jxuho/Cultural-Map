@@ -11,7 +11,7 @@ const MapContextMenu = () => {
   const setNearbySites = useUiStore((state) => state.setNearbySites);
   const openSidePanel = useUiStore((state) => state.openSidePanel); // SidePanel 열기 함수
   const setNearbySitesLoading = useUiStore(
-    (state) => state.setNearbySitesLoading
+    (state) => state.setNearbySitesLoading,
   ); // nearbySites 로딩 상태 설정 함수
   const setNearbySitesError = useUiStore((state) => state.setNearbySitesError); // nearbySites 에러 상태 설정 함수
   const user = useAuthStore((state) => state.user);
@@ -30,16 +30,24 @@ const MapContextMenu = () => {
   // "이 지역 검색" 버튼 클릭 시 호출될 함수
   const queryThisArea = () => {
     if (selectedLatLng?.lat && selectedLatLng?.lng) {
-      openSidePanel(); // SidePanel을 엽니다.
+      openSidePanel({
+        _id: "new",
+        name: "",
+        category: "other",
+        location: {
+          type: "Point",
+          coordinates: [selectedLatLng.lng, selectedLatLng.lat],
+        },
+      } as any); // SidePanel을 엽니다.
       setNearbySitesLoading(true); // 주변 검색 시작 시 로딩 상태를 true로 설정
       setNearbySitesError(null); // 이전 에러 상태 초기화
       refetchNearbyOsm(); // 주변 OSM 데이터 가져오기 시작
     } else {
       console.warn(
-        "The surrounding area cannot be searched due to lack of valid latitude and longitude information."
+        "The surrounding area cannot be searched due to lack of valid latitude and longitude information.",
       );
       setNearbySitesError(
-        new Error("There is no valid latitude and longitude information.")
+        new Error("There is no valid latitude and longitude information."),
       ); // 에러 상태 설정
     }
   };
@@ -52,13 +60,13 @@ const MapContextMenu = () => {
       setNearbySites(nearbyOsmData); // 응답 구조에 맞게 `data.osmCulturalSites` 접근
       console.log(
         "Surrounding OSM cultural site data is set in the UI store:",
-        nearbyOsmData
+        nearbyOsmData,
       );
     }
     if (isNearbyOsmError) {
       console.error(
         "Error occurred while retrieving surrounding OSM cultural site:",
-        nearbyOsmError
+        nearbyOsmError,
       );
       setNearbySites([]); // 에러 발생 시 빈 배열로 초기화
       setNearbySitesError(nearbyOsmError); // 에러 객체를 Zustand 스토어에 저장

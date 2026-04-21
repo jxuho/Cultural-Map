@@ -1,4 +1,3 @@
-// src/components/MapComponent.jsx
 import { useRef, useMemo, useEffect, useCallback } from "react";
 import {
   MapContainer,
@@ -8,6 +7,7 @@ import {
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { LatLngTuple, LatLngBoundsExpression } from "leaflet";
 
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
@@ -20,6 +20,8 @@ import CurrentLocationButton from "./CurrentLocationButton";
 
 import CulturalSiteMarkers from "./CulturalSiteMarkers";
 import useViewport from "../../hooks/ui/useViewPort";
+
+import { Place } from "@/types/place.ts";
 
 // MapEventsHandler 컴포넌트
 const MapEventsHandler = () => {
@@ -78,11 +80,11 @@ const MapCenterUpdater = () => {
 
 // MapComponent
 const MapComponent = () => {
-  const mapRef = useRef(null); // mapRef는 더 이상 MapCenterUpdater에서 직접 사용되지 않습니다.
+  const mapRef = useRef(null); 
 
   const openSidePanel = useUiStore((state) => state.openSidePanel);
   const handleOpenSidePanel = useCallback(
-    (site) => {
+    (site: Place) => {
       openSidePanel(site);
     },
     [openSidePanel]
@@ -151,8 +153,8 @@ const MapComponent = () => {
     );
   }
 
-  const initialPosition = [50.8303, 12.91895]; // Chemnitz Lat, Lng
-  const mapMaxBounds = [
+  const initialPosition: LatLngTuple = [50.8303, 12.91895]; // Chemnitz Lat, Lng
+  const mapMaxBounds: LatLngBoundsExpression = [
     [50.7, 12.7],
     [50.95, 13.1],
   ];
@@ -167,9 +169,10 @@ const MapComponent = () => {
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
         className="h-full w-full z-0"
-        whenCreated={(mapInstance) => {
-          mapRef.current = mapInstance;
-        }}
+        // whenCreated={(mapInstance) => {
+        //   mapRef.current = mapInstance;
+        // }}
+        ref={mapRef}
         zoomControl={false}
       >
         <CurrentLocationButton maxBounds={mapMaxBounds} />

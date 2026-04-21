@@ -1,6 +1,5 @@
-// src/config/colors.js
 
-export const categoryBorderColors = {
+export const categoryBorderColors: { [key: string]: string } = {
     artwork: '#A64AC9', // Purple
     gallery: '#1E90FF', // Dodger Blue
     museum: '#FFD700',  // Gold

@@ -29,13 +29,13 @@ const UserProfileCard = ({ user }: { user: any }) => {
         <img
           src={profileImage || defaultProfileImg}
           alt={`${username}'s profile`}
-          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-blue-400 shadow-sm flex-shrink-0"
+          className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-blue-400 shadow-sm shrink-0"
         />
-        <div className="flex-grow min-w-0">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1 break-words">
+        <div className="grow min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 sm:mb-1 wrap-break-word">
             {username}
           </h2>
-          <p className="text-sm sm:text-md text-gray-700 break-words">
+          <p className="text-sm sm:text-md text-gray-700 wrap-break-word">
             {email}
           </p>
           <p className="text-xs text-gray-500 mt-1">

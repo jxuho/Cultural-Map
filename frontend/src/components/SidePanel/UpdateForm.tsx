@@ -277,7 +277,7 @@ const UpdateForm: React.FC = () => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 relative">
+    <div className="grow overflow-y-auto p-4 relative">
       <div className="absolute top-4 right-4 z-10">
         <button
           className="text-gray-500 hover:text-gray-700 text-4xl font-bold hover:cursor-pointer p-1"

@@ -152,14 +152,14 @@ const UsersManagementPage = () => {
             className={`bg-white rounded-lg shadow-md p-4 sm:p-6 flex flex-col ${currentUser && user._id === currentUser._id ? 'border-2 border-blue-500' : ''}`} // Highlight current user
           >
             <div className="flex items-center justify-between flex-wrap sm:flex-nowrap gap-4">
-              <div className="flex items-center space-x-3 sm:space-x-4 flex-grow break-all">
+              <div className="flex items-center space-x-3 sm:space-x-4 grow break-all">
                 <img
                   src={user.profileImage || defaultProfileImg}
                   alt={`${user.username}'s profile`}
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border flex-shrink-0"
+                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border shrink-0"
                 />
                 <div>
-                  <h2 className="text-base sm:text-lg font-semibold text-gray-800 break-words">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-800 wrap-break-words">
                     {user.username || "N/A"}
                     {currentUser && user._id === currentUser._id && (
                       <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
@@ -167,12 +167,12 @@ const UsersManagementPage = () => {
                       </span>
                     )}
                   </h2>
-                  <p className="text-xs sm:text-sm text-gray-600 break-words">{user.email || "N/A"}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 wrap-break-words">{user.email || "N/A"}</p>
                 </div>
               </div>
               <button
                 onClick={() => handleViewProfile(user._id)}
-                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none text-sm sm:text-base flex-shrink-0 cursor-pointer"
+                className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none text-sm sm:text-base shrink-0 cursor-pointer"
               >
                 {selectedUserId === user._id ? "Hide Profile" : "View Profile"}
               </button>

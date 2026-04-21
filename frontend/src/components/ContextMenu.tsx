@@ -33,7 +33,7 @@ interface MenuSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 interface MenuProps {
-  children: React.ReactElement<MenuItemProps | MenuSeparatorProps>[];
+  children: React.ReactElement<MenuItemProps | MenuSeparatorProps>[] | React.ReactElement<MenuItemProps | MenuSeparatorProps>;
 }
 
 // MenuItem
@@ -41,7 +41,7 @@ export const MenuItem = ({ children, disabled, ...props }: MenuItemProps) => {
   return (
     <button
       {...props}
-      className="flex text-sm hover:bg-white-hover items-center min-h-[38px] pl-3 pr-4 text-text-dark"
+      className="flex text-sm hover:bg-white-hover items-center min-h-9.5 pl-3 pr-4 text-text-dark"
       role="menuitem"
       disabled={disabled}
       aria-disabled={disabled}

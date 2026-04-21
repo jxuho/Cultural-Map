@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import {
   fetchAllCulturalSites,
   fetchCulturalSiteById,
@@ -40,15 +40,20 @@ export const useCulturalSiteDetail = (id: string | undefined | null) => {
 /**
  * get nearby OSM cultural sites based on latitude and longitude
  */
-export const useNearbyOsm = (lat: number | null, lon: number | null) => {
+export const useNearbyOsm = (
+  lat: number | null | undefined, 
+  lon: number | null | undefined,
+  options?: Partial<UseQueryOptions<Place[], ApiError>> 
+) => {
   const queryResult = useQuery<Place[], ApiError>({
     queryKey: ['nearbyOsm', lat, lon],
     queryFn: () => getNearbyOsm(lat!, lon!),
-    enabled: false, // unable by default, will be triggered manually
+    enabled: false, // 기본값
     staleTime: 1000 * 60 * 10,
+    ...options, // 전달받은 options가 있다면 덮어씀
   });
 
-  return { ...queryResult, refetch: queryResult.refetch };
+  return queryResult;
 };
 
 /**
