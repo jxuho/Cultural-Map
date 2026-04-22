@@ -1,11 +1,10 @@
-// FilterPanel.jsx
 import { useState } from "react";
 import { useFloating, flip, shift, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react";
 import FilterButton from './FilterButton';
 import FilterContent from './FilterContent';
 
 const FilterPanel = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,

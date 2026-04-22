@@ -9,29 +9,6 @@ import ErrorMessage from "../ErrorMessage";
 import StarIcon from "../StarIcon";
 import BackButton from "../BackButton";
 
-interface Location {
-  type: "Point";
-  coordinates: [number, number];
-}
-
-interface FavoriteSite {
-  _id: string;
-  name: string;
-  description: string;
-  category: string;
-  location: Location;
-  address: string;
-  website: string;
-  imageUrl: string;
-  openingHours: string;
-  licenseInfo: string;
-  sourceId: string;
-  favoritesCount: number;
-  createdAt: string;
-  updatedAt: string;
-  averageRating: number;
-  reviewCount: number;
-}
 
 type SortCriteria = "name" | "averageRating" | "reviewCount";
 type SortOrder = "asc" | "desc";

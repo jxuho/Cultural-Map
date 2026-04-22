@@ -93,7 +93,7 @@ const SidePanelItems = ({
     async (
       actionType: "create" | "update" | "delete",
       newRating: number | null, // null 허용
-      oldRating: number | null, // oldRating 추가
+      oldRating: number | null, 
       comment?: string, // 선택적 인자로 변경
     ) => {
       if (!currentUser) {

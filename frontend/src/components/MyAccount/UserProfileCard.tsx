@@ -1,8 +1,15 @@
+import { User } from "@/types/user";
 import defaultProfileImg from "../../assets/profile_image.svg";
 import useUiStore from "../../store/uiStore";
 import { ChangeRoleModalContent } from "./ChangeRoleModalContent"; 
 
-const UserProfileCard = ({ user }: { user: any }) => {
+
+interface UserProfileCardProps {
+  user: User;
+  currentUser: User | null; 
+}
+
+const UserProfileCard = ({ user }: UserProfileCardProps) => {
   const { openModal } = useUiStore();
 
   const {

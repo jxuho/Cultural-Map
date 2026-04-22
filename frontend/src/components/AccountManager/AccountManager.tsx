@@ -1,12 +1,12 @@
 import { useRef, useEffect } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate } from "react-router";
 import defaultProfileImg from "../../assets/profile_image.svg";
 import useUiStore from "../../store/uiStore";
 import useAuthStore from "../../store/authStore";
 
 const AccountManager = () => {
   const navigate = useNavigate();
-  const accountManagerRef = useRef();
+  const accountManagerRef = useRef<HTMLDivElement>(null);
 
   const isAccountManagerOpen = useUiStore(
     (state) => state.isAccountManagerOpen
@@ -20,12 +20,13 @@ const AccountManager = () => {
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    const closeModalOnClickOutside = (event) => {
+    const closeModalOnClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
       if (
         accountManagerRef.current &&
-        !accountManagerRef.current.contains(event.target)
+        !accountManagerRef.current.contains(target)
       ) {
-        if (event.target.closest("#accountManagerButton")) {
+        if (target.closest("#accountManagerButton")) {
           return;
         }
         closeAccountManager();
@@ -78,7 +79,7 @@ const AccountManager = () => {
           {isAuthenticated ? (
             <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[1fr_3fr] leading-normal items-stretch h-full text-black">
               <div className="col-start-1 col-end-2 self-center text-sm px-4">
-                {user.role === 'admin' ? (
+                {user && user.role === 'admin' ? (
                   <span className="bg-chemnitz-blue text-white px-2 py-1 rounded-md font-bold text-xs shadow-md">
                     ADMIN ACCOUNT
                   </span>
@@ -89,17 +90,17 @@ const AccountManager = () => {
 
               <div className="col-start-1 col-end-4 min-h-[132px self-center] flex">
                 <div className="w-20 h-20 m-5  overflow-hidden rounded-full">
-                  {user.profileImage ? (
+                  {user && user.profileImage ? (
                     <img src={user.profileImage} alt="user profile image" />
                   ) : (
                     <img src={defaultProfileImg} alt="default profile image" />
                   )}
                 </div>
-                <div className="flex-grow pr-3 mt-4">
+                <div className="grow pr-3 mt-4">
                   <div className="font-semibold text-lg">
-                    {user.username ?? user.email}
+                    {user && user.username ? user.username : user && user.email}
                   </div>
-                  <div className="mt-1 font-semibold">{user.email}</div>
+                  <div className="mt-1 font-semibold">{user && user.email}</div>
 
                   <button
                     onClick={() => {window.location.pathname = "/my-account"}}

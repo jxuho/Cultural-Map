@@ -1,7 +1,7 @@
 import { useCallback, useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import StarIcon from '../StarIcon';
-import { Review } from '../../types/review'; // 프로젝트 경로에 맞게 조정하세요
-import { User } from '../../types/user'; // 프로젝트 경로에 맞게 조정하세요
+import { Review } from '../../types/review'; 
+import { User } from '../../types/user';
 
 interface ReviewFormProps {
   placeId: string;
@@ -18,7 +18,6 @@ interface ReviewFormProps {
 }
 
 const ReviewForm = ({
-  placeId,
   userReview,
   onReviewActionCompleted,
   currentUser,

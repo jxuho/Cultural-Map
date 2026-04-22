@@ -30,7 +30,7 @@ const MyReviews = () => {
     async (
       actionType: "create" | "update" | "delete",
       newRating: number | null,
-      oldRating: number | null,
+      _oldRating: number | null,
       comment?: string,
     ) => {
       // Find the current review being acted upon to get its culturalSite._id

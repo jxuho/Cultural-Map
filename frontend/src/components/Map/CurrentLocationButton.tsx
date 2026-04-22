@@ -1,13 +1,18 @@
 import { useMap } from "react-leaflet";
 import { useState } from "react";
-import L, { CircleMarker, LatLngTuple } from "leaflet";
+import L, { CircleMarker, LatLngBoundsExpression } from "leaflet";
 import { MdMyLocation } from "react-icons/md";
 
-const CurrentLocationButton = ({ maxBounds }: { maxBounds: [LatLngTuple, LatLngTuple] }) => {
+const CurrentLocationButton = ({
+  maxBounds,
+}: {
+  maxBounds: LatLngBoundsExpression;
+}) => {
   const map = useMap();
   const [locMarker, setLocMarker] = useState<CircleMarker | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLocationOutsideBounds, setIsLocationOutsideBounds] = useState<boolean>(false);
+  const [isLocationOutsideBounds, setIsLocationOutsideBounds] =
+    useState<boolean>(false);
 
   const handleClick = () => {
     if (!navigator.geolocation) {
@@ -16,19 +21,19 @@ const CurrentLocationButton = ({ maxBounds }: { maxBounds: [LatLngTuple, LatLngT
     }
 
     setIsLoading(true);
-    setIsLocationOutsideBounds(false); // Reset the flag on new attempt
+    setIsLocationOutsideBounds(false);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
         const currentLatLng = L.latLng(latitude, longitude);
 
-        const bounds = L.latLngBounds(maxBounds[0], maxBounds[1]);
+        const bounds = L.latLngBounds(maxBounds as L.LatLngBoundsLiteral);
 
         if (!bounds.contains(currentLatLng)) {
           setIsLocationOutsideBounds(true);
           alert(
-            "Your current location is outside the map's allowed boundaries."
+            "Your current location is outside the map's allowed boundaries.",
           );
           setIsLoading(false);
           return;
@@ -49,14 +54,16 @@ const CurrentLocationButton = ({ maxBounds }: { maxBounds: [LatLngTuple, LatLngT
       },
       (error) => {
         console.error("Error getting current location:", error);
-        alert("Failed to get your location. Please ensure location services are enabled.");
+        alert(
+          "Failed to get your location. Please ensure location services are enabled.",
+        );
         setIsLoading(false);
       },
       {
         enableHighAccuracy: false,
         timeout: 5000,
         maximumAge: 10000,
-      }
+      },
     );
   };
 

@@ -9,11 +9,11 @@ const UsersManagementPage = () => {
   const { data: users, isLoading, isError, error } = useAllUsers();
   const { user: currentUser } = useAuthStore(); // Get the current logged-in user
 
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [sortBy, setSortBy] = useState("username"); // Default sort by username
-  const [sortOrder, setSortOrder] = useState("asc"); // Default sort order
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"username" | "role" | "createdAt" | "updatedAt">("username"); // Default sort by username
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // Default sort order
 
-  const handleViewProfile = (userId) => {
+  const handleViewProfile = (userId: string) => {
     setSelectedUserId((prev) => (prev === userId ? null : userId)); // Toggle
   };
 
@@ -29,7 +29,7 @@ const UsersManagementPage = () => {
     const sortableUsers = [...otherUsers];
 
     sortableUsers.sort((a, b) => {
-      let valA, valB;
+      let valA: string | number, valB: string | number;
 
       switch (sortBy) {
         case "role":
@@ -57,7 +57,7 @@ const UsersManagementPage = () => {
           : valB.localeCompare(valA);
       } else {
         // For numbers (dates converted to timestamps)
-        return sortOrder === "asc" ? valA - valB : valB - valA;
+        return sortOrder === "asc" ? new Date(valA).getTime() - new Date(valB).getTime() : new Date(valB).getTime() - new Date(valA).getTime();
       }
     });
 
@@ -65,7 +65,7 @@ const UsersManagementPage = () => {
     return loggedInUser ? [loggedInUser, ...sortableUsers] : sortableUsers;
   }, [users, sortBy, sortOrder, currentUser]); // Re-run memoization when these dependencies change
 
-  const handleSortChange = (criteria) => {
+  const handleSortChange = (criteria: "username" | "role" | "createdAt" | "updatedAt") => {
     if (sortBy === criteria) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc"); // Toggle order if same criteria
     } else {
@@ -74,7 +74,7 @@ const UsersManagementPage = () => {
     }
   };
 
-  const getSortIndicator = (criteria) => {
+  const getSortIndicator = (criteria: "username" | "role" | "createdAt" | "updatedAt") => {
     if (sortBy === criteria) {
       return sortOrder === "asc" ? " ↑" : " ↓";
     }

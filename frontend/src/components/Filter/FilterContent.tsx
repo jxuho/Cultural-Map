@@ -1,11 +1,15 @@
-// src/components/Filter/FilterContent.jsx
 import React, { useMemo } from "react";
 import useFilterStore from "../../store/filterStore.ts";
-import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
+import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig.ts";
 import debounce from "lodash.debounce";
-import { categoryBorderColors } from "../../config/colors";
+import { categoryBorderColors } from "../../config/colors.ts";
 
-const FilterContent = React.forwardRef(
+interface FilterContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  isOpen: boolean;
+  floatingStyles?: React.CSSProperties;
+}
+
+const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
   ({ isOpen, floatingStyles, ...props }, ref) => {
     const selectedCategories = useFilterStore(
       (state) => state.selectedCategories
@@ -23,7 +27,7 @@ const FilterContent = React.forwardRef(
       [setSearchQuery]
     );
 
-    const handleSearchInputChange = (e) => {
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
       setLocalSearchInput(value);
       debouncedSetSearchQuery(value);

@@ -85,7 +85,7 @@ export const useUpdateCulturalSite = () => {
   const queryClient = useQueryClient();
   return useMutation<Place | null, ApiError, UpdateMutationParams>({
     mutationFn: ({ culturalSiteId, updateData }) => updateCulturalSite(culturalSiteId, updateData),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['culturalSite', variables.culturalSiteId] });
       queryClient.invalidateQueries({ queryKey: ['culturalSites'] });
       console.log(`Cultural site ${variables.culturalSiteId} update success!`);
@@ -93,7 +93,7 @@ export const useUpdateCulturalSite = () => {
     onError: (error, variables) => {
       const msg = error.response?.data?.message || error.message || "Unknown error";
       console.error(`Cultural site ${variables.culturalSiteId} update fail:`, error);
-      alert(`Cultural site update 실패: ${msg}`);
+      alert(`Cultural site update fail: ${msg}`);
     },
   });
 };
