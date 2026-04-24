@@ -2,12 +2,9 @@ import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import useUiStore from "../store/uiStore"; 
 
-const Modal: React.FC = () => {
-  // Get state and actions from the store. 
-  // (The type is automatically inferred as defined in the interface.)
+const Modal = () => {
   const { isModalOpen, modalContent, closeModal } = useUiStore();
   
-  // Specify the HTMLDivElement type in Ref.
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Prevent body scrolling when modal opens
