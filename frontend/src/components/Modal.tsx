@@ -58,6 +58,7 @@ const Modal = () => {
           onClick={closeModal}
           className="absolute top-2 right-4 text-gray-500 hover:text-gray-700 text-2xl font-bold hover:cursor-pointer"
           type="button"
+          aria-label="close"
         >
           &times;
         </button>

@@ -21,14 +21,15 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Core settings for migration */
-    "allowJs": true,           // No error occurs even if JS file exists
-    "checkJs": false,          // Type checking is not performed on JS files (recommended false during migration)
+    "allowJs": true, // No error occurs even if JS file exists
+    "checkJs": false, // Type checking is not performed on JS files (recommended false during migration)
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "@/*": ["./src/*"]  // Specify that it is a relative path by adding './' in front.
-    }
+      "@/*": ["./src/*"] // Specify that it is a relative path by adding './' in front.
+    },
+    "types": ["vitest/globals"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
