@@ -11,14 +11,14 @@ const createMockSite = (id: string, name: string) => ({
   },
   address: 'Chemnitz address example',
   favoritesCount: 1,
-  averageRating: 4.5, // Aggregation으로 추가되는 필드
-  reviewCount: 10,    // Aggregation으로 추가되는 필드
+  averageRating: 4.5, // Fields added by Aggregation
+  reviewCount: 10,    // Fields added by Aggregation
 });
 
 let mockFavorites = [createMockSite('site-123', 'ABC Historic Site')];
 
 export const favoriteHandlers = [
-  // [GET] 즐겨찾기 목록 조회
+  // [GET] View favorites list
   http.get('*/users/me/favorites', () => {
     return HttpResponse.json({
       status: 'success',
@@ -29,12 +29,12 @@ export const favoriteHandlers = [
     });
   }),
 
-  // [POST] 즐겨찾기 추가
+  // [POST] Add to favorites
   http.post('*/users/me/favorites/:siteId', ({ params }) => {
     const { siteId } = params as { siteId: string };
     const newSite = createMockSite(siteId, 'new historic site');
     
-    // 테스트 환경의 가짜 상태 업데이트 (선택 사항)
+    // Fake status updates in test environment (optional)
     mockFavorites.push(newSite);
 
     return HttpResponse.json({
@@ -43,13 +43,13 @@ export const favoriteHandlers = [
       data: {
         user: { _id: 'user-1', favoriteSites: mockFavorites.map(s => s._id) },
         culturalSite: newSite,
-        // 중요: 프론트엔드 api/favoriteApi.ts가 이 경로를 참조함
+        // IMPORTANT: Frontend api/favoriteApi.ts references this path
         favoriteSites: mockFavorites 
       }
     });
   }),
 
-  // [DELETE] 즐겨찾기 삭제
+  // [DELETE] Delete favorites
   http.delete('*/users/me/favorites/:siteId', ({ params }) => {
     const { siteId } = params as { siteId: string };
     mockFavorites = mockFavorites.filter(s => s._id !== siteId);
