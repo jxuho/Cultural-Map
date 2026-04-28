@@ -15,7 +15,7 @@ window.alert = vi.fn();
 describe('useUserQueries', () => {
 
   describe('Edit my profile (User)', () => {
-    it('should successfully update profile information', async () => {
+    test('should successfully update profile information', async () => {
       const { result } = renderHook(() => useUpdateProfile(), {
         wrapper: createWrapper(),
       });
@@ -27,7 +27,7 @@ describe('useUserQueries', () => {
       expect(response.data.user.username).toBe('new username');
     });
 
-    it('should show a success message when deleting the account', async () => {
+    test('should show a success message when deleting the account', async () => {
       const { result } = renderHook(() => useDeleteMyAccount(), {
         wrapper: createWrapper(),
       });
@@ -40,7 +40,7 @@ describe('useUserQueries', () => {
   });
 
   describe('Search and manage users (Admin)', () => {
-    it('should fetch specific user information when userId is provided', async () => {
+    test('should fetch specific user information when userId is provided', async () => {
       const { result } = renderHook(() => useUserById('user-1'), {
         wrapper: createWrapper(),
       });
@@ -49,7 +49,7 @@ describe('useUserQueries', () => {
       expect(result.current.data?.username).toBe('max');
     });
 
-    it('should view all users when called by an admin', async () => {
+    test('should view all users when called by an admin', async () => {
       const { result } = renderHook(() => useAllUsers(), {
         wrapper: createWrapper(),
       });
@@ -58,7 +58,7 @@ describe('useUserQueries', () => {
       expect(result.current.data).toHaveLength(2);
     });
 
-    it('should modify user permissions when called by an admin', async () => {
+    test('should modify user permissions when called by an admin', async () => {
       const { result } = renderHook(() => useUpdateUserRole(), {
         wrapper: createWrapper(),
       });

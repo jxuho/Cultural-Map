@@ -14,7 +14,7 @@ window.alert = vi.fn();
 describe('useProposalQueries', () => {
   
   describe('useProposals & useMyProposals (get)', () => {
-    it('Administrator can get a list of all suggestions', async () => {
+    test('Administrator can get a list of all suggestions', async () => {
       const { result } = renderHook(() => useProposals(), {
         wrapper: createWrapper(),
       });
@@ -24,7 +24,7 @@ describe('useProposalQueries', () => {
       expect(result.current.data?.[0]._id).toBe('prop-1');
     });
 
-    it('User can only get their own proposal list', async () => {
+    test('User can only get their own proposal list', async () => {
       const { result } = renderHook(() => useMyProposals(), {
         wrapper: createWrapper(),
       });
@@ -35,7 +35,7 @@ describe('useProposalQueries', () => {
   });
 
   describe('useSubmitProposal (Submit Proposal)', () => {
-    it('should successfully submit a new proposal', async () => {
+    test('should successfully submit a new proposal', async () => {
       const { result } = renderHook(() => useSubmitProposal(), {
         wrapper: createWrapper(),
       });
@@ -53,7 +53,7 @@ describe('useProposalQueries', () => {
   });
 
   describe('useProposalModeration (Approve/Rejectt/Reject)', () => {
-    it('should show an alert and return success data when a proposal is accepted', async () => {
+    test('should show an alert and return success data when a proposal is accepted', async () => {
       const { result } = renderHook(() => useProposalModeration(), {
         wrapper: createWrapper(),
       });
@@ -68,7 +68,7 @@ describe('useProposalQueries', () => {
       expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('successfully accepted'));
     });
 
-    it('should update the proposal status to rejected when it is rejected', async () => {
+    test('should update the proposal status to rejected when it is rejected', async () => {
       const { result } = renderHook(() => useProposalModeration(), {
         wrapper: createWrapper(),
       });

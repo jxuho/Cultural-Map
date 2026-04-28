@@ -9,7 +9,7 @@ window.alert = vi.fn();
 describe('useReviewQueries', () => {
   
   describe('usePlaceReviews', () => {
-    it('Retrieves a list of reviews only when isExpanded is true', async () => {
+    test('Retrieves a list of reviews only when isExpanded is true', async () => {
       const { result, rerender } = renderHook(
         ({ expanded }) => usePlaceReviews('site-123', expanded),
         {
@@ -31,7 +31,7 @@ describe('useReviewQueries', () => {
   });
 
   describe('useMyReviews', () => {
-    it('Get a list of my reviews based on sorting options', async () => {
+    test('Get a list of my reviews based on sorting options', async () => {
       const { result } = renderHook(() => useMyReviews('highest'), {
         wrapper: createWrapper(),
       });
@@ -44,7 +44,7 @@ describe('useReviewQueries', () => {
   describe('useReviewMutation', () => {
     const wrapper = createWrapper();
 
-    it('Successfully perform the review create action', async () => {
+    test('Successfully perform the review create action', async () => {
       const { result } = renderHook(() => useReviewMutation(), { wrapper });
 
       await result.current.mutateAsync({
@@ -57,7 +57,7 @@ describe('useReviewQueries', () => {
       expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('processed successfully'));
     });
 
-    it('Successfully perform the review update action', async () => {
+    test('Successfully perform the review update action', async () => {
       const { result } = renderHook(() => useReviewMutation(), { wrapper });
 
       await result.current.mutateAsync({
@@ -70,7 +70,7 @@ describe('useReviewQueries', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
     });
 
-    it('Successfully perform the review delete action', async () => {
+    test('Successfully perform the review delete action', async () => {
       const { result } = renderHook(() => useReviewMutation(), { wrapper });
 
       const response = await result.current.mutateAsync({
@@ -83,7 +83,7 @@ describe('useReviewQueries', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
     });
 
-    it('Shows an error alert when an error occurs', async () => {
+    test('Shows an error alert when an error occurs', async () => {
       // Artificially sending an incorrect request to create an API error situation
       // In a real environment, you can temporarily write a 500 error handler in MSW and test it.
       const { result } = renderHook(() => useReviewMutation(), { wrapper });
