@@ -13,3 +13,26 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           String   @id @default(uuid())
+  username     String?  // maxlength 20 등은 서비스 로직에서 검증
+  email        String   @unique
+  googleId     String   @unique
+  profileImage String?
+  role         Role     @default(ADMIN) // 기존 설정대로 admin 기본값
+  active       Boolean  @default(true)
+  
+  // 중요: MongoDB의 ObjectId들을 문자열 배열로 저장
+  // Mongoose의 ref 기능 대신, 서비스 로직에서 이 ID들로 MongoDB를 쿼리함
+  favoriteSites String[] 
+  
+  bio          String?  // maxlength 200
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum Role {
+  USER  @map("user")
+  ADMIN @map("admin")
+}
