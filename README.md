@@ -132,6 +132,10 @@ router.delete('/users/:id', authenticate, authorize('admin'), deleteUser);
 ```
 Role checks are enforced at the route level and re-validated in the service layer for defense in depth.
 
+### Automated CI Pipeline & Quality Control
+GitHub Actions → Linting & Formatting → Vitest/RTL → PR Validation. This was necessary to migrate User entity from MongoDB to PostgreSQL to leverage relational data integrity.
+
+
 ---
 
 ## 📊 Project Stats
