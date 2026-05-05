@@ -30,6 +30,8 @@ const proposalRoutes = require('./routes/proposalRoutes');
 // chemnitz boundary load
 const { loadChemnitzBoundary } = require('./utils/locationUtils');
 
+const seedIfEmpty = require('./utils/seedIfEmpty');
+
 // cron-related files (scheduling)
 const cron = require('node-cron');
 const { overpassUpdater } = require('./services/overpassService');
@@ -115,8 +117,12 @@ app.use(errorController);
 
 mongoose
   .connect(MONGO_URI)
-  .then(() => {
+  .then(async () => {
     console.log('Connected to MongoDB');
+
+    if (process.env.NODE_ENV !== 'production') {
+      await seedIfEmpty();
+    }
 
     // chemnitz boundary load
     try {

@@ -6,16 +6,17 @@
   },
   "main": "index.js",
   "scripts": {
+    "dev": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "seed": "node scripts/fetchAndSaveCulturalSites.js && node scripts/importGeojson.js --no-reverse-geocode"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.19.3",
     "@turf/turf": "^7.2.0",
     "axios": "^1.9.0",
     "cookie-parser": "^1.4.7",
@@ -33,7 +34,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prettier": "^3.8.3",
-    "prisma": "^6.19.3"
+    "prettier": "^3.8.3"
   }
 }

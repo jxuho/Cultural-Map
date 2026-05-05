@@ -33,6 +33,7 @@ async function fetchAndSaveCulturalSites() {
         );
       }
     });
+    return filePath; // Return the path of the saved file for further processing
   } catch (error) {
     console.error('Error occurred while calling Overpass API:', error.message);
     if (error.response) {
@@ -43,4 +44,11 @@ async function fetchAndSaveCulturalSites() {
 }
 
 // function execution
-fetchAndSaveCulturalSites();
+// fetchAndSaveCulturalSites();
+
+module.exports = fetchAndSaveCulturalSites;
+
+// CLI execution
+if (require.main === module) {
+  fetchAndSaveCulturalSites();
+}
