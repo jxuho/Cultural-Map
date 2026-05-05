@@ -1,18 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createWrapper } from '../../test/test-utils';
-import { 
-  useSubmitProposal, 
-  useProposals, 
-  useProposalModeration, 
-  useMyProposals 
+import {
+  useSubmitProposal,
+  useProposals,
+  useProposalModeration,
+  useMyProposals,
 } from './useProposalQueries';
 
 // Mocking global alerts
 window.alert = vi.fn();
 
 describe('useProposalQueries', () => {
-  
   describe('useProposals & useMyProposals (get)', () => {
     test('Administrator can get a list of all suggestions', async () => {
       const { result } = renderHook(() => useProposals(), {
@@ -42,7 +41,7 @@ describe('useProposalQueries', () => {
 
       const newProposal = {
         proposalType: 'create',
-        proposedChanges: { name: '테스트 유적지', category: 'temple' }
+        proposedChanges: { name: '테스트 유적지', category: 'temple' },
       } as const;
 
       await result.current.mutateAsync(newProposal);
@@ -61,11 +60,13 @@ describe('useProposalQueries', () => {
       await result.current.mutateAsync({
         proposalId: 'prop-1',
         actionType: 'accept',
-        adminComment: 'I approve.'
+        adminComment: 'I approve.',
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('successfully accepted'));
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining('successfully accepted'),
+      );
     });
 
     test('should update the proposal status to rejected when it is rejected', async () => {
@@ -76,7 +77,7 @@ describe('useProposalQueries', () => {
       const response = await result.current.mutateAsync({
         proposalId: 'prop-1',
         actionType: 'reject',
-        adminComment: 'Reason for nonconformity not suitable'
+        adminComment: 'Reason for nonconformity not suitable',
       });
 
       expect(response.data.proposal.status).toBe('rejected');

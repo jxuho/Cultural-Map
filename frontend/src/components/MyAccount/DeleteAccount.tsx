@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router"; 
-import { useDeleteMyAccount } from "../../hooks/data/useUserQueries"; 
-import BackButton from "../BackButton"; 
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { useDeleteMyAccount } from '../../hooks/data/useUserQueries';
+import BackButton from '../BackButton';
 
 const DeleteAccount = () => {
   const navigate = useNavigate();
@@ -16,8 +16,8 @@ const DeleteAccount = () => {
   // Redirect after successful account deletion
   useEffect(() => {
     if (isDeleted) {
-      console.log("Account deleted, redirecting to login...");
-      navigate("/login"); // Redirect to the login page
+      console.log('Account deleted, redirecting to login...');
+      navigate('/login'); // Redirect to the login page
     }
   }, [isDeleted, navigate]);
 
@@ -25,7 +25,7 @@ const DeleteAccount = () => {
     // Show a confirmation dialog before proceeding
     if (
       window.confirm(
-        "Are you absolutely sure you want to delete your account? This action is irreversible and all your data will be permanently lost."
+        'Are you absolutely sure you want to delete your account? This action is irreversible and all your data will be permanently lost.',
       )
     ) {
       deleteAccount(); // Trigger the mutation to delete the account
@@ -59,7 +59,7 @@ const DeleteAccount = () => {
             <strong className="font-bold">Error:</strong>
             <span className="block sm:inline ml-2">
               {deleteError.message ||
-                "Failed to delete account. Please try again."}
+                'Failed to delete account. Please try again.'}
             </span>
           </div>
         )}
@@ -69,7 +69,7 @@ const DeleteAccount = () => {
           className="w-full px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           disabled={isDeleting}
         >
-          {isDeleting ? "Deleting Account..." : "Confirm Account Deletion"}
+          {isDeleting ? 'Deleting Account...' : 'Confirm Account Deletion'}
         </button>
 
         <p className="text-sm text-gray-500 mt-6 text-center">

@@ -6,7 +6,6 @@ import { useMyFavorites, useFavoriteMutation } from './useFavoriteQueries';
 window.alert = vi.fn();
 
 describe('Favorite system integration testing', () => {
-  
   describe('useMyFavorites', () => {
     test('You will need to bring a list of historical sites with detailed information (location, rating, etc.)', async () => {
       const { result } = renderHook(() => useMyFavorites('user-1'), {
@@ -34,7 +33,7 @@ describe('Favorite system integration testing', () => {
       // Add new historic sites
       const updatedList = await result.current.mutateAsync({
         actionType: 'add',
-        culturalSiteId: 'site-789'
+        culturalSiteId: 'site-789',
       });
 
       // Check if Place[] array is returned according to API code
@@ -49,7 +48,7 @@ describe('Favorite system integration testing', () => {
 
       const success = await result.current.mutateAsync({
         actionType: 'delete',
-        culturalSiteId: 'site-123'
+        culturalSiteId: 'site-123',
       });
 
       expect(success).toBe(true);

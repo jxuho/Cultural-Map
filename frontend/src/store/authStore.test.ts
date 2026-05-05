@@ -40,8 +40,13 @@ describe('authStore', () => {
   });
 
   test('When the login action is executed, user information is saved and the authentication status is changed to true.change authentication status to true', () => {
-    const mockUser = { _id: '1', username: 'tester', email: 'test@test.com', role: 'user' };
-    
+    const mockUser = {
+      _id: '1',
+      username: 'tester',
+      email: 'test@test.com',
+      role: 'user',
+    };
+
     useAuthStore.getState().login(mockUser as any);
 
     const state = useAuthStore.getState();
@@ -51,7 +56,9 @@ describe('authStore', () => {
 
   test('When the updateUser action is executed, it merges new information with existing user information', () => {
     // Initial user settings
-    useAuthStore.setState({ user: { _id: '1', username: 'oldName', role: 'user' } as any });
+    useAuthStore.setState({
+      user: { _id: '1', username: 'oldName', role: 'user' } as any,
+    });
 
     useAuthStore.getState().updateUser({ username: 'newName' });
 
@@ -88,7 +95,10 @@ describe('authStore', () => {
   describe('logout', () => {
     test('When logout is successful, a request is sent to the server and the state is reset', async () => {
       // Start logged in
-      useAuthStore.setState({ user: { username: 'tester' } as any, isAuthenticated: true });
+      useAuthStore.setState({
+        user: { username: 'tester' } as any,
+        isAuthenticated: true,
+      });
       mockedApi.post.mockResolvedValueOnce({});
 
       await useAuthStore.getState().logout();

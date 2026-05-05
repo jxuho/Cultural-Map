@@ -1,7 +1,7 @@
-import { useMap } from "react-leaflet";
-import { useState } from "react";
-import L, { CircleMarker, LatLngBoundsExpression } from "leaflet";
-import { MdMyLocation } from "react-icons/md";
+import { useMap } from 'react-leaflet';
+import { useState } from 'react';
+import L, { CircleMarker, LatLngBoundsExpression } from 'leaflet';
+import { MdMyLocation } from 'react-icons/md';
 
 const CurrentLocationButton = ({
   maxBounds,
@@ -47,15 +47,15 @@ const CurrentLocationButton = ({
 
         const marker = L.circleMarker([latitude, longitude], {
           radius: 8,
-          color: "red",
+          color: 'red',
         }).addTo(map);
         setLocMarker(marker);
         setIsLoading(false);
       },
       (error) => {
-        console.error("Error getting current location:", error);
+        console.error('Error getting current location:', error);
         alert(
-          "Failed to get your location. Please ensure location services are enabled.",
+          'Failed to get your location. Please ensure location services are enabled.',
         );
         setIsLoading(false);
       },

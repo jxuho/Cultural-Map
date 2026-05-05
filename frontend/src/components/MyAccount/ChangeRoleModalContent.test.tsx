@@ -37,20 +37,20 @@ describe('ChangeRoleModalContent', () => {
     });
   });
 
-  test('Displays the user\'s name and current role correctly on the screen', () => {
+  test("Displays the user's name and current role correctly on the screen", () => {
     render(<ChangeRoleModalContent user={mockUser} />);
-    
+
     expect(screen.getByText(/Change Role for "testuser"/i)).toBeInTheDocument();
     expect(screen.getByRole('combobox')).toHaveValue('user');
   });
 
   test('Shows an alert and closes the modal if the role is not changed', async () => {
     render(<ChangeRoleModalContent user={mockUser} />);
-    
+
     const submitButton = screen.getByRole('button', { name: /update role/i });
     fireEvent.click(submitButton);
 
-    expect(alertMock).toHaveBeenCalledWith("role is not changed.");
+    expect(alertMock).toHaveBeenCalledWith('role is not changed.');
     expect(mockCloseModal).toHaveBeenCalled();
     expect(mockMutateAsync).not.toHaveBeenCalled();
   });
@@ -59,7 +59,7 @@ describe('ChangeRoleModalContent', () => {
     mockMutateAsync.mockResolvedValueOnce({}); // success simulation
 
     render(<ChangeRoleModalContent user={mockUser} />);
-    
+
     const select = screen.getByLabelText(/select new role:/i);
     const submitButton = screen.getByRole('button', { name: /update role/i });
 
@@ -84,7 +84,7 @@ describe('ChangeRoleModalContent', () => {
     });
 
     render(<ChangeRoleModalContent user={mockUser} />);
-    
+
     expect(screen.getByRole('button', { name: /updating.../i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeDisabled();
     expect(screen.getByRole('combobox')).toBeDisabled();
@@ -100,13 +100,13 @@ describe('ChangeRoleModalContent', () => {
     });
 
     render(<ChangeRoleModalContent user={mockUser} />);
-    
+
     expect(screen.getByText(`Error: ${errorMessage}`)).toBeInTheDocument();
   });
 
   test('Cancel button click calls closeModal', () => {
     render(<ChangeRoleModalContent user={mockUser} />);
-    
+
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
     fireEvent.click(cancelButton);
 

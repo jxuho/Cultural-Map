@@ -26,7 +26,7 @@ describe('useSidePanelResizer', () => {
       selector({
         sidePanelWidth: 400,
         setSidePanelWidth,
-      })
+      }),
     );
 
     (useViewport as any).mockReturnValue({
@@ -35,18 +35,14 @@ describe('useSidePanelResizer', () => {
   });
 
   test('initial state is correct', () => {
-    const { result } = renderHook(() =>
-      useSidePanelResizer(createMockRef())
-    );
+    const { result } = renderHook(() => useSidePanelResizer(createMockRef()));
 
     expect(result.current.resizerPosition).toBe(400);
     expect(result.current.isResizing).toBe(false);
   });
 
   test('mousedown sets resizing true', () => {
-    const { result } = renderHook(() =>
-      useSidePanelResizer(createMockRef())
-    );
+    const { result } = renderHook(() => useSidePanelResizer(createMockRef()));
 
     act(() => {
       result.current.resizerMouseDownHandler();
@@ -58,18 +54,14 @@ describe('useSidePanelResizer', () => {
   test('mousemove updates resizerPosition within bounds', () => {
     const ref = createMockRef();
 
-    const { result } = renderHook(() =>
-      useSidePanelResizer(ref)
-    );
+    const { result } = renderHook(() => useSidePanelResizer(ref));
 
     act(() => {
       result.current.resizerMouseDownHandler();
     });
 
     act(() => {
-      document.dispatchEvent(
-        new MouseEvent('mousemove', { clientX: 500 })
-      );
+      document.dispatchEvent(new MouseEvent('mousemove', { clientX: 500 }));
     });
 
     expect(result.current.resizerPosition).toBeGreaterThanOrEqual(360);
@@ -77,9 +69,7 @@ describe('useSidePanelResizer', () => {
   });
 
   test('mouseup stops resizing and updates store', () => {
-    const { result } = renderHook(() =>
-      useSidePanelResizer(createMockRef())
-    );
+    const { result } = renderHook(() => useSidePanelResizer(createMockRef()));
 
     act(() => {
       result.current.resizerMouseDownHandler();
@@ -96,18 +86,14 @@ describe('useSidePanelResizer', () => {
   test('resizerPosition is clamped to max 700', () => {
     const ref = createMockRef();
 
-    const { result } = renderHook(() =>
-      useSidePanelResizer(ref)
-    );
+    const { result } = renderHook(() => useSidePanelResizer(ref));
 
     act(() => {
       result.current.resizerMouseDownHandler();
     });
 
     act(() => {
-      document.dispatchEvent(
-        new MouseEvent('mousemove', { clientX: -1000 })
-      );
+      document.dispatchEvent(new MouseEvent('mousemove', { clientX: -1000 }));
     });
 
     expect(result.current.resizerPosition).toBe(700);
@@ -116,18 +102,14 @@ describe('useSidePanelResizer', () => {
   test('resizerPosition is clamped to min 360', () => {
     const ref = createMockRef();
 
-    const { result } = renderHook(() =>
-      useSidePanelResizer(ref)
-    );
+    const { result } = renderHook(() => useSidePanelResizer(ref));
 
     act(() => {
       result.current.resizerMouseDownHandler();
     });
 
     act(() => {
-      document.dispatchEvent(
-        new MouseEvent('mousemove', { clientX: 9999 })
-      );
+      document.dispatchEvent(new MouseEvent('mousemove', { clientX: 9999 }));
     });
 
     expect(result.current.resizerPosition).toBe(360);
@@ -138,9 +120,7 @@ describe('useSidePanelResizer', () => {
       width: 300,
     });
 
-    const { result } = renderHook(() =>
-      useSidePanelResizer(createMockRef())
-    );
+    const { result } = renderHook(() => useSidePanelResizer(createMockRef()));
 
     expect(result.current.resizerPosition).toBe(300);
   });

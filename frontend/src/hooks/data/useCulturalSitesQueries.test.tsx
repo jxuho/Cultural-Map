@@ -10,7 +10,6 @@ import {
 } from './useCulturalSitesQueries';
 import { createWrapper } from '../../test/test-utils';
 
-
 describe('useCulturalSitesQueries', () => {
   describe('Queries', () => {
     test('useAllCulturalSites: All historical sites must be loaded successfully', async () => {
@@ -73,7 +72,7 @@ describe('useCulturalSitesQueries', () => {
       await result.current.mutateAsync(newSiteData);
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      
+
       // MSW is set to return '_id: new-id-999' combined.
       expect(result.current.data?._id).toBe('new-id-999');
       expect(result.current.data?.name).toBe('New Site');

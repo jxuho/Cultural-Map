@@ -7,49 +7,50 @@ const path = require('path');
 const filePath = path.join(__dirname, '../data', 'FILENAME.geojson');
 
 fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-        console.error("Error reading the file:", err);
-        return;
+  if (err) {
+    console.error('Error reading the file:', err);
+    return;
+  }
+
+  try {
+    const geojson = JSON.parse(data);
+    const propertyCounts = {};
+
+    if (Array.isArray(geojson)) {
+      // If it's an array of features
+      geojson.forEach((feature) => {
+        if (feature.properties && typeof feature.properties === 'object') {
+          for (const propName in feature.properties) {
+            if (feature.properties.hasOwnProperty(propName)) {
+              propertyCounts[propName] = (propertyCounts[propName] || 0) + 1;
+            }
+          }
+        }
+      });
+    } else if (geojson.features && Array.isArray(geojson.features)) {
+      // If it's a FeatureCollection
+      geojson.features.forEach((feature) => {
+        if (feature.properties && typeof feature.properties === 'object') {
+          for (const propName in feature.properties) {
+            if (feature.properties.hasOwnProperty(propName)) {
+              propertyCounts[propName] = (propertyCounts[propName] || 0) + 1;
+            }
+          }
+        }
+      });
     }
 
-    try {
-        const geojson = JSON.parse(data);
-        const propertyCounts = {};
+    // Sort the properties by their count in descending order
+    const sortedPropertyCounts = Object.entries(propertyCounts).sort(
+      ([, countA], [, countB]) => countB - countA,
+    );
 
-        if (Array.isArray(geojson)) { // If it's an array of features
-            geojson.forEach(feature => {
-                if (feature.properties && typeof feature.properties === 'object') {
-                    for (const propName in feature.properties) {
-                        if (feature.properties.hasOwnProperty(propName)) {
-                            propertyCounts[propName] = (propertyCounts[propName] || 0) + 1;
-                        }
-                    }
-                }
-            });
-        }
-        else if (geojson.features && Array.isArray(geojson.features)) { // If it's a FeatureCollection
-            geojson.features.forEach(feature => {
-                if (feature.properties && typeof feature.properties === 'object') {
-                    for (const propName in feature.properties) {
-                        if (feature.properties.hasOwnProperty(propName)) {
-                            propertyCounts[propName] = (propertyCounts[propName] || 0) + 1;
-                        }
-                    }
-                }
-            });
-        }
-
-        // Sort the properties by their count in descending order
-        const sortedPropertyCounts = Object.entries(propertyCounts).sort(([, countA], [, countB]) => countB - countA);
-
-        console.log("Property counts across all features:");
-        sortedPropertyCounts.forEach(([propName, count]) => {
-            console.log(`  '${propName}': ${count} times`);
-        });
-        console.log(`Total number of properties: ${sortedPropertyCounts.length}`);
-
-
-    } catch (parseError) {
-        console.error("Error parsing JSON:", parseError);
-    }
+    console.log('Property counts across all features:');
+    sortedPropertyCounts.forEach(([propName, count]) => {
+      console.log(`  '${propName}': ${count} times`);
+    });
+    console.log(`Total number of properties: ${sortedPropertyCounts.length}`);
+  } catch (parseError) {
+    console.error('Error parsing JSON:', parseError);
+  }
 });

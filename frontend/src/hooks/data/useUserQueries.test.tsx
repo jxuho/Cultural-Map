@@ -1,19 +1,18 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createWrapper } from '../../test/test-utils';
-import { 
-  useUpdateProfile, 
-  useDeleteMyAccount, 
-  useUserById, 
-  useAllUsers, 
-  useUpdateUserRole 
+import {
+  useUpdateProfile,
+  useDeleteMyAccount,
+  useUserById,
+  useAllUsers,
+  useUpdateUserRole,
 } from './useUserQueries';
 
 // alert mocking
 window.alert = vi.fn();
 
 describe('useUserQueries', () => {
-
   describe('Edit my profile (User)', () => {
     test('should successfully update profile information', async () => {
       const { result } = renderHook(() => useUpdateProfile(), {
@@ -35,7 +34,9 @@ describe('useUserQueries', () => {
       await result.current.mutateAsync();
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('successfully deleted'));
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining('successfully deleted'),
+      );
     });
   });
 
@@ -65,7 +66,7 @@ describe('useUserQueries', () => {
 
       const response = await result.current.mutateAsync({
         userId: 'user-1',
-        newRole: 'admin'
+        newRole: 'admin',
       });
 
       expect(response.data.user.role).toBe('admin');

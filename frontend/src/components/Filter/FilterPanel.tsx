@@ -1,5 +1,12 @@
-import { useState } from "react";
-import { useFloating, flip, shift, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react";
+import { useState } from 'react';
+import {
+  useFloating,
+  flip,
+  shift,
+  useDismiss,
+  useInteractions,
+  FloatingPortal,
+} from '@floating-ui/react';
 import FilterButton from './FilterButton';
 import FilterContent from './FilterContent';
 
@@ -9,11 +16,8 @@ const FilterPanel = () => {
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
     onOpenChange: setIsOpen,
-    middleware: [
-      flip(),
-      shift(),
-    ],
-    placement: "bottom-start",
+    middleware: [flip(), shift()],
+    placement: 'bottom-start',
   });
 
   const dismiss = useDismiss(context);
@@ -32,12 +36,12 @@ const FilterPanel = () => {
         {...getReferenceProps()}
       />
 
-      {isOpen && ( 
+      {isOpen && (
         <FloatingPortal>
           <FilterContent
             ref={refs.setFloating}
             isOpen={isOpen}
-            floatingStyles={floatingStyles} 
+            floatingStyles={floatingStyles}
             {...getFloatingProps()}
           />
         </FloatingPortal>

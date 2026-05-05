@@ -1,7 +1,7 @@
-import axiosInstance from "./axiosInstance";
-import { User } from "../types/user";
-import { ApiResponse } from "@/types/api";
-import { AxiosError } from "axios";
+import axiosInstance from './axiosInstance';
+import { User } from '../types/user';
+import { ApiResponse } from '@/types/api';
+import { AxiosError } from 'axios';
 
 // interface for the response of fetching all users (Admin only)
 interface AllUsersResponse {
@@ -17,16 +17,16 @@ interface AllUsersResponse {
  */
 export const updateProfileApi = async (
   updateData: Partial<User>,
-): Promise<ApiResponse<{ user: User }>> => { 
+): Promise<ApiResponse<{ user: User }>> => {
   try {
     const response = await axiosInstance.patch<ApiResponse<{ user: User }>>(
-      "/users/updateMe",
-      updateData
+      '/users/updateMe',
+      updateData,
     );
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    throw err.response?.data?.message || "Failed to update profile.";
+    throw err.response?.data?.message || 'Failed to update profile.';
   }
 };
 
@@ -38,30 +38,31 @@ export const deleteMyAccount = async (): Promise<{
   message: string;
 }> => {
   try {
-    const response = await axiosInstance.delete<{ status: string; message: string }>(
-      "/users/deleteMe"
-    );
+    const response = await axiosInstance.delete<{
+      status: string;
+      message: string;
+    }>('/users/deleteMe');
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    throw err.response?.data?.message || "Failed to delete account";
+    throw err.response?.data?.message || 'Failed to delete account';
   }
 };
 
 /**
- * fetch user information by user ID 
+ * fetch user information by user ID
  */
 export const fetchUserById = async (userId: string): Promise<User | null> => {
-  if (!userId) throw new Error("User ID is required.");
+  if (!userId) throw new Error('User ID is required.');
 
   try {
     const response = await axiosInstance.get<ApiResponse<User>>(
-      `/users/${userId}`
+      `/users/${userId}`,
     );
-    return response.data.data || null; 
+    return response.data.data || null;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    throw err.response?.data?.message || "Failed to fetch user";
+    throw err.response?.data?.message || 'Failed to fetch user';
   }
 };
 
@@ -70,11 +71,11 @@ export const fetchUserById = async (userId: string): Promise<User | null> => {
  */
 export const fetchAllUsers = async (): Promise<User[]> => {
   try {
-    const response = await axiosInstance.get<AllUsersResponse>("/users");
+    const response = await axiosInstance.get<AllUsersResponse>('/users');
     return response.data.data.users;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    throw err.response?.data?.message || "Failed to fetch users";
+    throw err.response?.data?.message || 'Failed to fetch users';
   }
 };
 
@@ -83,16 +84,16 @@ export const fetchAllUsers = async (): Promise<User[]> => {
  */
 export const updateUserRoleApi = async (
   userId: string,
-  newRole: "user" | "admin",
+  newRole: 'user' | 'admin',
 ): Promise<ApiResponse<{ user: User }>> => {
   try {
     const response = await axiosInstance.patch<ApiResponse<{ user: User }>>(
       `/users/updateRole/${userId}`,
-      { newRole }
+      { newRole },
     );
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
-    throw err.response?.data?.message || "Failed to update user role.";
+    throw err.response?.data?.message || 'Failed to update user role.';
   }
 };

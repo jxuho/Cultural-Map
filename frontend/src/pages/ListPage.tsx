@@ -1,28 +1,28 @@
-import React, { ChangeEvent } from "react";
-import { useNavigate } from "react-router";
-import { FaHeart, FaCommentAlt } from "react-icons/fa";
+import React, { ChangeEvent } from 'react';
+import { useNavigate } from 'react-router';
+import { FaHeart, FaCommentAlt } from 'react-icons/fa';
 
 // Import types and custom hooks
-import { Place } from "../types/place";
-import { useAllCulturalSites } from "../hooks/data/useCulturalSitesQueries";
-import useFilterStore from "../store/filterStore"; 
-import useUiStore from "../store/uiStore";
+import { Place } from '../types/place';
+import { useAllCulturalSites } from '../hooks/data/useCulturalSitesQueries';
+import useFilterStore from '../store/filterStore';
+import useUiStore from '../store/uiStore';
 
 // Component import
-import FilterPanel from "../components/Filter/FilterPanel";
-import StarIcon from "../components/StarIcon";
-import GoToTopButton from "../components/GoToTopButton";
+import FilterPanel from '../components/Filter/FilterPanel';
+import StarIcon from '../components/StarIcon';
+import GoToTopButton from '../components/GoToTopButton';
 
 /**
  * A helper function that converts category identifiers into readable strings.
  */
 const formatCategoryName = (name: string): string => {
-  if (!name) return "";
+  if (!name) return '';
   return name
-    .replace(/_/g, " ")
-    .split(" ")
+    .replace(/_/g, ' ')
+    .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    .join(' ');
 };
 
 const ListPage: React.FC = () => {
@@ -37,7 +37,9 @@ const ListPage: React.FC = () => {
   } = useAllCulturalSites();
 
   // 2. Global state management (using individual selection instead of destructuring is advantageous for re-rendering optimization)
-  const selectedCategories = useFilterStore((state) => state.selectedCategories);
+  const selectedCategories = useFilterStore(
+    (state) => state.selectedCategories,
+  );
   const searchQuery = useFilterStore((state) => state.searchQuery);
   const sortBy = useFilterStore((state) => state.sortBy);
   const setSortBy = useFilterStore((state) => state.setSortBy);
@@ -47,7 +49,7 @@ const ListPage: React.FC = () => {
 
   // 3. Event handler
   const handleCardClick = (site: Place): void => {
-    navigate("/");
+    navigate('/');
     openSidePanel(site);
     setJumpToPlace(site);
   };
@@ -78,33 +80,33 @@ const ListPage: React.FC = () => {
 
   // 5. Filtering and sorting integration logic
   const query = searchQuery.toLowerCase();
-  
+
   // filtering
   let processedSites = culturalSites.filter((site: Place) => {
     const matchesCategory =
       selectedCategories.length === 0 ||
       selectedCategories.includes(site.category);
-    
+
     const matchesSearch =
       site.name.toLowerCase().includes(query) ||
       (site.description && site.description.toLowerCase().includes(query));
-    
+
     return matchesCategory && matchesSearch;
   });
 
   // Alignment (applies defensive code)
   processedSites.sort((a, b) => {
     switch (sortBy) {
-      case "alphabetical":
-        return (a.name || "").localeCompare(b.name || "");
+      case 'alphabetical':
+        return (a.name || '').localeCompare(b.name || '');
 
-      case "reviews":
+      case 'reviews':
         // If site.reviewCount is not available, the length of the reviews array can be used as an alternative.
         const countA = a.reviewCount ?? a.reviews?.length ?? 0;
         const countB = b.reviewCount ?? b.reviews?.length ?? 0;
         return countB - countA;
 
-      case "favorites":
+      case 'favorites':
         return (b.favoritesCount || 0) - (a.favoritesCount || 0);
 
       default:
@@ -131,7 +133,11 @@ const ListPage: React.FC = () => {
             <option value="favorites">Sort by Favorites Count</option>
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <svg
+              className="fill-current h-4 w-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
               <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 6.757 7.586 5.343 9z" />
             </svg>
           </div>
@@ -145,7 +151,7 @@ const ListPage: React.FC = () => {
         <p className="text-lg text-gray-600">
           Showing <strong>{processedSites.length}</strong> cultural sites
           {selectedCategories.length > 0 &&
-            ` (filtered by ${selectedCategories.map(formatCategoryName).join(", ")})`}
+            ` (filtered by ${selectedCategories.map(formatCategoryName).join(', ')})`}
         </p>
       </header>
 
@@ -179,13 +185,17 @@ const ListPage: React.FC = () => {
                         onClick={() => {}} // Prevent essential props errors
                       />
                     ))}
-                    <span className="ml-1 font-semibold">{site.averageRating.toFixed(1)}</span>
+                    <span className="ml-1 font-semibold">
+                      {site.averageRating.toFixed(1)}
+                    </span>
                   </div>
                 )}
 
                 <div className="flex items-center">
                   <FaCommentAlt className="text-blue-500 mr-1" />
-                  <span>{site.reviewCount ?? site.reviews?.length ?? 0} Reviews</span>
+                  <span>
+                    {site.reviewCount ?? site.reviews?.length ?? 0} Reviews
+                  </span>
                 </div>
 
                 <div className="flex items-center">

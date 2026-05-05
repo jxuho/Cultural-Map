@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface ErrorMessageProps {
   message: string;
@@ -20,7 +20,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ message, onClose }) => {
           </button>
         </div>
       )}
-      <p className="pr-10">Error: {message}</p> 
+      <p className="pr-10">Error: {message}</p>
     </div>
   );
 };

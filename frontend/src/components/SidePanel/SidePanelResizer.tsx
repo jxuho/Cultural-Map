@@ -17,7 +17,7 @@ const SidePanelResizer = ({
   return (
     <div
       className={`w-1 absolute top-0 h-full m-0 p-0 box-border bg-gray-500 opacity-0 translate-x-1 ${
-        (isHover || isResizing) && "opacity-40 cursor-ew-resize"
+        (isHover || isResizing) && 'opacity-40 cursor-ew-resize'
       }`}
       onMouseDown={resizerMouseDownHandler}
       onMouseEnter={() => setIsHover(true)}

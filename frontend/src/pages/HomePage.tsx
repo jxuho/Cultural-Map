@@ -1,8 +1,7 @@
-import MapComponent from "../components/Map/MapComponent.jsx";
-import SidePanel from "../components/SidePanel/SidePanel.jsx";
-import FilterPanel from "../components/Filter/FilterPanel.jsx";
-import MapContextMenu from "../components/Map/MapContextMenu.jsx";
-
+import MapComponent from '../components/Map/MapComponent.jsx';
+import SidePanel from '../components/SidePanel/SidePanel.jsx';
+import FilterPanel from '../components/Filter/FilterPanel.jsx';
+import MapContextMenu from '../components/Map/MapContextMenu.jsx';
 
 const HomePage = () => {
   return (
@@ -12,10 +11,9 @@ const HomePage = () => {
         <FilterPanel />
       </div>
       <SidePanel />
-      <MapContextMenu/>
+      <MapContextMenu />
     </>
   );
 };
 
 export default HomePage;
-

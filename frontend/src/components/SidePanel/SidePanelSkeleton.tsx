@@ -2,7 +2,6 @@ interface SidePanelSkeletonProps {
   onClose?: () => void;
 }
 
-
 const SidePanelSkeleton = ({ onClose }: SidePanelSkeletonProps) => {
   return (
     <div className="p-4 animate-pulse relative">
@@ -29,7 +28,9 @@ const SidePanelSkeleton = ({ onClose }: SidePanelSkeletonProps) => {
         <div className="h-4 bg-gray-200 rounded w-full"></div>
       </div>
       {/* Optionally add loading text */}
-      <p className="mt-4 text-center text-gray-500">Loading cultural site information...</p>
+      <p className="mt-4 text-center text-gray-500">
+        Loading cultural site information...
+      </p>
     </div>
   );
 };

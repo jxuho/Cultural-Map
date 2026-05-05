@@ -8,17 +8,17 @@ import { ApiResponse } from '../types/api';
  */
 export const addFavorite = async (culturalSiteId: string): Promise<Place[]> => {
   if (!culturalSiteId) {
-    throw new Error("Cultural site ID is required to add to favorites.");
+    throw new Error('Cultural site ID is required to add to favorites.');
   }
-  
+
   try {
-    const response = await apiClient.post<ApiResponse<{ favoriteSites: Place[] }>>(
-      `/users/me/favorites/${culturalSiteId}`
-    );
+    const response = await apiClient.post<
+      ApiResponse<{ favoriteSites: Place[] }>
+    >(`/users/me/favorites/${culturalSiteId}`);
     return response.data.data.favoriteSites || [];
   } catch (error) {
     const err = error as AxiosError;
-    console.error("Error adding favorite:", err);
+    console.error('Error adding favorite:', err);
     throw err;
   }
 };
@@ -28,13 +28,13 @@ export const addFavorite = async (culturalSiteId: string): Promise<Place[]> => {
  */
 export const fetchMyFavorites = async (): Promise<Place[]> => {
   try {
-    const response = await apiClient.get<ApiResponse<{ favoriteSites: Place[] }>>(
-      '/users/me/favorites'
-    );
+    const response = await apiClient.get<
+      ApiResponse<{ favoriteSites: Place[] }>
+    >('/users/me/favorites');
     return response.data.data.favoriteSites || [];
   } catch (error) {
     const err = error as AxiosError;
-    console.error("Error fetching my favorites:", err);
+    console.error('Error fetching my favorites:', err);
     throw err;
   }
 };
@@ -42,17 +42,19 @@ export const fetchMyFavorites = async (): Promise<Place[]> => {
 /**
  * Delete a cultural site from favorites
  */
-export const deleteFavorite = async (culturalSiteId: string): Promise<boolean> => {
+export const deleteFavorite = async (
+  culturalSiteId: string,
+): Promise<boolean> => {
   if (!culturalSiteId) {
-    throw new Error("Cultural site ID is required to delete from favorites.");
+    throw new Error('Cultural site ID is required to delete from favorites.');
   }
-  
+
   try {
     await apiClient.delete(`/users/me/favorites/${culturalSiteId}`);
-    return true; 
+    return true;
   } catch (error) {
     const err = error as AxiosError;
-    console.error("Error deleting favorite:", err);
+    console.error('Error deleting favorite:', err);
     throw err;
   }
 };

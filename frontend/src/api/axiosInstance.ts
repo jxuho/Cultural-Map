@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 // const API_BASE_URL = import.meta.env.PROD
 //   ? "https://chemnitz-cultural-sites-map.onrender.com/api/v1"
@@ -9,8 +9,8 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true, // include cookies in requests
   headers: {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   },
 });
 
-export default apiClient
+export default apiClient;

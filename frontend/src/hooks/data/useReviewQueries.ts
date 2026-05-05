@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createReview,
   deleteReview,
   fetchReviewsByPlaceId,
   getMyReviews,
   updateReview,
-} from "../../api/reviewApi";
-import { Review, ReviewInput } from "../../types/review";
+} from '../../api/reviewApi';
+import { Review, ReviewInput } from '../../types/review';
 
 // fetch reviews for a specific cultural site by place ID, only when the placeId is available and the review section is expanded
 export const usePlaceReviews = (
@@ -14,7 +14,7 @@ export const usePlaceReviews = (
   isExpanded: boolean,
 ) => {
   return useQuery<Review[], Error>({
-    queryKey: ["reviews", placeId],
+    queryKey: ['reviews', placeId],
     queryFn: () => fetchReviewsByPlaceId(placeId!),
     enabled: !!placeId && isExpanded,
     staleTime: 1000 * 10,
@@ -23,10 +23,10 @@ export const usePlaceReviews = (
 
 // fetch my reviews with optional sorting by date or rating
 export const useMyReviews = (
-  sortOption: "newest" | "oldest" | "highest" | "lowest" = "newest",
+  sortOption: 'newest' | 'oldest' | 'highest' | 'lowest' = 'newest',
 ) => {
   return useQuery<Review[], Error>({
-    queryKey: ["myReviews", sortOption],
+    queryKey: ['myReviews', sortOption],
     queryFn: () => getMyReviews(sortOption),
     staleTime: 1000 * 10,
   });
@@ -36,11 +36,11 @@ export const useMyReviews = (
  * review mutation variables type (Discriminated Unions)
  */
 type ReviewMutationVariables = {
-  actionType: "create" | "update" | "delete";
+  actionType: 'create' | 'update' | 'delete';
   placeId: string;
-  reviewId?: string; 
-  reviewData?: ReviewInput; 
-  oldRating?: number; 
+  reviewId?: string;
+  reviewData?: ReviewInput;
+  oldRating?: number;
 };
 // mutation hook for creating, updating, and deleting reviews
 export const useReviewMutation = () => {
@@ -51,15 +51,15 @@ export const useReviewMutation = () => {
       const { actionType, placeId } = variables;
 
       switch (actionType) {
-        case "create":
+        case 'create':
           return createReview(placeId, variables.reviewData!);
-        case "update":
+        case 'update':
           return updateReview(
             placeId,
             variables.reviewId!,
             variables.reviewData!,
           );
-        case "delete":
+        case 'delete':
           return deleteReview(placeId, variables.reviewId!);
         default:
           const _exhaustiveCheck: never = actionType;
@@ -67,20 +67,20 @@ export const useReviewMutation = () => {
       }
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["myReviews"] });
+      queryClient.invalidateQueries({ queryKey: ['myReviews'] });
       queryClient.invalidateQueries({
-        queryKey: ["reviews", variables.placeId],
+        queryKey: ['reviews', variables.placeId],
       });
-      queryClient.invalidateQueries({ queryKey: ["culturalSites"] });
+      queryClient.invalidateQueries({ queryKey: ['culturalSites'] });
       queryClient.invalidateQueries({
-        queryKey: ["culturalSite", variables.placeId],
+        queryKey: ['culturalSite', variables.placeId],
       });
 
-      alert("Review is processed successfully!");
+      alert('Review is processed successfully!');
     },
     onError: (error: Error) => {
-      console.error("Review action failed:", error);
-      alert(`Review process failed: ${error.message || "Unknown error"}`);
+      console.error('Review action failed:', error);
+      alert(`Review process failed: ${error.message || 'Unknown error'}`);
     },
   });
 };

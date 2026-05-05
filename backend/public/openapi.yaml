@@ -42,7 +42,7 @@ components:
         category:
           type: string
           description: Category of the cultural site.
-          enum: 
+          enum:
             - artwork
             - gallery
             - museum
@@ -88,7 +88,7 @@ components:
           description: Opening hours of the cultural site.
         licenseInfo:
           type: string
-          default: "Data © OpenStreetMap contributors, ODbL."
+          default: 'Data © OpenStreetMap contributors, ODbL.'
           description: Licensing information for the data.
         sourceId:
           type: string
@@ -371,18 +371,18 @@ paths:
             examples:
               newCulturalSite:
                 value:
-                  name: "Example Museum"
-                  description: "A wonderful museum of modern art."
-                  category: "Museum"
+                  name: 'Example Museum'
+                  description: 'A wonderful museum of modern art.'
+                  category: 'Museum'
                   location:
-                    type: "Point"
+                    type: 'Point'
                     coordinates: [12.345, 54.321]
-                  address: "123 Museum St, City"
-                  website: "http://examplemuseum.com"
-                  sourceId: "osm_node_12345"
+                  address: '123 Museum St, City'
+                  website: 'http://examplemuseum.com'
+                  sourceId: 'osm_node_12345'
                   originalTags:
-                    amenity: "museum"
-                    name: "Example Museum"
+                    amenity: 'museum'
+                    name: 'Example Museum'
       responses:
         201:
           description: Cultural site successfully saved.
@@ -425,7 +425,7 @@ paths:
         404:
           description: Cultural site not found.
         500:
-          description: Internal server error.       
+          description: Internal server error.
     put:
       summary: Update a cultural site by ID (Admin only)
       tags:
@@ -449,8 +449,8 @@ paths:
             examples:
               updateCulturalSite:
                 value:
-                  description: "Updated description of the museum."
-                  openingHours: "9 AM - 5 PM"
+                  description: 'Updated description of the museum.'
+                  openingHours: '9 AM - 5 PM'
       responses:
         200:
           description: Cultural site updated successfully.
@@ -520,7 +520,7 @@ paths:
         404:
           description: The specified cultural site does not exist.
         500:
-          description: Internal server error.  
+          description: Internal server error.
     post:
       summary: Create a review for a specific cultural site
       tags:
@@ -556,7 +556,7 @@ paths:
               newReview:
                 value:
                   rating: 4
-                  comment: "A great place to visit!"
+                  comment: 'A great place to visit!'
       responses:
         201:
           description: Review successfully created.
@@ -607,7 +607,7 @@ paths:
         500:
           description: Internal server error.
     patch:
-      summary: Update a specific review 
+      summary: Update a specific review
       tags:
         - Reviews
       operationId: updateReviewById
@@ -644,7 +644,7 @@ paths:
             examples:
               updateReview:
                 value:
-                  comment: "An updated comment."
+                  comment: 'An updated comment.'
       responses:
         200:
           description: Review updated successfully.
@@ -750,29 +750,29 @@ paths:
             examples:
               createProposal:
                 value:
-                  proposalType: "create"
+                  proposalType: 'create'
                   proposedChanges:
-                    name: "New Museum Idea"
-                    category: "Museum"
+                    name: 'New Museum Idea'
+                    category: 'Museum'
                     location:
-                      type: "Point"
+                      type: 'Point'
                       coordinates: [10.123, 20.456]
-                    address: "New Street 1"
-                    sourceId: "new_osm_id_xyz"
+                    address: 'New Street 1'
+                    sourceId: 'new_osm_id_xyz'
                     originalTags:
-                      building: "yes"
-                      name: "New Museum Idea"
+                      building: 'yes'
+                      name: 'New Museum Idea'
               updateProposal:
                 value:
-                  culturalSite: "60c72b2f9b1d6c001c8e4d3a"
-                  proposalType: "update"
+                  culturalSite: '60c72b2f9b1d6c001c8e4d3a'
+                  proposalType: 'update'
                   proposedChanges:
-                    description: "Updated description for the museum."
-                    openingHours: "10 AM - 6 PM"
+                    description: 'Updated description for the museum.'
+                    openingHours: '10 AM - 6 PM'
               deleteProposal:
                 value:
-                  culturalSite: "60c72b2f9b1d6c001c8e4d3b"
-                  proposalType: "delete"
+                  culturalSite: '60c72b2f9b1d6c001c8e4d3b'
+                  proposalType: 'delete'
                   proposedChanges: {}
       responses:
         201:
@@ -974,7 +974,7 @@ paths:
             examples:
               changeToAdmin:
                 value:
-                  role: "admin"
+                  role: 'admin'
       responses:
         200:
           description: User role updated successfully.
@@ -1036,8 +1036,8 @@ paths:
             examples:
               updateProfile:
                 value:
-                  username: "NewUsername"
-                  bio: "My updated bio."
+                  username: 'NewUsername'
+                  bio: 'My updated bio.'
       responses:
         200:
           description: User profile updated successfully.

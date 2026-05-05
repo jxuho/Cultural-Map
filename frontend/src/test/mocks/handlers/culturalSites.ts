@@ -2,27 +2,27 @@ import { http, HttpResponse } from 'msw';
 
 const mockCulturalSites = [
   {
-    _id: "site-123",
-    name: "abc",
-    description: "hello",
-    category: "artwork",
+    _id: 'site-123',
+    name: 'abc',
+    description: 'hello',
+    category: 'artwork',
     location: {
-      type: "Point",
-      coordinates: [126.974, 37.564]
+      type: 'Point',
+      coordinates: [126.974, 37.564],
     },
-    address: "chemnitzer str. 123, 09111 Chemnitz, Germany",
-    website: "https://example.com",
-    imageUrl: "https://example.com/image.jpg",
-    openingHours: "09:00 - 18:00",
-    licenseInfo: "Data © OpenStreetMap contributors, ODbL.",
-    sourceId: "osm-1",
-    reviews: ["hello"],
+    address: 'chemnitzer str. 123, 09111 Chemnitz, Germany',
+    website: 'https://example.com',
+    imageUrl: 'https://example.com/image.jpg',
+    openingHours: '09:00 - 18:00',
+    licenseInfo: 'Data © OpenStreetMap contributors, ODbL.',
+    sourceId: 'osm-1',
+    reviews: ['hello'],
     favoritesCount: 10,
-    originalTags: { amenity: "arts_centre" },
-    proposedBy: "admin",
-    registeredBy: "system",
-    active: true
-  }
+    originalTags: { amenity: 'arts_centre' },
+    proposedBy: 'admin',
+    registeredBy: 'system',
+    active: true,
+  },
 ];
 export const culturalSitesHandlers = [
   // [GET] View all historic sites
@@ -33,7 +33,7 @@ export const culturalSitesHandlers = [
 
     return HttpResponse.json({
       success: true,
-      data: { culturalSites: mockCulturalSites }
+      data: { culturalSites: mockCulturalSites },
     });
   }),
 
@@ -50,48 +50,54 @@ export const culturalSitesHandlers = [
 
     return HttpResponse.json({
       success: true,
-      data: { osmCulturalSites: [mockCulturalSites[0]] } // Return data for testing
+      data: { osmCulturalSites: [mockCulturalSites[0]] }, // Return data for testing
     });
   }),
 
   // [GET] Search for specific ID historic sites
   http.get('*/cultural-sites/:id', ({ params }) => {
     const { id } = params;
-    const site = mockCulturalSites.find(p => p._id === id) || mockCulturalSites[0];
+    const site =
+      mockCulturalSites.find((p) => p._id === id) || mockCulturalSites[0];
 
     return HttpResponse.json({
       success: true,
-      data: { culturalSite: { ...site, _id: id } }
+      data: { culturalSite: { ...site, _id: id } },
     });
   }),
 
   // [POST] Create historic site (Admin)
   http.post('*/cultural-sites', async ({ request }) => {
-    const siteData = await request.json() as any;
-    return HttpResponse.json({
-      success: true,
-      data: { culturalSite: { ...siteData, _id: 'new-id-999' } }
-    }, { status: 201 });
+    const siteData = (await request.json()) as any;
+    return HttpResponse.json(
+      {
+        success: true,
+        data: { culturalSite: { ...siteData, _id: 'new-id-999' } },
+      },
+      { status: 201 },
+    );
   }),
 
   // [PUT] Edit historic sites (Admin)
   http.put('*/cultural-sites/:id', async ({ request, params }) => {
     const { id } = params;
-    const updateData = await request.json() as any;
-    
+    const updateData = (await request.json()) as any;
+
     return HttpResponse.json({
       success: true,
-      data: { culturalSite: { ...mockCulturalSites[0], ...updateData, _id: id } }
+      data: {
+        culturalSite: { ...mockCulturalSites[0], ...updateData, _id: id },
+      },
     });
   }),
 
   // [DELETE] Delete historic sites (Admin)
   http.delete('*/cultural-sites/:id', ({ params }) => {
     console.log(`Deleting site: ${params.id}`);
-    
+
     return HttpResponse.json({
       success: true,
-      data: null
+      data: null,
     });
   }),
 ];

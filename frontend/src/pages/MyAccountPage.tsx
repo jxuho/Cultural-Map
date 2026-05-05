@@ -1,5 +1,5 @@
-import { Outlet } from "react-router";
-import GoToTopButton from "../components/GoToTopButton";
+import { Outlet } from 'react-router';
+import GoToTopButton from '../components/GoToTopButton';
 
 const MyAccountPage = () => {
   return (

@@ -1,12 +1,12 @@
-import { useState } from 'react'; 
-import useUiStore from "../../store/uiStore";
-import { useCulturalSiteDetail } from "../../hooks/data/useCulturalSitesQueries";
-import SidePanelSkeleton from "./SidePanelSkeleton";
-import ErrorMessage from "../ErrorMessage";
-import NearbySitesList from "./NearbySitesList";
-import SidePanelItems from "./SidePanelItems";
-import CreateForm from "./CreateForm";
-import UpdateForm from "./UpdateForm";
+import { useState } from 'react';
+import useUiStore from '../../store/uiStore';
+import { useCulturalSiteDetail } from '../../hooks/data/useCulturalSitesQueries';
+import SidePanelSkeleton from './SidePanelSkeleton';
+import ErrorMessage from '../ErrorMessage';
+import NearbySitesList from './NearbySitesList';
+import SidePanelItems from './SidePanelItems';
+import CreateForm from './CreateForm';
+import UpdateForm from './UpdateForm';
 import UserProfileDisplay from './UserProfileDisplay';
 
 const SidePanelContent = () => {
@@ -17,8 +17,10 @@ const SidePanelContent = () => {
   const nearbySitesLoading = useUiStore((state) => state.nearbySitesLoading);
   const nearbySitesError = useUiStore((state) => state.nearbySitesError);
   const uiSelectedPlace = useUiStore((state) => state.selectedPlace);
-  const handleCloseAndCancel = useUiStore((state) => state.handleCloseAndCancel); // Action from store
-  const isUserProfileOpen = useUiStore(state => state.isUserProfileOpen)
+  const handleCloseAndCancel = useUiStore(
+    (state) => state.handleCloseAndCancel,
+  ); // Action from store
+  const isUserProfileOpen = useUiStore((state) => state.isUserProfileOpen);
 
   // Local state for reviews expansion
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
@@ -37,21 +39,17 @@ const SidePanelContent = () => {
     panelContent = <CreateForm />;
   } else if (isUpdateFormOpen) {
     panelContent = <UpdateForm />;
-  } 
-
-   else if (isUserProfileOpen) { 
+  } else if (isUserProfileOpen) {
     panelContent = <UserProfileDisplay />;
-  } 
-
-  else if (nearbySitesLoading) {
+  } else if (nearbySitesLoading) {
     panelContent = (
-      <SidePanelSkeleton onClose={() => handleCloseAndCancel("nearbyOsm")} />
+      <SidePanelSkeleton onClose={() => handleCloseAndCancel('nearbyOsm')} />
     );
   } else if (nearbySitesError) {
     panelContent = (
       <ErrorMessage
         message={
-          nearbySitesError?.message || "Failed to load nearby cultural sites."
+          nearbySitesError?.message || 'Failed to load nearby cultural sites.'
         }
         onClose={() => handleCloseAndCancel(null)}
       />
@@ -66,13 +64,17 @@ const SidePanelContent = () => {
   } else if (isPlaceError) {
     panelContent = (
       <ErrorMessage
-        message={placeError?.message || "Failed to load cultural site information."}
+        message={
+          placeError?.message || 'Failed to load cultural site information.'
+        }
         onClose={() => handleCloseAndCancel(null)}
       />
     );
   } else if (isPlaceLoading && !selectedPlaceData) {
     panelContent = (
-      <SidePanelSkeleton onClose={() => handleCloseAndCancel("culturalSiteDetail")} />
+      <SidePanelSkeleton
+        onClose={() => handleCloseAndCancel('culturalSiteDetail')}
+      />
     );
   } else if (selectedPlaceData) {
     panelContent = (
@@ -114,7 +116,7 @@ const SidePanelContent = () => {
             <div className="absolute top-4 right-4">
               <button
                 className="text-gray-500 hover:text-gray-700 text-4xl font-bold hover:cursor-pointer p-1"
-                onClick={() => handleCloseAndCancel("culturalSiteDetail")}
+                onClick={() => handleCloseAndCancel('culturalSiteDetail')}
                 aria-label="Close panel"
               >
                 &times;

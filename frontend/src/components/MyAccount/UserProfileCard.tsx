@@ -1,12 +1,11 @@
-import { User } from "@/types/user";
-import defaultProfileImg from "../../assets/profile_image.svg";
-import useUiStore from "../../store/uiStore";
-import { ChangeRoleModalContent } from "./ChangeRoleModalContent"; 
-
+import { User } from '@/types/user';
+import defaultProfileImg from '../../assets/profile_image.svg';
+import useUiStore from '../../store/uiStore';
+import { ChangeRoleModalContent } from './ChangeRoleModalContent';
 
 interface UserProfileCardProps {
   user: User;
-  currentUser: User | null; 
+  currentUser: User | null;
 }
 
 const UserProfileCard = ({ user }: UserProfileCardProps) => {
@@ -14,12 +13,12 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
 
   const {
     _id,
-    username = "N/A",
-    email = "N/A",
+    username = 'N/A',
+    email = 'N/A',
     profileImage,
-    role = "user",
+    role = 'user',
     googleId,
-    bio = "",
+    bio = '',
     favoriteSites = [],
     createdAt,
     updatedAt,
@@ -46,8 +45,8 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
             {email}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-              DB ID: <span className="font-mono break-all">{_id}</span>
-            </p>
+            DB ID: <span className="font-mono break-all">{_id}</span>
+          </p>
           {googleId && (
             <p className="text-xs text-gray-500 mt-1">
               Google ID: <span className="font-mono break-all">{googleId}</span>
@@ -73,22 +72,22 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
           <p>
             <strong>Registered On: </strong>
             {createdAt
-              ? new Date(createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+              ? new Date(createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })
-              : "N/A"}
+              : 'N/A'}
           </p>
           <p>
             <strong>Last Updated: </strong>
             {updatedAt
-              ? new Date(updatedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+              ? new Date(updatedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })
-              : "N/A"}
+              : 'N/A'}
           </p>
         </div>
       </div>
@@ -110,7 +109,7 @@ const UserProfileCard = ({ user }: UserProfileCardProps) => {
           Bio
         </h3>
         <p className="italic text-gray-600 whitespace-pre-line leading-relaxed text-sm sm:text-base">
-          {bio.trim() !== "" ? bio : "No biography provided."}
+          {bio.trim() !== '' ? bio : 'No biography provided.'}
         </p>
       </div>
     </div>

@@ -1,10 +1,10 @@
-import React from "react";
-import useUiStore from "../store/uiStore";
-import { CgProfile } from "react-icons/cg";
-import { FaThList, FaMapMarkedAlt } from "react-icons/fa";
-import { useNavigate, useLocation } from "react-router";
+import React from 'react';
+import useUiStore from '../store/uiStore';
+import { CgProfile } from 'react-icons/cg';
+import { FaThList, FaMapMarkedAlt } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router';
 
-type HeaderOption = "accountManager" | "toggleListView";
+type HeaderOption = 'accountManager' | 'toggleListView';
 
 const Header: React.FC = () => {
   const isAccountManagerOpen = useUiStore(
@@ -16,22 +16,22 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isNotRootPath = location.pathname !== "/";
+  const isNotRootPath = location.pathname !== '/';
 
   const headerButtonsClickHandler = (option: HeaderOption) => {
     switch (option) {
-      case "accountManager":
+      case 'accountManager':
         if (isAccountManagerOpen) {
           closeAccountManager();
         } else {
           openAccountManager();
         }
         break;
-      case "toggleListView":
+      case 'toggleListView':
         if (isNotRootPath) {
-          navigate("/");
+          navigate('/');
         } else {
-          navigate("/list");
+          navigate('/list');
         }
         break;
       default:
@@ -46,8 +46,8 @@ const Header: React.FC = () => {
         <div
           id="toggleListViewButton"
           className="flex justify-center items-center h-12 w-12 hover:bg-[#44a1bd] transition ease-in-out duration-100 hover:cursor-pointer"
-          onClick={() => headerButtonsClickHandler("toggleListView")}
-          title={isNotRootPath ? "Go to Map View" : "See All Cultural Sites"}
+          onClick={() => headerButtonsClickHandler('toggleListView')}
+          title={isNotRootPath ? 'Go to Map View' : 'See All Cultural Sites'}
         >
           {isNotRootPath ? (
             <FaMapMarkedAlt size="20px" className="text-white" />
@@ -71,7 +71,7 @@ const Header: React.FC = () => {
           <div
             id="accountManagerButton"
             className="flex justify-center items-center h-12 w-12 hover:bg-[#44a1bd] transition ease-in-out duration-100 hover:cursor-pointer"
-            onClick={() => headerButtonsClickHandler("accountManager")}
+            onClick={() => headerButtonsClickHandler('accountManager')}
             title="Account manager"
           >
             <CgProfile size="20px" className="text-white" />

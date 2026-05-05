@@ -1,6 +1,12 @@
-import useUiStore from "../../store/uiStore";
+import useUiStore from '../../store/uiStore';
 
-const NearbySitesList = ({ sites, onClose }: { sites: any[]; onClose: () => void }) => {
+const NearbySitesList = ({
+  sites,
+  onClose,
+}: {
+  sites: any[];
+  onClose: () => void;
+}) => {
   const openCreateForm = useUiStore((state) => state.openCreateForm);
 
   if (!sites || sites.length === 0) {

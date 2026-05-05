@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useUiStore from '../../store/uiStore'; 
+import useUiStore from '../../store/uiStore';
 import { useUpdateUserRole } from '../../hooks/data/useUserQueries';
 
 export const ChangeRoleModalContent = ({ user }: { user: any }) => {
@@ -11,7 +11,7 @@ export const ChangeRoleModalContent = ({ user }: { user: any }) => {
     e.preventDefault();
 
     if (selectedRole === user.role) {
-      alert("role is not changed.");
+      alert('role is not changed.');
       closeModal();
       return;
     }
@@ -23,7 +23,7 @@ export const ChangeRoleModalContent = ({ user }: { user: any }) => {
       });
       closeModal();
     } catch (error) {
-      console.error("Failed to change role in modal:", error);
+      console.error('Failed to change role in modal:', error);
     }
   };
 
@@ -34,12 +34,16 @@ export const ChangeRoleModalContent = ({ user }: { user: any }) => {
       </h2>
       {updateUserRoleMutation.isError && (
         <p className="text-red-500 text-sm mb-3">
-          Error: {updateUserRoleMutation.error.message || 'Failed to update role.'}
+          Error:{' '}
+          {updateUserRoleMutation.error.message || 'Failed to update role.'}
         </p>
       )}
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label htmlFor="role-select" className="block text-gray-700 text-sm font-bold mb-2">
+          <label
+            htmlFor="role-select"
+            className="block text-gray-700 text-sm font-bold mb-2"
+          >
             Select New Role:
           </label>
           <select

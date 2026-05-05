@@ -1,4 +1,4 @@
-import { MdKeyboardArrowRight } from "react-icons/md";
+import { MdKeyboardArrowRight } from 'react-icons/md';
 import {
   PiUserCircleThin,
   PiTrashThin,
@@ -7,11 +7,11 @@ import {
   PiClipboardTextThin,
   PiUsersThreeThin,
   PiFileTextThin,
-} from "react-icons/pi";
-import useAuthStore from "../../store/authStore";
-import useUiStore from "../../store/uiStore";
-import defaultProfileImg from "../../assets/profile_image.svg";
-import { Link } from "react-router";
+} from 'react-icons/pi';
+import useAuthStore from '../../store/authStore';
+import useUiStore from '../../store/uiStore';
+import defaultProfileImg from '../../assets/profile_image.svg';
+import { Link } from 'react-router';
 
 const ProfileView = () => {
   const user = useAuthStore((state) => state.user);
@@ -19,7 +19,6 @@ const ProfileView = () => {
 
   const openModal = useUiStore((state) => state.openModal);
   const closeModal = useUiStore((state) => state.closeModal);
-
 
   if (!user) {
     return <div className="text-center p-4">Loading user data...</div>;
@@ -34,13 +33,13 @@ const ProfileView = () => {
           onClick={() => {
             closeModal();
             logout();
-            window.location.reload(); 
+            window.location.reload();
           }}
           className="mt-3 px-3 py-1.5 bg-red-500 text-white rounded hover:cursor-pointer font-semibold"
         >
           Sign Out
         </button>
-      </div>
+      </div>,
     );
   };
 
@@ -51,7 +50,7 @@ const ProfileView = () => {
         className="min-[640px]:h-150 row-span-2 flex flex-col justify-between max-w-xs p-4 bg-white rounded"
         style={{
           boxShadow:
-            "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
         }}
       >
         <div className="flex flex-col items-center">
@@ -97,7 +96,7 @@ const ProfileView = () => {
         className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
         style={{
           boxShadow:
-            "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
         }}
       >
         <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -107,7 +106,7 @@ const ProfileView = () => {
             </div>
             <PiUserCircleThin
               className="text-light-text scale-x-[-1]"
-              size={"60px"}
+              size={'60px'}
             />
             <p className="py-3 text-center">
               Update your personal information.
@@ -124,7 +123,7 @@ const ProfileView = () => {
               Update Profile
             </span>
             <span>
-              <MdKeyboardArrowRight size={"22px"} />
+              <MdKeyboardArrowRight size={'22px'} />
             </span>
           </Link>
         </div>
@@ -135,7 +134,7 @@ const ProfileView = () => {
         className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
         style={{
           boxShadow:
-            "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
         }}
       >
         <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -145,7 +144,7 @@ const ProfileView = () => {
             </div>
             <PiMapPinLineThin
               className="text-light-text scale-x-[-1]"
-              size={"60px"}
+              size={'60px'}
             />
             <p className="py-3 text-center">
               See your favorite cultural sites.
@@ -162,7 +161,7 @@ const ProfileView = () => {
               Go to favorites
             </span>
             <span>
-              <MdKeyboardArrowRight size={"22px"} />
+              <MdKeyboardArrowRight size={'22px'} />
             </span>
           </Link>
         </div>
@@ -173,7 +172,7 @@ const ProfileView = () => {
         className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
         style={{
           boxShadow:
-            "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
         }}
       >
         <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -183,7 +182,7 @@ const ProfileView = () => {
             </div>
             <PiChatCircleTextThin
               className="text-light-text scale-x-[-1]"
-              size={"60px"}
+              size={'60px'}
             />
             <p className="py-3 text-center">Check your reviews</p>
           </div>
@@ -198,18 +197,18 @@ const ProfileView = () => {
               Check reviews
             </span>
             <span>
-              <MdKeyboardArrowRight size={"22px"} />
+              <MdKeyboardArrowRight size={'22px'} />
             </span>
           </Link>
         </div>
       </div>
 
-      {user.role === "user" && (
+      {user.role === 'user' && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
           style={{
             boxShadow:
-              "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+              '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
           }}
         >
           <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -217,17 +216,14 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 My Proposals
               </div>
-              <PiFileTextThin 
-                className="text-light-text"
-                size={"60px"}
-              />
+              <PiFileTextThin className="text-light-text" size={'60px'} />
               <p className="py-3 text-center">
                 View the proposals you have submitted.
               </p>
             </div>
             <Link
               className="font-medium text-chemnitz-blue flex hover:underline hover:cursor-pointer pb-2 pt-4 border-t"
-              to="my-proposals" 
+              to="my-proposals"
             >
               <span
                 className="uppercase max-[400px]:text-sm"
@@ -236,7 +232,7 @@ const ProfileView = () => {
                 View My Proposals
               </span>
               <span>
-                <MdKeyboardArrowRight size={"22px"} />
+                <MdKeyboardArrowRight size={'22px'} />
               </span>
             </Link>
           </div>
@@ -244,12 +240,12 @@ const ProfileView = () => {
       )}
 
       {/* Admin: View Proposals Card (Conditionally Rendered) */}
-      {user.role === "admin" && (
+      {user.role === 'admin' && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
           style={{
             boxShadow:
-              "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+              '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
           }}
         >
           <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -257,7 +253,7 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 View Proposals
               </div>
-              <PiClipboardTextThin className="text-light-text" size={"60px"} />
+              <PiClipboardTextThin className="text-light-text" size={'60px'} />
               <p className="py-3 text-center">
                 Review and manage user-submitted proposals.
               </p>
@@ -273,7 +269,7 @@ const ProfileView = () => {
                 View Proposals
               </span>
               <span>
-                <MdKeyboardArrowRight size={"22px"} />
+                <MdKeyboardArrowRight size={'22px'} />
               </span>
             </Link>
           </div>
@@ -281,12 +277,12 @@ const ProfileView = () => {
       )}
 
       {/* Admin: Check Users Card (Conditionally Rendered) */}
-      {user.role === "admin" && (
+      {user.role === 'admin' && (
         <div
           className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1"
           style={{
             boxShadow:
-              "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+              '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
           }}
         >
           <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -294,7 +290,7 @@ const ProfileView = () => {
               <div className="text-2xl font-normal pb-4 max-[400px]:text-lg">
                 Check Users
               </div>
-              <PiUsersThreeThin className="text-light-text" size={"60px"} />
+              <PiUsersThreeThin className="text-light-text" size={'60px'} />
               <p className="py-3 text-center">
                 View and manage all registered users.
               </p>
@@ -310,7 +306,7 @@ const ProfileView = () => {
                 Check Users
               </span>
               <span>
-                <MdKeyboardArrowRight size={"22px"} />
+                <MdKeyboardArrowRight size={'22px'} />
               </span>
             </Link>
           </div>
@@ -322,7 +318,7 @@ const ProfileView = () => {
         className="flex flex-col max-w-xs p-4 bg-white rounded h-full row-span-1 "
         style={{
           boxShadow:
-            "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
         }}
       >
         <div className="flex flex-col items-center justify-between h-full mt-4">
@@ -332,7 +328,7 @@ const ProfileView = () => {
             </div>
             <PiTrashThin
               className="text-light-text scale-x-[-1]"
-              size={"60px"}
+              size={'60px'}
             />
             <p className="py-3 text-center">
               Delete your account. <br />
@@ -350,7 +346,7 @@ const ProfileView = () => {
               Delete Account
             </span>
             <span>
-              <MdKeyboardArrowRight size={"22px"} />
+              <MdKeyboardArrowRight size={'22px'} />
             </span>
           </Link>
         </div>

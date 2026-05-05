@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
-import { useMyProposals } from "../../hooks/data/useProposalQueries";
-import BackButton from "../BackButton";
-import { ProposalType } from "../../types/proposal";
+import { useState, useMemo } from 'react';
+import { useMyProposals } from '../../hooks/data/useProposalQueries';
+import BackButton from '../BackButton';
+import { ProposalType } from '../../types/proposal';
 
 const MyProposalsList = () => {
-  const [sortOption, setSortOption] = useState("-createdAt"); 
+  const [sortOption, setSortOption] = useState('-createdAt');
 
   const { data: proposals = [], isLoading, isError, error } = useMyProposals();
 
@@ -17,18 +17,18 @@ const MyProposalsList = () => {
       let comparison = 0;
 
       switch (sortOption) {
-        case "-createdAt":
+        case '-createdAt':
           comparison =
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
           break;
-        case "createdAt":
+        case 'createdAt':
           comparison =
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
           break;
-        case "status":
+        case 'status':
           comparison = a.status.localeCompare(b.status);
           break;
-        case "-status":
+        case '-status':
           comparison = b.status.localeCompare(a.status);
           break;
         default:
@@ -48,17 +48,17 @@ const MyProposalsList = () => {
     proposalType: ProposalType,
   ) => {
     if (
-      key === "location" &&
-      typeof value === "object" &&
+      key === 'location' &&
+      typeof value === 'object' &&
       value !== null &&
-      value.type === "Point" &&
+      value.type === 'Point' &&
       Array.isArray(value.coordinates)
     ) {
       return `[Lon: ${value.coordinates[0]}, Lat: ${value.coordinates[1]}]`;
     }
 
-    if (proposalType === "create") {
-      if (typeof value === "object" && value !== null) {
+    if (proposalType === 'create') {
+      if (typeof value === 'object' && value !== null) {
         return JSON.stringify(value);
       }
       return `"${value}"`;
@@ -66,13 +66,13 @@ const MyProposalsList = () => {
       let oldValue = value.oldValue;
       let newValue = value.newValue;
 
-      if (typeof oldValue === "object" && oldValue !== null) {
+      if (typeof oldValue === 'object' && oldValue !== null) {
         oldValue = JSON.stringify(oldValue);
       } else {
         oldValue = `"${oldValue}"`;
       }
 
-      if (typeof newValue === "object" && newValue !== null) {
+      if (typeof newValue === 'object' && newValue !== null) {
         newValue = JSON.stringify(newValue);
       } else {
         newValue = `"${newValue}"`;
@@ -142,19 +142,19 @@ const MyProposalsList = () => {
             className="bg-white p-6 rounded-lg shadow-md border border-gray-200"
           >
             <h3 className="text-xl font-semibold mb-2">
-              {proposal.proposalType === "create"
-                ? "New Site Proposal"
-                : "Update Proposal"}
+              {proposal.proposalType === 'create'
+                ? 'New Site Proposal'
+                : 'Update Proposal'}
             </h3>
             <p className="text-gray-700 mb-1">
               <strong>Status: </strong>
               <span
                 className={`font-medium ${
-                  proposal.status === "pending"
-                    ? "text-yellow-600"
-                    : proposal.status === "accepted"
-                      ? "text-green-600"
-                      : "text-red-600"
+                  proposal.status === 'pending'
+                    ? 'text-yellow-600'
+                    : proposal.status === 'accepted'
+                      ? 'text-green-600'
+                      : 'text-red-600'
                 }`}
               >
                 {proposal.status}
@@ -165,7 +165,7 @@ const MyProposalsList = () => {
               <>
                 <p className="text-gray-700 mb-1">
                   <strong>Cultural Site:</strong>
-                  {proposal.culturalSite.name || "N/A"}
+                  {proposal.culturalSite.name || 'N/A'}
                 </p>
                 {proposal.culturalSite.description && (
                   <p className="text-gray-700 mb-1">
@@ -225,8 +225,8 @@ const MyProposalsList = () => {
                     .filter(
                       ([key]) =>
                         !(
-                          proposal.proposalType === "create" &&
-                          key === "originalTags"
+                          proposal.proposalType === 'create' &&
+                          key === 'originalTags'
                         ),
                     ) // Filter out originalTags for 'create' proposals
                     .map(([key, value]) => (
@@ -248,20 +248,20 @@ const MyProposalsList = () => {
               </div>
             )}
             <p className="text-sm text-gray-500 mt-2">
-              Submitted:{" "}
-              {new Date(proposal.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+              Submitted:{' '}
+              {new Date(proposal.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}
             </p>
             {proposal.reviewedAt && (
               <p className="text-sm text-gray-500">
-                Reviewed:{" "}
-                {new Date(proposal.reviewedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                Reviewed:{' '}
+                {new Date(proposal.reviewedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </p>
             )}

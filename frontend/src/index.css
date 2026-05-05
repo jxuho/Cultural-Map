@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-chemnitz-blue: #005385;
@@ -37,7 +37,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: "Segoe", "Segoe UI", "Arial", "sans-serif";
+  font-family: 'Segoe', 'Segoe UI', 'Arial', 'sans-serif';
   font-size: 14px;
   overflow: hidden;
   cursor: default;
@@ -48,9 +48,7 @@ body {
   outline: none;
 }
 
-
 .leaflet-tile {
-    outline: 2px solid transparent;
-    margin-left: -2px;
-
+  outline: 2px solid transparent;
+  margin-left: -2px;
 }

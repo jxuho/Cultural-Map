@@ -1,8 +1,8 @@
-import { useEffect } from "react";
-import useUiStore from "../../store/uiStore";
-import { Menu, MenuItem } from "../ContextMenu";
-import { useNearbyOsm } from "../../hooks/data/useCulturalSitesQueries";
-import useAuthStore from "../../store/authStore";
+import { useEffect } from 'react';
+import useUiStore from '../../store/uiStore';
+import { Menu, MenuItem } from '../ContextMenu';
+import { useNearbyOsm } from '../../hooks/data/useCulturalSitesQueries';
+import useAuthStore from '../../store/authStore';
 
 const MapContextMenu = () => {
   const selectedLatLng = useUiStore((state) => state.selectedLatLng);
@@ -29,24 +29,24 @@ const MapContextMenu = () => {
   const queryThisArea = () => {
     if (selectedLatLng?.lat && selectedLatLng?.lng) {
       openSidePanel({
-        _id: "new",
-        name: "",
-        category: "other",
+        _id: 'new',
+        name: '',
+        category: 'other',
         location: {
-          type: "Point",
+          type: 'Point',
           coordinates: [selectedLatLng.lng, selectedLatLng.lat],
         },
-      } as any); 
-      setNearbySitesLoading(true); 
-      setNearbySitesError(null); 
+      } as any);
+      setNearbySitesLoading(true);
+      setNearbySitesError(null);
       refetchNearbyOsm(); // Start importing nearby OSM data
     } else {
       console.warn(
-        "The surrounding area cannot be searched due to lack of valid latitude and longitude information.",
+        'The surrounding area cannot be searched due to lack of valid latitude and longitude information.',
       );
       setNearbySitesError(
-        new Error("There is no valid latitude and longitude information."),
-      ); 
+        new Error('There is no valid latitude and longitude information.'),
+      );
     }
   };
 
@@ -55,19 +55,19 @@ const MapContextMenu = () => {
     setNearbySitesLoading(isNearbyOsmLoading);
     if (isNearbyOsmSuccess && nearbyOsmData) {
       console.log(nearbyOsmData);
-      setNearbySites(nearbyOsmData); 
+      setNearbySites(nearbyOsmData);
       console.log(
-        "Surrounding OSM cultural site data is set in the UI store:",
+        'Surrounding OSM cultural site data is set in the UI store:',
         nearbyOsmData,
       );
     }
     if (isNearbyOsmError) {
       console.error(
-        "Error occurred while retrieving surrounding OSM cultural site:",
+        'Error occurred while retrieving surrounding OSM cultural site:',
         nearbyOsmError,
       );
-      setNearbySites([]); 
-      setNearbySitesError(nearbyOsmError); 
+      setNearbySites([]);
+      setNearbySitesError(nearbyOsmError);
     }
   }, [
     isNearbyOsmSuccess,
@@ -86,7 +86,7 @@ const MapContextMenu = () => {
         <Menu>
           <MenuItem onClick={queryThisArea}>
             <div className="px-1 mx-1 text-xs">
-              {user.role === "admin" ? "Add new place" : "Suggest new place"}
+              {user.role === 'admin' ? 'Add new place' : 'Suggest new place'}
             </div>
           </MenuItem>
         </Menu>

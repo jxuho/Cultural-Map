@@ -1,21 +1,24 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createWrapper } from '../../test/test-utils';
-import { usePlaceReviews, useMyReviews, useReviewMutation } from './useReviewQueries';
+import {
+  usePlaceReviews,
+  useMyReviews,
+  useReviewMutation,
+} from './useReviewQueries';
 
 // Mocking global alerts
 window.alert = vi.fn();
 
 describe('useReviewQueries', () => {
-  
   describe('usePlaceReviews', () => {
     test('Retrieves a list of reviews only when isExpanded is true', async () => {
       const { result, rerender } = renderHook(
         ({ expanded }) => usePlaceReviews('site-123', expanded),
         {
           wrapper: createWrapper(),
-          initialProps: { expanded: false }
-        }
+          initialProps: { expanded: false },
+        },
       );
 
       // Initially inactive (idle)
@@ -26,7 +29,9 @@ describe('useReviewQueries', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
       expect(result.current.data).toHaveLength(1);
-      expect(result.current.data?.[0].comment).toBe('It\'s a really cool place!');
+      expect(result.current.data?.[0].comment).toBe(
+        "It's a really cool place!",
+      );
     });
   });
 
@@ -50,11 +55,13 @@ describe('useReviewQueries', () => {
       await result.current.mutateAsync({
         actionType: 'create',
         placeId: 'site-123',
-        reviewData: { rating: 5, comment: 'It\'s the best!' }
+        reviewData: { rating: 5, comment: "It's the best!" },
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('processed successfully'));
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining('processed successfully'),
+      );
     });
 
     test('Successfully perform the review update action', async () => {
@@ -64,7 +71,7 @@ describe('useReviewQueries', () => {
         actionType: 'update',
         placeId: 'site-123',
         reviewId: 'rev-1',
-        reviewData: { rating: 4, comment: 'Updated comment' }
+        reviewData: { rating: 4, comment: 'Updated comment' },
       });
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -76,7 +83,7 @@ describe('useReviewQueries', () => {
       const response = await result.current.mutateAsync({
         actionType: 'delete',
         placeId: 'site-123',
-        reviewId: 'rev-1'
+        reviewId: 'rev-1',
       });
 
       expect(response).toBe(true);
@@ -89,13 +96,17 @@ describe('useReviewQueries', () => {
       const { result } = renderHook(() => useReviewMutation(), { wrapper });
 
       // API internal error occurs when requesting without placeId
-      await expect(result.current.mutateAsync({
-        actionType: 'create',
-        placeId: '', // Error induction
-        reviewData: { rating: 1, comment: '' }
-      })).rejects.toThrow();
+      await expect(
+        result.current.mutateAsync({
+          actionType: 'create',
+          placeId: '', // Error induction
+          reviewData: { rating: 1, comment: '' },
+        }),
+      ).rejects.toThrow();
 
-      expect(window.alert).toHaveBeenCalledWith(expect.stringContaining('Review process failed'));
+      expect(window.alert).toHaveBeenCalledWith(
+        expect.stringContaining('Review process failed'),
+      );
     });
   });
 });

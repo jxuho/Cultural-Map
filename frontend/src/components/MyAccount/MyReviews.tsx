@@ -1,21 +1,21 @@
-import { useState, useCallback, useMemo } from "react";
-import StarIcon from "../StarIcon";
-import ReviewForm from "../Review/ReviewForm";
-import useAuthStore from "../../store/authStore";
+import { useState, useCallback, useMemo } from 'react';
+import StarIcon from '../StarIcon';
+import ReviewForm from '../Review/ReviewForm';
+import useAuthStore from '../../store/authStore';
 import {
   useMyReviews,
   useReviewMutation,
-} from "../../hooks/data/useReviewQueries";
-import BackButton from "../BackButton";
+} from '../../hooks/data/useReviewQueries';
+import BackButton from '../BackButton';
 
 const MyReviews = () => {
   const currentUser = useAuthStore((state) => state.user);
 
   const [expandedReviewId, setExpandedReviewId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<
-    "createdAt" | "culturalSiteName" | "rating"
-  >("createdAt"); 
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc"); 
+    'createdAt' | 'culturalSiteName' | 'rating'
+  >('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const {
     data: reviews = [],
@@ -28,7 +28,7 @@ const MyReviews = () => {
 
   const handleReviewActionCompleted = useCallback(
     async (
-      actionType: "create" | "update" | "delete",
+      actionType: 'create' | 'update' | 'delete',
       newRating: number | null,
       _oldRating: number | null,
       comment?: string,
@@ -46,11 +46,11 @@ const MyReviews = () => {
       await reviewMutation.mutateAsync({
         actionType,
         placeId: placeIdForAction,
-        reviewId: actionType === "create" ? undefined : reviewIdForAction,
+        reviewId: actionType === 'create' ? undefined : reviewIdForAction,
         reviewData:
-          actionType === "delete"
+          actionType === 'delete'
             ? undefined
-            : { rating: newRating ?? 0, comment: comment ?? "" },
+            : { rating: newRating ?? 0, comment: comment ?? '' },
       });
 
       // This state update should remain in the component, not in the generic hook
@@ -69,50 +69,50 @@ const MyReviews = () => {
       let valA, valB;
 
       switch (sortBy) {
-        case "culturalSiteName":
-          valA = a.culturalSite?.name || "";
-          valB = b.culturalSite?.name || "";
+        case 'culturalSiteName':
+          valA = a.culturalSite?.name || '';
+          valB = b.culturalSite?.name || '';
           break;
-        case "rating":
+        case 'rating':
           valA = a.rating;
           valB = b.rating;
           break;
-        case "createdAt":
+        case 'createdAt':
         default: // Default to createdAt
           valA = new Date(a.createdAt).getTime();
           valB = new Date(b.createdAt).getTime();
           break;
       }
 
-      if (typeof valA === "string" && typeof valB === "string") {
-        return sortOrder === "asc"
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return sortOrder === 'asc'
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       } else {
         // For numbers (ratings, dates converted to timestamps)
-        return sortOrder === "asc" ? valA - valB : valB - valA;
+        return sortOrder === 'asc' ? valA - valB : valB - valA;
       }
     });
     return sortableReviews;
-  }, [reviews, sortBy, sortOrder]); 
+  }, [reviews, sortBy, sortOrder]);
 
   const handleSortChange = (criteria: string) => {
     if (sortBy === criteria) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortBy(criteria as "createdAt" | "culturalSiteName" | "rating");
-      setSortOrder("asc"); 
+      setSortBy(criteria as 'createdAt' | 'culturalSiteName' | 'rating');
+      setSortOrder('asc');
     }
   };
 
   const getSortIndicator = (criteria: string) => {
     if (sortBy === criteria) {
-      return sortOrder === "asc" ? " ↑" : " ↓";
+      return sortOrder === 'asc' ? ' ↑' : ' ↓';
     }
-    return "";
+    return '';
   };
 
-  // Loading/Error/Empty Review Status Handling 
+  // Loading/Error/Empty Review Status Handling
   const renderContent = () => {
     if (loadingReviews) {
       return (
@@ -165,7 +165,7 @@ const MyReviews = () => {
               >
                 <div className="flex items-center mb-2">
                   <p className="font-semibold text-gray-800 mr-2 grow break-all">
-                    {review.culturalSite.name || "Unknown"}
+                    {review.culturalSite.name || 'Unknown'}
                   </p>
                   <div className="flex text-yellow-500 text-sm">
                     {[...Array(5)].map((_, i) => (
@@ -185,10 +185,10 @@ const MyReviews = () => {
                   </p>
                 )}
                 <p className="text-gray-500 text-xs mt-2 text-right">
-                  {new Date(review.createdAt).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
+                  {new Date(review.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
                   })}
                 </p>
               </div>
@@ -204,7 +204,7 @@ const MyReviews = () => {
                     userReview={review}
                     onReviewActionCompleted={handleReviewActionCompleted}
                     currentUser={currentUser}
-                    isSubmitting={reviewMutation.isPending} 
+                    isSubmitting={reviewMutation.isPending}
                     submitError={reviewMutation.error?.message || null}
                   />
                 </div>
@@ -231,22 +231,22 @@ const MyReviews = () => {
       {/* Sort Buttons for MyReviews */}
       <div className="mb-6 flex flex-wrap gap-2 sm:gap-4 justify-start">
         <button
-          onClick={() => handleSortChange("createdAt")}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "createdAt" ? "bg-blue-600 text-white cursor-pointer" : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"}`}
+          onClick={() => handleSortChange('createdAt')}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'createdAt' ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
         >
-          Sort by Date{getSortIndicator("createdAt")}
+          Sort by Date{getSortIndicator('createdAt')}
         </button>
         <button
-          onClick={() => handleSortChange("rating")}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "rating" ? "bg-blue-600 text-white cursor-pointer" : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"}`}
+          onClick={() => handleSortChange('rating')}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'rating' ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
         >
-          Sort by Rating{getSortIndicator("rating")}
+          Sort by Rating{getSortIndicator('rating')}
         </button>
         <button
-          onClick={() => handleSortChange("culturalSiteName")}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "culturalSiteName" ? "bg-blue-600 text-white cursor-pointer" : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"}`}
+          onClick={() => handleSortChange('culturalSiteName')}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'culturalSiteName' ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
         >
-          Sort by Site Name{getSortIndicator("culturalSiteName")}
+          Sort by Site Name{getSortIndicator('culturalSiteName')}
         </button>
       </div>
 

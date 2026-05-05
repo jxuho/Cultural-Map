@@ -1,15 +1,15 @@
-import { useRef, useEffect } from "react";
-import { useNavigate } from "react-router";
-import defaultProfileImg from "../../assets/profile_image.svg";
-import useUiStore from "../../store/uiStore";
-import useAuthStore from "../../store/authStore";
+import { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import defaultProfileImg from '../../assets/profile_image.svg';
+import useUiStore from '../../store/uiStore';
+import useAuthStore from '../../store/authStore';
 
 const AccountManager = () => {
   const navigate = useNavigate();
   const accountManagerRef = useRef<HTMLDivElement>(null);
 
   const isAccountManagerOpen = useUiStore(
-    (state) => state.isAccountManagerOpen
+    (state) => state.isAccountManagerOpen,
   );
   const closeAccountManager = useUiStore((state) => state.closeAccountManager);
   const openModal = useUiStore((state) => state.openModal);
@@ -26,17 +26,17 @@ const AccountManager = () => {
         accountManagerRef.current &&
         !accountManagerRef.current.contains(target)
       ) {
-        if (target.closest("#accountManagerButton")) {
+        if (target.closest('#accountManagerButton')) {
           return;
         }
         closeAccountManager();
       }
     };
     if (isAccountManagerOpen) {
-      document.addEventListener("click", closeModalOnClickOutside, true);
+      document.addEventListener('click', closeModalOnClickOutside, true);
     }
     return () => {
-      document.removeEventListener("click", closeModalOnClickOutside, true);
+      document.removeEventListener('click', closeModalOnClickOutside, true);
     };
   }, [isAccountManagerOpen, closeAccountManager]);
 
@@ -58,7 +58,7 @@ const AccountManager = () => {
         >
           Sign Out
         </button>
-      </div>
+      </div>,
     );
   };
 
@@ -70,10 +70,10 @@ const AccountManager = () => {
           className="absolute w-80 bg-white right-0 top-12 z-40 animate-fadeFillSlow delay-0 max-w-full"
           style={{
             boxShadow:
-              "0 24px 54px rgba(0,0,0,.15), 0 4.5px 13.5px rgba(0,0,0,.08)",
-            color: "#333",
-            height: "180px",
-            transition: "visibility 0s linear 120ms,opacity 120ms ease",
+              '0 24px 54px rgba(0,0,0,.15), 0 4.5px 13.5px rgba(0,0,0,.08)',
+            color: '#333',
+            height: '180px',
+            transition: 'visibility 0s linear 120ms,opacity 120ms ease',
           }}
         >
           {isAuthenticated ? (
@@ -84,7 +84,7 @@ const AccountManager = () => {
                     ADMIN ACCOUNT
                   </span>
                 ) : (
-                  "Welcome!"
+                  'Welcome!'
                 )}
               </div>
 
@@ -103,7 +103,9 @@ const AccountManager = () => {
                   <div className="mt-1 font-semibold">{user && user.email}</div>
 
                   <button
-                    onClick={() => {window.location.pathname = "/my-account"}}
+                    onClick={() => {
+                      window.location.pathname = '/my-account';
+                    }}
                     className="mt-1 font-semibold underline text-blue-hover hover:cursor-pointer hover:text-[#132395]"
                   >
                     My account
@@ -126,7 +128,7 @@ const AccountManager = () => {
               </h2>
               <button
                 className="text-lg font-semibold border rounded-md w-[80%] border-light-text hover:bg-white-hover duration-75 hover:cursor-pointer mt-4 py-1"
-                onClick={() => navigate("/sign-in")}
+                onClick={() => navigate('/sign-in')}
                 title="sign in"
               >
                 Sign in

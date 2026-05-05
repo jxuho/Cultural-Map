@@ -1,5 +1,5 @@
-import StarIcon from "../StarIcon";
-import useUiStore from "../../store/uiStore";
+import StarIcon from '../StarIcon';
+import useUiStore from '../../store/uiStore';
 
 const ReviewDisplay = ({
   reviews,
@@ -49,7 +49,7 @@ const ReviewDisplay = ({
               className="font-semibold text-gray-800 mr-2 grow cursor-pointer hover:underline" // Add cursor-pointer and hover:underline
               onClick={() => handleUserClick(review.user)} // Add onClick
             >
-              {review.user?.username || "Unknown user"}
+              {review.user?.username || 'Unknown user'}
             </p>
             <div className="flex text-yellow-500 text-sm">
               {[...Array(5)].map((_, i) => (
@@ -67,10 +67,10 @@ const ReviewDisplay = ({
             <p className="text-gray-700 text-sm italic">"{review.comment}"</p>
           )}
           <p className="text-gray-500 text-xs mt-2 text-right">
-            {new Date(review.createdAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
+            {new Date(review.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}
           </p>
         </div>

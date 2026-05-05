@@ -17,7 +17,7 @@ const mockProposals = [
     status: 'pending',
     proposedChanges: { name: { oldValue: 'Old Name', newValue: 'New Name' } },
     createdAt: new Date().toISOString(),
-  }
+  },
 ];
 
 export const proposalHandlers = [
@@ -25,7 +25,7 @@ export const proposalHandlers = [
   http.get('*/proposals', () => {
     return HttpResponse.json({
       status: 'success',
-      data: { proposals: mockProposals }
+      data: { proposals: mockProposals },
     });
   }),
 
@@ -33,34 +33,37 @@ export const proposalHandlers = [
   http.get('*/proposals/my-proposals', () => {
     return HttpResponse.json({
       status: 'success',
-      data: { proposals: [mockProposals[0]] }
+      data: { proposals: [mockProposals[0]] },
     });
   }),
 
   // 3. Submit proposal
   http.post('*/proposals', async ({ request }) => {
-    const body = await request.json() as any;
-    return HttpResponse.json({
-      status: 'success',
-      data: { proposal: { ...body, _id: 'new-prop', status: 'pending' } }
-    }, { status: 201 });
+    const body = (await request.json()) as any;
+    return HttpResponse.json(
+      {
+        status: 'success',
+        data: { proposal: { ...body, _id: 'new-prop', status: 'pending' } },
+      },
+      { status: 201 },
+    );
   }),
 
   // 4. Accept/reject proposal (Patch)
   http.patch('*/proposals/:id/:action', ({ params }) => {
     const { id, action } = params;
     const status = action === 'accept' ? 'accepted' : 'rejected';
-    
+
     return HttpResponse.json({
       status: 'success',
-      data: { 
-        proposal: { 
-          _id: id, 
-          status, 
+      data: {
+        proposal: {
+          _id: id,
+          status,
           proposalType: 'create', // Fixed value for testing
-          culturalSite: 'site-123' 
-        } 
-      }
+          culturalSite: 'site-123',
+        },
+      },
     });
   }),
 ];

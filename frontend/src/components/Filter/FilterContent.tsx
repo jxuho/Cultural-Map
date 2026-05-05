@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
-import useFilterStore from "../../store/filterStore.ts";
-import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig.ts";
-import debounce from "lodash.debounce";
-import { categoryBorderColors } from "../../config/colors.ts";
+import React, { useMemo } from 'react';
+import useFilterStore from '../../store/filterStore.ts';
+import { CULTURAL_CATEGORY } from '../../config/culturalSiteConfig.ts';
+import debounce from 'lodash.debounce';
+import { categoryBorderColors } from '../../config/colors.ts';
 
 interface FilterContentProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen: boolean;
@@ -12,7 +12,7 @@ interface FilterContentProps extends React.HTMLAttributes<HTMLDivElement> {
 const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
   ({ isOpen, floatingStyles, ...props }, ref) => {
     const selectedCategories = useFilterStore(
-      (state) => state.selectedCategories
+      (state) => state.selectedCategories,
     );
     const toggleCategory = useFilterStore((state) => state.toggleCategory);
     const searchQuery = useFilterStore((state) => state.searchQuery);
@@ -24,25 +24,27 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
         debounce((value) => {
           setSearchQuery(value);
         }, 300),
-      [setSearchQuery]
+      [setSearchQuery],
     );
 
-    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchInputChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+    ) => {
       const value = e.target.value;
       setLocalSearchInput(value);
       debouncedSetSearchQuery(value);
     };
 
     const handleClearSearch = () => {
-      setLocalSearchInput("");
-      setSearchQuery("");
+      setLocalSearchInput('');
+      setSearchQuery('');
       debouncedSetSearchQuery.cancel();
     };
 
     const isPositioned =
       floatingStyles &&
-      typeof floatingStyles.left === "number" &&
-      typeof floatingStyles.top === "number";
+      typeof floatingStyles.left === 'number' &&
+      typeof floatingStyles.top === 'number';
 
     return (
       <div
@@ -53,8 +55,8 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
           transition-opacity duration-300
           ${
             isOpen && isPositioned
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
+              ? 'opacity-100 pointer-events-auto'
+              : 'opacity-0 pointer-events-none'
           }
         `}
         {...props}
@@ -70,9 +72,9 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
             const buttonBorderStyle = {
               borderColor: isCategorySelected
                 ? categorySpecificBorderColor
-                : "transparent",
-              borderWidth: "3px", // Ensure border width is applied
-              borderStyle: "solid", // Ensure border style is applied
+                : 'transparent',
+              borderWidth: '3px', // Ensure border width is applied
+              borderStyle: 'solid', // Ensure border style is applied
             };
 
             return (
@@ -94,7 +96,7 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
                   }`}
               >
                 {category
-                  .replace(/_/g, " ")
+                  .replace(/_/g, ' ')
                   .replace(/\b\w/g, (c) => c.toUpperCase())}
               </button>
             );
@@ -133,7 +135,7 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default FilterContent;

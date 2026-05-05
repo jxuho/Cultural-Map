@@ -1,10 +1,10 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
-import useUiStore from "../../store/uiStore";
-import useAuthStore from "../../store/authStore";
-import { useCreateCulturalSite } from "../../hooks/data/useCulturalSitesQueries";
-import { useSubmitProposal } from "../../hooks/data/useProposalQueries";
-import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
-import { Point } from "leaflet";
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import useUiStore from '../../store/uiStore';
+import useAuthStore from '../../store/authStore';
+import { useCreateCulturalSite } from '../../hooks/data/useCulturalSitesQueries';
+import { useSubmitProposal } from '../../hooks/data/useProposalQueries';
+import { CULTURAL_CATEGORY } from '../../config/culturalSiteConfig';
+import { Point } from 'leaflet';
 
 // --- Types & Interfaces ---
 interface LocationData {
@@ -47,17 +47,17 @@ const CreateForm: React.FC = () => {
 
   // --- State ---
   const [formData, setFormData] = useState<FormData>({
-    name: "",
-    description: "",
-    category: "",
-    imageUrl: "",
-    openingHours: "",
-    address: "",
-    website: "",
-    proposalMessage: "",
+    name: '',
+    description: '',
+    category: '',
+    imageUrl: '',
+    openingHours: '',
+    address: '',
+    website: '',
+    proposalMessage: '',
     location: null,
-    licenseInfo: "",
-    sourceId: "",
+    licenseInfo: '',
+    sourceId: '',
     originalTags: {},
   });
 
@@ -68,17 +68,17 @@ const CreateForm: React.FC = () => {
   useEffect(() => {
     if (createFormData) {
       setFormData({
-        name: createFormData.name || "",
-        description: createFormData.description || "",
-        category: createFormData.category || "",
-        imageUrl: createFormData.imageUrl || "",
-        openingHours: createFormData.openingHours || "",
-        address: createFormData.address || "",
-        website: createFormData.website || "",
-        proposalMessage: "",
+        name: createFormData.name || '',
+        description: createFormData.description || '',
+        category: createFormData.category || '',
+        imageUrl: createFormData.imageUrl || '',
+        openingHours: createFormData.openingHours || '',
+        address: createFormData.address || '',
+        website: createFormData.website || '',
+        proposalMessage: '',
         location: createFormData.location || null,
-        licenseInfo: createFormData.licenseInfo || "",
-        sourceId: createFormData.sourceId || "",
+        licenseInfo: createFormData.licenseInfo || '',
+        sourceId: createFormData.sourceId || '',
         originalTags: createFormData.originalTags || {},
       });
       setFormErrors({});
@@ -105,19 +105,19 @@ const CreateForm: React.FC = () => {
 
   const validateForm = (): FormErrors => {
     const errors: FormErrors = {};
-    if (!formData.name.trim()) errors.name = "Cultural site name is required.";
-    if (!formData.category.trim()) errors.category = "Category is required.";
-    if (!formData.address.trim()) errors.address = "Address is required.";
+    if (!formData.name.trim()) errors.name = 'Cultural site name is required.';
+    if (!formData.category.trim()) errors.category = 'Category is required.';
+    if (!formData.address.trim()) errors.address = 'Address is required.';
 
-    if (role !== "admin" && !formData.proposalMessage.trim())
-      errors.proposalMessage = "Proposal message is required.";
+    if (role !== 'admin' && !formData.proposalMessage.trim())
+      errors.proposalMessage = 'Proposal message is required.';
 
     if (
       !formData.location ||
       !formData.location.coordinates ||
       formData.location.coordinates.length !== 2
     ) {
-      errors.location = "Invalid location information.";
+      errors.location = 'Invalid location information.';
     }
     return errors;
   };
@@ -137,7 +137,7 @@ const CreateForm: React.FC = () => {
       description: formData.description,
       category: formData.category,
       location: {
-        type: "Point" as const,
+        type: 'Point' as const,
         coordinates: formData.location!.coordinates,
       },
       address: formData.address,
@@ -150,17 +150,17 @@ const CreateForm: React.FC = () => {
     };
 
     try {
-      if (role === "admin") {
+      if (role === 'admin') {
         await createCulturalSiteMutation.mutateAsync(commonSiteData);
-        alert("New cultural site added successfully by admin!");
+        alert('New cultural site added successfully by admin!');
       } else {
         const proposalBody = {
-          proposalType: "create" as const,
+          proposalType: 'create' as const,
           proposalMessage: formData.proposalMessage,
           ...commonSiteData,
         };
         await submitProposalMutation.mutateAsync(proposalBody);
-        alert("Proposal submitted successfully!");
+        alert('Proposal submitted successfully!');
       }
       closeCreateForm();
       closeSidePanel();
@@ -168,14 +168,14 @@ const CreateForm: React.FC = () => {
       const errorMessage =
         error.response?.data?.message ||
         error.message ||
-        "Unknown error occurred.";
+        'Unknown error occurred.';
       setSubmissionError(errorMessage);
     }
   };
 
   // --- Derived State ---
   const isSubmitting =
-    role === "admin"
+    role === 'admin'
       ? createCulturalSiteMutation.isPending
       : submitProposalMutation.isPending;
 
@@ -227,9 +227,9 @@ const CreateForm: React.FC = () => {
       </div>
 
       <h2 className="text-xl font-bold mb-4 pr-10">
-        {role === "admin"
-          ? "Add New Cultural Site (Admin)"
-          : "Propose New Cultural Site"}
+        {role === 'admin'
+          ? 'Add New Cultural Site (Admin)'
+          : 'Propose New Cultural Site'}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -240,7 +240,7 @@ const CreateForm: React.FC = () => {
           >
             <strong className="font-bold">Validation Error!</strong>
             <span className="block sm:inline">
-              {" "}
+              {' '}
               Please correct the highlighted fields.
             </span>
           </div>
@@ -313,7 +313,7 @@ const CreateForm: React.FC = () => {
             <option value="">Select Category</option>
             {categories.map((cat) => (
               <option key={cat} value={cat}>
-                {cat.replace(/_/g, " ")}
+                {cat.replace(/_/g, ' ')}
               </option>
             ))}
           </select>
@@ -408,7 +408,7 @@ const CreateForm: React.FC = () => {
             </label>
             <input
               type="text"
-              value={formData.location?.coordinates[1] || ""}
+              value={formData.location?.coordinates[1] || ''}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
               readOnly
             />
@@ -419,7 +419,7 @@ const CreateForm: React.FC = () => {
             </label>
             <input
               type="text"
-              value={formData.location?.coordinates[0] || ""}
+              value={formData.location?.coordinates[0] || ''}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
               readOnly
             />
@@ -443,7 +443,7 @@ const CreateForm: React.FC = () => {
         </div>
 
         {/* Proposal Message */}
-        {role !== "admin" && (
+        {role !== 'admin' && (
           <div>
             <label
               htmlFor="proposalMessage"
@@ -474,10 +474,10 @@ const CreateForm: React.FC = () => {
           disabled={isSubmitting}
         >
           {isSubmitting
-            ? "Submitting..."
-            : role === "admin"
-              ? "Add New Cultural Site"
-              : "Submit Proposal"}
+            ? 'Submitting...'
+            : role === 'admin'
+              ? 'Add New Cultural Site'
+              : 'Submit Proposal'}
         </button>
       </form>
     </div>

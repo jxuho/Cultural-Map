@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { FaArrowUp } from 'react-icons/fa'; 
+import { FaArrowUp } from 'react-icons/fa';
 
 const GoToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   // Show button when page is scrolled down
   const toggleVisibility = () => {
-    if (window.scrollY > 300) { // Show button after scrolling 300px
+    if (window.scrollY > 300) {
+      // Show button after scrolling 300px
       setIsVisible(true);
     } else {
       setIsVisible(false);
@@ -17,7 +18,7 @@ const GoToTopButton = () => {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth' // Smooth scroll
+      behavior: 'smooth', // Smooth scroll
     });
   };
 

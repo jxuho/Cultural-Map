@@ -1,103 +1,115 @@
 // backend/models/culturalSite.js
 const mongoose = require('mongoose');
-const {CULTURAL_CATEGORY} = require('../config/culturalSiteConfig')
+const { CULTURAL_CATEGORY } = require('../config/culturalSiteConfig');
 
-
-const culturalSiteSchema = new mongoose.Schema({
+const culturalSiteSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
-        trim: true,
-        minlength: [2, 'Name must be at least 2 characters.'],
-        maxlength: [100, 'Name cannot be over 100 characters.']
+      type: String,
+      required: true,
+      trim: true,
+      minlength: [2, 'Name must be at least 2 characters.'],
+      maxlength: [100, 'Name cannot be over 100 characters.'],
     },
     description: {
-        type: String,
-        trim: true,
-        maxlength: [1000, 'Description cannot be over 1000 characters.']
+      type: String,
+      trim: true,
+      maxlength: [1000, 'Description cannot be over 1000 characters.'],
     },
     category: {
-        type: String,
-        enum: CULTURAL_CATEGORY,
-        required: true,
-        trim: true
+      type: String,
+      enum: CULTURAL_CATEGORY,
+      required: true,
+      trim: true,
     },
     location: {
-        type: {
-            type: String,
-            enum: ['Point'], // GeoJSON Point 
-            required: true
+      type: {
+        type: String,
+        enum: ['Point'], // GeoJSON Point
+        required: true,
+      },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+        index: '2dsphere', // Indexes for geospatial queries
+        validate: {
+          validator: function (v) {
+            return (
+              v.length === 2 &&
+              v[0] >= -180 &&
+              v[0] <= 180 &&
+              v[1] >= -90 &&
+              v[1] <= 90
+            );
+          },
+          message:
+            'Not valid coordinates. lon must be between -180~180, lat must be between -90~90.',
         },
-        coordinates: {
-            type: [Number], // [longitude, latitude]
-            required: true,
-            index: '2dsphere', // Indexes for geospatial queries
-            validate: {
-                validator: function (v) {
-                    return v.length === 2 && v[0] >= -180 && v[0] <= 180 && v[1] >= -90 && v[1] <= 90;
-                },
-                message: 'Not valid coordinates. lon must be between -180~180, lat must be between -90~90.'
-            }
-        },
+      },
     },
     address: {
-        type: String,
-        trim: true,
-        // required: true // commented for quick database setup
+      type: String,
+      trim: true,
+      // required: true // commented for quick database setup
     },
     website: {
-        type: String,
-        trim: true,
+      type: String,
+      trim: true,
     },
     imageUrl: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
     openingHours: {
-        type: String,
-        trim: true
+      type: String,
+      trim: true,
     },
     licenseInfo: {
-        type: String,
-        default: "Data © OpenStreetMap contributors, ODbL.", // Basic licensing information
-        trim: true
+      type: String,
+      default: 'Data © OpenStreetMap contributors, ODbL.', // Basic licensing information
+      trim: true,
     },
-    sourceId: { // Overpass API's OSM ID (node/way/relation ID)
-        type: String,
-        required: true,
-        unique: true, 
-        trim: true
+    sourceId: {
+      // Overpass API's OSM ID (node/way/relation ID)
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
-    reviews: [{ 
+    reviews: [
+      {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Review'
-    }],
+        ref: 'Review',
+      },
+    ],
     favoritesCount: {
-        type: Number,
-        default: 0,
-        min: 0
+      type: Number,
+      default: 0,
+      min: 0,
     },
     // Preserve data by saving the ‘properties’ object of the original GeoJSON data as is
     originalTags: {
-        type: mongoose.Schema.Types.Mixed, 
-        required: true
+      type: mongoose.Schema.Types.Mixed,
+      required: true,
     },
     proposedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
-    registeredBy: { 
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+    registeredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
-    active: { //Field for soft delete. Not implemented.
-        type: Boolean,
-        default: true,
-        select: false
-    }
-}, {
-    timestamps: true // createdAt, updatedAt Automatically add timestamps
-});
-
+    active: {
+      //Field for soft delete. Not implemented.
+      type: Boolean,
+      default: true,
+      select: false,
+    },
+  },
+  {
+    timestamps: true, // createdAt, updatedAt Automatically add timestamps
+  },
+);
 
 module.exports = mongoose.model('CulturalSite', culturalSiteSchema);

@@ -7,13 +7,12 @@ import { AxiosError } from 'axios';
  * Submit a new proposal
  */
 export const submitProposal = async (
-  proposalData: Partial<Proposal>
+  proposalData: Partial<Proposal>,
 ): Promise<ApiResponse<{ proposal: Proposal }>> => {
   try {
-    const response = await axiosInstance.post<ApiResponse<{ proposal: Proposal }>>(
-      '/proposals', 
-      proposalData
-    );
+    const response = await axiosInstance.post<
+      ApiResponse<{ proposal: Proposal }>
+    >('/proposals', proposalData);
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -26,13 +25,14 @@ export const submitProposal = async (
  */
 export const fetchAllProposals = async (): Promise<Proposal[]> => {
   try {
-    const response = await axiosInstance.get<ApiResponse<{ proposals: Proposal[] }>>(
-      '/proposals/'
-    );
+    const response =
+      await axiosInstance.get<ApiResponse<{ proposals: Proposal[] }>>(
+        '/proposals/',
+      );
     return response.data.data.proposals || [];
   } catch (error) {
     const err = error as AxiosError;
-    console.error("Error fetching all proposals:", err);
+    console.error('Error fetching all proposals:', err);
     throw err;
   }
 };
@@ -40,14 +40,13 @@ export const fetchAllProposals = async (): Promise<Proposal[]> => {
  * Accept a proposal (Admin)
  */
 export const acceptProposal = async (
-  proposalId: string, 
-  adminComment?: string 
+  proposalId: string,
+  adminComment?: string,
 ): Promise<ApiResponse<{ proposal: Proposal }>> => {
   try {
-    const response = await axiosInstance.patch<ApiResponse<{ proposal: Proposal }>>(
-      `/proposals/${proposalId}/accept`,
-      { adminComment }
-    );
+    const response = await axiosInstance.patch<
+      ApiResponse<{ proposal: Proposal }>
+    >(`/proposals/${proposalId}/accept`, { adminComment });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -59,14 +58,13 @@ export const acceptProposal = async (
  * Reject a proposal (Admin only)
  */
 export const rejectProposal = async (
-  proposalId: string, 
-  adminComment?: string 
+  proposalId: string,
+  adminComment?: string,
 ): Promise<ApiResponse<{ proposal: Proposal }>> => {
   try {
-    const response = await axiosInstance.patch<ApiResponse<{ proposal: Proposal }>>(
-      `/proposals/${proposalId}/reject`,
-      { adminComment }
-    );
+    const response = await axiosInstance.patch<
+      ApiResponse<{ proposal: Proposal }>
+    >(`/proposals/${proposalId}/reject`, { adminComment });
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ message: string }>;
@@ -79,9 +77,9 @@ export const rejectProposal = async (
  */
 export const fetchMyProposals = async (): Promise<Proposal[]> => {
   try {
-    const response = await axiosInstance.get<ApiResponse<{ proposals: Proposal[] }>>(
-      '/proposals/my-proposals'
-    );
+    const response = await axiosInstance.get<
+      ApiResponse<{ proposals: Proposal[] }>
+    >('/proposals/my-proposals');
     return response.data.data.proposals || [];
   } catch (error) {
     const err = error as AxiosError;

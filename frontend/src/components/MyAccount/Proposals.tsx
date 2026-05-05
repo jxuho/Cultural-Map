@@ -1,13 +1,13 @@
-import { useState, useMemo } from "react";
-import {
-  useProposalModeration,
-} from "../../hooks/data/useProposalQueries";
-import { useProposals } from "../../hooks/data/useProposalQueries";
-import BackButton from "../BackButton";
+import { useState, useMemo } from 'react';
+import { useProposalModeration } from '../../hooks/data/useProposalQueries';
+import { useProposals } from '../../hooks/data/useProposalQueries';
+import BackButton from '../BackButton';
 
 const Proposals = () => {
-  const [sortOption, setSortOption] = useState<string>("-createdAt");
-  const [adminComment, setadminComment] = useState<{ [key: string]: string }>({});
+  const [sortOption, setSortOption] = useState<string>('-createdAt');
+  const [adminComment, setadminComment] = useState<{ [key: string]: string }>(
+    {},
+  );
 
   const { data: proposals = [], isLoading, isError, error } = useProposals();
   const {
@@ -26,32 +26,41 @@ const Proposals = () => {
       let comparison = 0;
 
       switch (sortOption) {
-        case "-createdAt":
-          comparison = new Date(b.createdAt).getDate() - new Date(a.createdAt).getDate();
+        case '-createdAt':
+          comparison =
+            new Date(b.createdAt).getDate() - new Date(a.createdAt).getDate();
           break;
-        case "createdAt":
-          comparison = new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate();
+        case 'createdAt':
+          comparison =
+            new Date(a.createdAt).getDate() - new Date(b.createdAt).getDate();
           break;
-        case "-reviewedAt":
+        case '-reviewedAt':
           if (!a.reviewedAt && !b.reviewedAt) comparison = 0;
           else if (!a.reviewedAt) comparison = 1;
           else if (!b.reviewedAt) comparison = -1;
-          else comparison = new Date(b.reviewedAt).getDate() - new Date(a.reviewedAt).getDate();
+          else
+            comparison =
+              new Date(b.reviewedAt).getDate() -
+              new Date(a.reviewedAt).getDate();
           break;
-        case "reviewedAt":
+        case 'reviewedAt':
           if (!a.reviewedAt && !b.reviewedAt) comparison = 0;
           else if (!a.reviewedAt) comparison = -1;
           else if (!b.reviewedAt) comparison = 1;
-          else comparison = new Date(a.reviewedAt).getDate() - new Date(b.reviewedAt).getDate();
+          else
+            comparison =
+              new Date(a.reviewedAt).getDate() -
+              new Date(b.reviewedAt).getDate();
           break;
-        case "status":
+        case 'status':
           comparison = a.status.localeCompare(b.status);
           break;
-        case "-status":
+        case '-status':
           comparison = b.status.localeCompare(a.status);
           break;
         default:
-          comparison = new Date(b.createdAt).getDate() - new Date(a.createdAt).getDate();
+          comparison =
+            new Date(b.createdAt).getDate() - new Date(a.createdAt).getDate();
       }
       return comparison;
     });
@@ -69,38 +78,42 @@ const Proposals = () => {
 
   // Proposal Approval Handler
   const handleAccept = (proposalId: string) => {
-    const note = adminComment[proposalId] || "";
+    const note = adminComment[proposalId] || '';
     if (!note.trim()) {
-      alert("note must be entered upon approval.");
+      alert('note must be entered upon approval.');
       return;
     }
-    moderateProposal({ proposalId, actionType: "accept", adminComment: note });
+    moderateProposal({ proposalId, actionType: 'accept', adminComment: note });
   };
 
   // Proposal Rejection Handler
   const handleReject = (proposalId: string) => {
-    const note = adminComment[proposalId] || "";
+    const note = adminComment[proposalId] || '';
     if (!note.trim()) {
-      alert("note must be entered upon rejection.");
+      alert('note must be entered upon rejection.');
       return;
     }
-    moderateProposal({ proposalId, actionType: "reject", adminComment: note });
+    moderateProposal({ proposalId, actionType: 'reject', adminComment: note });
   };
 
   // Helper function to safely render values from proposedChanges
-  const renderProposedValue = (key: string, value: any, proposalType: string) => {
+  const renderProposedValue = (
+    key: string,
+    value: any,
+    proposalType: string,
+  ) => {
     if (
-      key === "location" &&
-      typeof value === "object" &&
+      key === 'location' &&
+      typeof value === 'object' &&
       value !== null &&
-      value.type === "Point" &&
+      value.type === 'Point' &&
       Array.isArray(value.coordinates)
     ) {
       return `[Lon: ${value.coordinates[0]}, Lat: ${value.coordinates[1]}]`;
     }
 
-    if (proposalType === "create") {
-      if (typeof value === "object" && value !== null) {
+    if (proposalType === 'create') {
+      if (typeof value === 'object' && value !== null) {
         return JSON.stringify(value);
       }
       return `"${value}"`;
@@ -108,13 +121,13 @@ const Proposals = () => {
       let oldValue = value.oldValue;
       let newValue = value.newValue;
 
-      if (typeof oldValue === "object" && oldValue !== null) {
+      if (typeof oldValue === 'object' && oldValue !== null) {
         oldValue = JSON.stringify(oldValue);
       } else {
         oldValue = `"${oldValue}"`;
       }
 
-      if (typeof newValue === "object" && newValue !== null) {
+      if (typeof newValue === 'object' && newValue !== null) {
         newValue = JSON.stringify(newValue);
       } else {
         newValue = `"${newValue}"`;
@@ -200,11 +213,11 @@ const Proposals = () => {
               <strong>Status: </strong>
               <span
                 className={`font-medium ${
-                  proposal.status === "pending"
-                    ? "text-yellow-600"
-                    : proposal.status === "accepted"
-                    ? "text-green-600"
-                    : "text-red-600"
+                  proposal.status === 'pending'
+                    ? 'text-yellow-600'
+                    : proposal.status === 'accepted'
+                      ? 'text-green-600'
+                      : 'text-red-600'
                 }`}
               >
                 {proposal.status}
@@ -214,7 +227,7 @@ const Proposals = () => {
               <>
                 <p className="text-gray-700 mb-1">
                   <strong>Cultural Site: </strong>
-                  {proposal.culturalSite.name || "N/A"}
+                  {proposal.culturalSite.name || 'N/A'}
                 </p>
                 {proposal.culturalSite.description && (
                   <p className="text-gray-700 mb-1">
@@ -260,7 +273,7 @@ const Proposals = () => {
 
             <p className="text-gray-700 mb-1">
               <strong>Proposed By: </strong>
-              {proposal.proposedBy?.email || "N/A"}
+              {proposal.proposedBy?.email || 'N/A'}
             </p>
 
             {proposal.proposalMessage && (
@@ -277,9 +290,9 @@ const Proposals = () => {
                     .filter(
                       ([key]) =>
                         !(
-                          proposal.proposalType === "create" &&
-                          key === "originalTags"
-                        )
+                          proposal.proposalType === 'create' &&
+                          key === 'originalTags'
+                        ),
                     )
                     .map(([key, value]) => (
                       <li key={key}>
@@ -298,25 +311,25 @@ const Proposals = () => {
             )}
             <p className="text-sm text-gray-500 mt-2">
               Created:
-              {new Date(proposal.createdAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+              {new Date(proposal.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}
             </p>
             {proposal.reviewedAt && (
               <p className="text-sm text-gray-500">
                 Reviewed: Created:
-                {new Date(proposal.reviewedAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                {new Date(proposal.reviewedAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
                 })}
               </p>
             )}
 
             {/* Administrator note entry field (inside each card)*/}
-            {proposal.status === "pending" && (
+            {proposal.status === 'pending' && (
               <div className="mt-4 p-3 border rounded-md bg-gray-50">
                 <label
                   htmlFor={`adminComment-${proposal._id}`}
@@ -326,7 +339,7 @@ const Proposals = () => {
                 </label>
                 <textarea
                   id={`adminComment-${proposal._id}`}
-                  value={adminComment[proposal._id] || ""}
+                  value={adminComment[proposal._id] || ''}
                   onChange={(e) =>
                     handleAdminNoteChange(proposal._id, e.target.value)
                   }

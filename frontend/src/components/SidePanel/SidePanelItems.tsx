@@ -1,21 +1,21 @@
-import StarIcon from "../StarIcon";
-import ReviewForm from "../Review/ReviewForm";
-import ReviewDisplay from "../Review/ReviewDisplay";
-import { BsStar, BsStarFill } from "react-icons/bs";
-import useAuthStore from "../../store/authStore";
-import { useCallback } from "react";
-import { useCulturalSiteDetail } from "../../hooks/data/useCulturalSitesQueries";
+import StarIcon from '../StarIcon';
+import ReviewForm from '../Review/ReviewForm';
+import ReviewDisplay from '../Review/ReviewDisplay';
+import { BsStar, BsStarFill } from 'react-icons/bs';
+import useAuthStore from '../../store/authStore';
+import { useCallback } from 'react';
+import { useCulturalSiteDetail } from '../../hooks/data/useCulturalSitesQueries';
 import {
   useFavoriteMutation,
   useMyFavorites,
-} from "../../hooks/data/useFavoriteQueries";
+} from '../../hooks/data/useFavoriteQueries';
 import {
   usePlaceReviews,
   useReviewMutation,
-} from "../../hooks/data/useReviewQueries";
-import useUiStore from "../../store/uiStore";
-import ErrorMessage from "../ErrorMessage";
-import { Place } from "@/types/place";
+} from '../../hooks/data/useReviewQueries';
+import useUiStore from '../../store/uiStore';
+import ErrorMessage from '../ErrorMessage';
+import { Place } from '@/types/place';
 
 interface SidePanelItemsProps {
   isReviewsExpanded: boolean;
@@ -56,15 +56,15 @@ const SidePanelItems = ({
   const userReview =
     reviews.find((review) => {
       return (
-        typeof review.user !== "string" && review.user?._id === currentUser?._id
+        typeof review.user !== 'string' && review.user?._id === currentUser?._id
       );
     }) || null;
   const otherReviews = reviews.filter((review) => {
-    if (review.user && typeof review.user !== "string") {
+    if (review.user && typeof review.user !== 'string') {
       return review.user._id !== currentUser?._id;
     }
 
-    if (typeof review.user === "string") {
+    if (typeof review.user === 'string') {
       return review.user !== currentUser?._id;
     }
 
@@ -78,12 +78,12 @@ const SidePanelItems = ({
   const handleFavoriteChange = useCallback(
     async (newStatus: boolean) => {
       if (!currentUser) {
-        alert("You can add favorite after sign in.");
+        alert('You can add favorite after sign in.');
         return;
       }
       await favoriteMutation.mutateAsync({
-        actionType: newStatus ? "add" : "delete",
-        culturalSiteId: uiSelectedPlace?._id || "",
+        actionType: newStatus ? 'add' : 'delete',
+        culturalSiteId: uiSelectedPlace?._id || '',
       });
     },
     [favoriteMutation, uiSelectedPlace?._id, currentUser],
@@ -91,31 +91,31 @@ const SidePanelItems = ({
 
   const handleReviewActionCompleted = useCallback(
     async (
-      actionType: "create" | "update" | "delete",
+      actionType: 'create' | 'update' | 'delete',
       newRating: number | null,
-      oldRating: number | null, 
+      oldRating: number | null,
       comment?: string,
     ) => {
       if (!currentUser) {
-        alert("Please sign in...");
+        alert('Please sign in...');
         return;
       }
 
       if (!uiSelectedPlace?._id) {
-        console.error("No place selected");
+        console.error('No place selected');
         return;
       }
 
       await reviewMutation.mutateAsync({
         actionType,
         placeId: uiSelectedPlace._id,
-        reviewId: actionType === "create" ? undefined : userReview?._id,
+        reviewId: actionType === 'create' ? undefined : userReview?._id,
         reviewData:
-          actionType === "delete"
+          actionType === 'delete'
             ? undefined
             : {
                 rating: newRating ?? 0,
-                comment: comment ?? "",
+                comment: comment ?? '',
               },
         oldRating: oldRating ?? undefined,
       });
@@ -142,11 +142,11 @@ const SidePanelItems = ({
           <button
             onClick={() => handleFavoriteChange(!isSelectedPlaceFavorite)}
             className={`text-xl p-1 hover:cursor-pointer ${
-              favoriteMutation.isPending ? "opacity-50 cursor-not-allowed" : ""
+              favoriteMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
             } ${
               isSelectedPlaceFavorite
-                ? "text-yellow-400"
-                : "text-gray-400 hover:text-yellow-300"
+                ? 'text-yellow-400'
+                : 'text-gray-400 hover:text-yellow-300'
             }`}
             disabled={favoriteMutation.isPending}
           >
@@ -174,7 +174,7 @@ const SidePanelItems = ({
           onClick={toggleReviewsExpansion}
         >
           <h3 className="text-lg font-semibold text-blue-800 grow">
-            {selectedPlaceData.reviewCount === 1 ? "Review" : "Reviews"} (
+            {selectedPlaceData.reviewCount === 1 ? 'Review' : 'Reviews'} (
             {selectedPlaceData.reviewCount || 0})
           </h3>
           {selectedPlaceData.averageRating !== undefined &&
@@ -199,7 +199,7 @@ const SidePanelItems = ({
               </div>
             )}
           <span className="ml-4 text-gray-500">
-            {isReviewsExpanded ? "▲" : "▼"}
+            {isReviewsExpanded ? '▲' : '▼'}
           </span>
         </div>
       </div>
@@ -233,7 +233,7 @@ const SidePanelItems = ({
           )}
           {reviewFetchError && (
             <ErrorMessage
-              message={reviewsError?.message || "Failed to fetch reviews."}
+              message={reviewsError?.message || 'Failed to fetch reviews.'}
             />
           )}
           {!loadingReviews && !reviewFetchError && reviews.length === 0 && (
@@ -263,10 +263,10 @@ const SidePanelItems = ({
               <p className="text-sm text-gray-700 mb-2 leading-relaxed">
                 <span className="font-semibold text-blue-600">Category: </span>
                 {selectedPlaceData.category
-                  ?.replace(/_/g, " ")
-                  .split(" ")
+                  ?.replace(/_/g, ' ')
+                  .split(' ')
                   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ") || "N/A"}
+                  .join(' ') || 'N/A'}
               </p>
             )}
             {selectedPlaceData.address && (
@@ -291,7 +291,7 @@ const SidePanelItems = ({
             {selectedPlaceData.openingHours && (
               <p className="text-sm text-gray-700 mb-2 leading-relaxed">
                 <span className="font-semibold text-blue-600">
-                  Opening Hours:{" "}
+                  Opening Hours:{' '}
                 </span>
                 {selectedPlaceData.openingHours}
               </p>

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
-import defaultProfileImg from "../../assets/profile_image.svg";
-import useAuthStore from "../../store/authStore";
-import BackButton from "../BackButton";
-import { useUpdateProfile } from "../../hooks/data/useUserQueries";
-import { User } from "@/types/user";
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import defaultProfileImg from '../../assets/profile_image.svg';
+import useAuthStore from '../../store/authStore';
+import BackButton from '../BackButton';
+import { useUpdateProfile } from '../../hooks/data/useUserQueries';
+import { User } from '@/types/user';
 
 const UpdateProfile = () => {
   const nameRegex = /^(?!^\d+$)[\p{L}][\p{L}\p{N}\s.'-]*$/u;
@@ -15,18 +15,18 @@ const UpdateProfile = () => {
   const updateUser = useAuthStore((state) => state.updateUser);
   const navigate = useNavigate();
 
-  const [userName, setUserName] = useState<string>(user?.username ?? "");
-  const [nameMessage, setNameMessage] = useState("");
+  const [userName, setUserName] = useState<string>(user?.username ?? '');
+  const [nameMessage, setNameMessage] = useState('');
 
-  const [bio, setBio] = useState<string>(user?.bio ?? "");
-  const [bioMessage, setBioMessage] = useState("");
+  const [bio, setBio] = useState<string>(user?.bio ?? '');
+  const [bioMessage, setBioMessage] = useState('');
 
   const [showMessage, setShowMessage] = useState({
     showNameMessage: false,
     showBioMessage: false,
     changeSuccess: false,
     apiError: false,
-    apiErrorMessage: "",
+    apiErrorMessage: '',
   });
 
   const updateProfileMutation = useUpdateProfile();
@@ -35,10 +35,10 @@ const UpdateProfile = () => {
     const inputValue = e.target.value;
     setUserName(inputValue);
     setShowMessage((prevState) => ({ ...prevState, showNameMessage: false }));
-    setNameMessage("");
+    setNameMessage('');
 
-    if (inputValue.trim() === "") {
-      setNameMessage("Please type username.");
+    if (inputValue.trim() === '') {
+      setNameMessage('Please type username.');
       setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
       return;
     }
@@ -64,7 +64,7 @@ const UpdateProfile = () => {
     const inputValue = e.target.value;
     setBio(inputValue);
     setShowMessage((prevState) => ({ ...prevState, showBioMessage: false }));
-    setBioMessage("");
+    setBioMessage('');
 
     if (inputValue.length > BIO_MAX_LENGTH) {
       setBioMessage(`Bio must be less than ${BIO_MAX_LENGTH} characters.`);
@@ -81,12 +81,12 @@ const UpdateProfile = () => {
     setShowMessage((prevState) => ({
       ...prevState,
       apiError: false,
-      apiErrorMessage: "",
+      apiErrorMessage: '',
     }));
 
     // ---Username validation (when submitting) ---
-    if (userName.trim() === "") {
-      setNameMessage("Please tye username.");
+    if (userName.trim() === '') {
+      setNameMessage('Please tye username.');
       setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
       isValid = false;
     } else if (userName.length > USERNAME_MAX_LENGTH) {
@@ -103,7 +103,7 @@ const UpdateProfile = () => {
       isValid = false;
     } else {
       setShowMessage((prevState) => ({ ...prevState, showNameMessage: false }));
-      setNameMessage("");
+      setNameMessage('');
     }
 
     // ---Self-introduction validation (when submitting) ---
@@ -113,7 +113,7 @@ const UpdateProfile = () => {
       isValid = false;
     } else {
       setShowMessage((prevState) => ({ ...prevState, showBioMessage: false }));
-      setBioMessage("");
+      setBioMessage('');
     }
 
     if (!isValid) {
@@ -145,8 +145,8 @@ const UpdateProfile = () => {
         apiError: false,
       }));
     } catch (error: unknown) {
-      console.error("Profile update failed:", error);
-      let errorMessage = "An unexpected error occurred";
+      console.error('Profile update failed:', error);
+      let errorMessage = 'An unexpected error occurred';
       if (error instanceof Error) {
         errorMessage = error.message;
       }
@@ -167,7 +167,7 @@ const UpdateProfile = () => {
           className="p-8 bg-white rounded w-full md:max-w-xl lg:max-w-2xl"
           style={{
             boxShadow:
-              "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+              '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
           }}
         >
           <form className="flex flex-col m-6">
@@ -182,7 +182,7 @@ const UpdateProfile = () => {
             <div className="flex justify-center items-center">
               <button
                 className="py-1.5 px-8 rounded-sm border bg-blue text-white hover:bg-blue-hover transition-colors hover:cursor-pointer"
-                onClick={() => navigate("/my-account")}
+                onClick={() => navigate('/my-account')}
               >
                 Ok
               </button>
@@ -200,7 +200,7 @@ const UpdateProfile = () => {
         className="p-8 bg-white rounded w-full md:max-w-xl lg:max-w-2xl"
         style={{
           boxShadow:
-            "0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)",
+            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
         }}
       >
         <form className="flex flex-col" onSubmit={submitUpdateProfileHandler}>
@@ -249,7 +249,7 @@ const UpdateProfile = () => {
               className={`
                                 w-full p-2 border rounded-md shadow-sm
                                 focus:ring-blue-500 focus:border-blue-500
-                                ${showMessage.showNameMessage ? "border-red-500" : "border-gray-300"}
+                                ${showMessage.showNameMessage ? 'border-red-500' : 'border-gray-300'}
                                 text-gray-900 bg-white placeholder-gray-400
                             `}
               onChange={nameInputHandler}
@@ -275,7 +275,7 @@ const UpdateProfile = () => {
               className={`
                                 w-full p-2 border rounded-md shadow-sm
                                 focus:ring-blue-500 focus:border-blue-500
-                                ${showMessage.showBioMessage ? "border-red-500" : "border-gray-300"}
+                                ${showMessage.showBioMessage ? 'border-red-500' : 'border-gray-300'}
                                 text-gray-900 bg-white placeholder-gray-400 resize-y
                             `}
               onChange={bioInputHandler}
@@ -300,7 +300,7 @@ const UpdateProfile = () => {
               type="submit"
               disabled={updateProfileMutation.isPending} // Disable button while mutation is in progress (TanStack Query v5 uses isPending instead of isLoading)
             >
-              {updateProfileMutation.isPending ? "Saving..." : "Save"}
+              {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
-import useUiStore from "../../store/uiStore";
-import useSidePanelResizer from "../../hooks/ui/useSidePanelResizer";
+import { useEffect, useRef } from 'react';
+import useUiStore from '../../store/uiStore';
+import useSidePanelResizer from '../../hooks/ui/useSidePanelResizer';
 
-import SidePanelResizer from "./SidePanelResizer";
-import SidePanelContent from "./SidePanelContent";
-import SidePanelButtons from "./SidePanelButtons";
+import SidePanelResizer from './SidePanelResizer';
+import SidePanelContent from './SidePanelContent';
+import SidePanelButtons from './SidePanelButtons';
 
 const SidePanel = () => {
   const isSidePanelOpen = useUiStore((state) => state.isSidePanelOpen);
@@ -13,7 +13,7 @@ const SidePanel = () => {
   const isCreateFormOpen = useUiStore((state) => state.isCreateFormOpen);
   const isUpdateFormOpen = useUiStore((state) => state.isUpdateFormOpen);
   const handleCloseAndCancel = useUiStore(
-    (state) => state.handleCloseAndCancel
+    (state) => state.handleCloseAndCancel,
   );
 
   const detailRef = useRef<HTMLDivElement>(null);
@@ -51,10 +51,10 @@ const SidePanel = () => {
       className="absolute z-30 right-0 top-0 h-full shadow-lg bg-white flex flex-col"
       style={{
         width: sidePanelWidth,
-        transition: "width 180ms ease",
+        transition: 'width 180ms ease',
         right: 0,
         boxShadow:
-          "0px 1.2px 3.6px rgba(0,0,0,0.1), 0px 6.4px 14.4px rgba(0,0,0,0.1)",
+          '0px 1.2px 3.6px rgba(0,0,0,0.1), 0px 6.4px 14.4px rgba(0,0,0,0.1)',
       }}
     >
       <SidePanelResizer detailRef={detailRef} {...resizer} />

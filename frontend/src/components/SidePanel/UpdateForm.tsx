@@ -1,10 +1,10 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
-import useUiStore from "../../store/uiStore";
-import useAuthStore from "../../store/authStore";
-import { useUpdateCulturalSite } from "../../hooks/data/useCulturalSitesQueries";
-import { useSubmitProposal } from "../../hooks/data/useProposalQueries";
-import { CULTURAL_CATEGORY } from "../../config/culturalSiteConfig";
-import { Place } from "../../types/place";
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import useUiStore from '../../store/uiStore';
+import useAuthStore from '../../store/authStore';
+import { useUpdateCulturalSite } from '../../hooks/data/useCulturalSitesQueries';
+import { useSubmitProposal } from '../../hooks/data/useProposalQueries';
+import { CULTURAL_CATEGORY } from '../../config/culturalSiteConfig';
+import { Place } from '../../types/place';
 
 interface UpdateFormData {
   _id: string;
@@ -17,7 +17,7 @@ interface UpdateFormData {
   website: string;
   proposalMessage: string;
   location: {
-    type: "Point";
+    type: 'Point';
     coordinates: number[];
   } | null;
   licenseInfo: string;
@@ -44,55 +44,57 @@ const UpdateForm: React.FC = () => {
   const updateCulturalSiteMutation = useUpdateCulturalSite();
 
   const [formData, setFormData] = useState<UpdateFormData>({
-    _id: "",
-    name: "",
-    description: "",
-    category: "",
-    imageUrl: "",
-    openingHours: "",
-    address: "",
-    website: "",
-    proposalMessage: "",
+    _id: '',
+    name: '',
+    description: '',
+    category: '',
+    imageUrl: '',
+    openingHours: '',
+    address: '',
+    website: '',
+    proposalMessage: '',
     location: null,
-    licenseInfo: "",
-    sourceId: "",
+    licenseInfo: '',
+    sourceId: '',
     originalTags: {},
     initialData: null,
   });
 
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [proposalType, setProposalType] = useState<"update" | "delete">("update");
+  const [proposalType, setProposalType] = useState<'update' | 'delete'>(
+    'update',
+  );
   const [backendError, setBackendError] = useState<string | null>(null);
 
   useEffect(() => {
     if (updateFormData) {
       const data = updateFormData as Place;
       setFormData({
-        _id: data._id || "",
-        name: data.name || "",
-        description: data.description || "",
-        category: data.category || "",
-        imageUrl: data.imageUrl || "",
-        openingHours: data.openingHours || "",
-        address: data.address || "",
-        website: data.website || "",
-        proposalMessage: "",
-        location: data.location ? { ...data.location, type: "Point" } : null,
-        licenseInfo: data.licenseInfo || "",
-        sourceId: data.sourceId || "",
+        _id: data._id || '',
+        name: data.name || '',
+        description: data.description || '',
+        category: data.category || '',
+        imageUrl: data.imageUrl || '',
+        openingHours: data.openingHours || '',
+        address: data.address || '',
+        website: data.website || '',
+        proposalMessage: '',
+        location: data.location ? { ...data.location, type: 'Point' } : null,
+        licenseInfo: data.licenseInfo || '',
+        sourceId: data.sourceId || '',
         originalTags: data.originalTags || {},
         initialData: data,
       });
       setFormErrors({});
       setSubmissionError(null);
       setBackendError(null);
-      setProposalType("update");
+      setProposalType('update');
     }
   }, [updateFormData]);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -108,32 +110,38 @@ const UpdateForm: React.FC = () => {
 
   const validateForm = (): FormErrors => {
     const errors: FormErrors = {};
-    if (!formData.name.trim() && proposalType === "update")
-      errors.name = "Cultural site name is required.";
-    if (!formData.category.trim() && proposalType === "update")
-      errors.category = "Category is required.";
-    if (!formData.address.trim() && proposalType === "update")
-      errors.address = "Address is required.";
-    
+    if (!formData.name.trim() && proposalType === 'update')
+      errors.name = 'Cultural site name is required.';
+    if (!formData.category.trim() && proposalType === 'update')
+      errors.category = 'Category is required.';
+    if (!formData.address.trim() && proposalType === 'update')
+      errors.address = 'Address is required.';
+
     if (
       (!formData.location ||
         !formData.location.coordinates ||
         formData.location.coordinates.length !== 2) &&
-      proposalType === "update"
+      proposalType === 'update'
     ) {
-      errors.location = "Invalid location information.";
+      errors.location = 'Invalid location information.';
     }
 
-    if (role !== "admin" && !formData.proposalMessage.trim()) {
-      errors.proposalMessage = "Proposal message is required.";
+    if (role !== 'admin' && !formData.proposalMessage.trim()) {
+      errors.proposalMessage = 'Proposal message is required.';
     }
 
-    if (role !== "admin" && proposalType === "update" && formData.initialData) {
-      const hasChanges = (Object.keys(formData) as Array<keyof UpdateFormData>).some((key) => {
-        if (["_id", "proposalMessage", "initialData", "proposalType"].includes(key)) {
+    if (role !== 'admin' && proposalType === 'update' && formData.initialData) {
+      const hasChanges = (
+        Object.keys(formData) as Array<keyof UpdateFormData>
+      ).some((key) => {
+        if (
+          ['_id', 'proposalMessage', 'initialData', 'proposalType'].includes(
+            key,
+          )
+        ) {
           return false;
         }
-        if (key === "location") {
+        if (key === 'location') {
           const currentCoords = formData.location?.coordinates;
           const initialCoords = formData.initialData?.location?.coordinates;
           return (
@@ -145,7 +153,8 @@ const UpdateForm: React.FC = () => {
       });
 
       if (!hasChanges && !formData.proposalMessage.trim()) {
-        errors.noChanges = "No changes detected. Please modify a field or provide a proposal message.";
+        errors.noChanges =
+          'No changes detected. Please modify a field or provide a proposal message.';
       }
     }
     return errors;
@@ -177,20 +186,20 @@ const UpdateForm: React.FC = () => {
     };
 
     try {
-      if (role === "admin") {
+      if (role === 'admin') {
         await updateCulturalSiteMutation.mutateAsync({
           culturalSiteId: formData._id,
           updateData: currentSiteData as Partial<Place>,
         });
-        alert("Cultural site updated successfully by admin!");
+        alert('Cultural site updated successfully by admin!');
       } else {
         let proposalBody: any;
 
-        if (proposalType === "update") {
+        if (proposalType === 'update') {
           const proposedChanges: any = {};
           for (const key in currentSiteData) {
             const k = key as keyof typeof currentSiteData;
-            if (k === "location") {
+            if (k === 'location') {
               const currentCoords = currentSiteData.location?.coordinates;
               const initialCoords = formData.initialData?.location?.coordinates;
               if (
@@ -199,20 +208,22 @@ const UpdateForm: React.FC = () => {
               ) {
                 proposedChanges.location = currentSiteData.location;
               }
-            } else if (currentSiteData[k] !== (formData.initialData as any)[k]) {
+            } else if (
+              currentSiteData[k] !== (formData.initialData as any)[k]
+            ) {
               proposedChanges[k] = currentSiteData[k];
             }
           }
 
           proposalBody = {
-            proposalType: "update",
+            proposalType: 'update',
             proposalMessage: formData.proposalMessage,
             culturalSite: formData._id,
             ...proposedChanges,
           };
         } else {
           proposalBody = {
-            proposalType: "delete",
+            proposalType: 'delete',
             proposalMessage: formData.proposalMessage,
             culturalSite: formData._id,
           };
@@ -224,23 +235,24 @@ const UpdateForm: React.FC = () => {
       closeUpdateForm();
       closeSidePanel();
     } catch (error: any) {
-      if (error.response?.data?.message?.includes("E11000")) {
+      if (error.response?.data?.message?.includes('E11000')) {
         setBackendError(
-          "A pending proposal for this site already exists from your account. Please wait for it to be processed."
+          'A pending proposal for this site already exists from your account. Please wait for it to be processed.',
         );
       } else {
         const errorMessage =
           error.response?.data?.message ||
           error.message ||
-          "Unknown error occurred during submission.";
+          'Unknown error occurred during submission.';
         setSubmissionError(errorMessage);
       }
     }
   };
 
-  const isSubmitting = role === "admin"
-    ? updateCulturalSiteMutation.isPending
-    : submitProposalMutation.isPending;
+  const isSubmitting =
+    role === 'admin'
+      ? updateCulturalSiteMutation.isPending
+      : submitProposalMutation.isPending;
 
   if (isSubmitting) {
     return (
@@ -287,9 +299,9 @@ const UpdateForm: React.FC = () => {
       </div>
 
       <h2 className="text-xl font-bold mb-4 pr-10">
-        {role === "admin"
-          ? "Update Cultural Site (Admin)"
-          : "Propose Cultural Site Modification"}
+        {role === 'admin'
+          ? 'Update Cultural Site (Admin)'
+          : 'Propose Cultural Site Modification'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         {(Object.keys(formErrors).length > 0 ||
@@ -313,7 +325,8 @@ const UpdateForm: React.FC = () => {
               !backendError &&
               !submissionError && (
                 <span className="block sm:inline">
-                  {" "}Please correct the highlighted fields.
+                  {' '}
+                  Please correct the highlighted fields.
                 </span>
               )}
           </div>
@@ -331,10 +344,13 @@ const UpdateForm: React.FC = () => {
           />
         </div>
 
-        <fieldset disabled={proposalType === "delete"}>
+        <fieldset disabled={proposalType === 'delete'}>
           <legend className="sr-only">Cultural Site Details</legend>
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700"
+            >
               Name *
             </label>
             <input
@@ -351,7 +367,10 @@ const UpdateForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700"
+            >
               Description
             </label>
             <textarea
@@ -365,7 +384,10 @@ const UpdateForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="category"
+              className="block text-sm font-medium text-gray-700"
+            >
               Category *
             </label>
             <select
@@ -378,7 +400,7 @@ const UpdateForm: React.FC = () => {
               <option value="">Select Category</option>
               {CULTURAL_CATEGORY.map((cat) => (
                 <option key={cat} value={cat}>
-                  {cat.replace(/_/g, " ")}
+                  {cat.replace(/_/g, ' ')}
                 </option>
               ))}
             </select>
@@ -388,7 +410,10 @@ const UpdateForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="imageUrl"
+              className="block text-sm font-medium text-gray-700"
+            >
               Image URL
             </label>
             <input
@@ -403,7 +428,10 @@ const UpdateForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="openingHours" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="openingHours"
+              className="block text-sm font-medium text-gray-700"
+            >
               Opening Hours
             </label>
             <input
@@ -418,7 +446,10 @@ const UpdateForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="address"
+              className="block text-sm font-medium text-gray-700"
+            >
               Address *
             </label>
             <input
@@ -435,7 +466,10 @@ const UpdateForm: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="website"
+              className="block text-sm font-medium text-gray-700"
+            >
               Website
             </label>
             <input
@@ -455,7 +489,7 @@ const UpdateForm: React.FC = () => {
             </label>
             <input
               type="text"
-              value={formData.location?.coordinates[1] || ""}
+              value={formData.location?.coordinates[1] || ''}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
               readOnly
             />
@@ -469,7 +503,7 @@ const UpdateForm: React.FC = () => {
             </label>
             <input
               type="text"
-              value={formData.location?.coordinates[0] || ""}
+              value={formData.location?.coordinates[0] || ''}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
               readOnly
             />
@@ -487,9 +521,12 @@ const UpdateForm: React.FC = () => {
           </div>
         </fieldset>
 
-        {role !== "admin" && (
+        {role !== 'admin' && (
           <div>
-            <label htmlFor="proposalMessage" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="proposalMessage"
+              className="block text-sm font-medium text-gray-700"
+            >
               Proposal Message *
             </label>
             <textarea
@@ -500,9 +537,9 @@ const UpdateForm: React.FC = () => {
               rows={4}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder={
-                proposalType === "update"
-                  ? "Please provide a detailed reason for proposing these modifications."
-                  : "Please provide a detailed reason for suggesting the deletion of this cultural site."
+                proposalType === 'update'
+                  ? 'Please provide a detailed reason for proposing these modifications.'
+                  : 'Please provide a detailed reason for suggesting the deletion of this cultural site.'
               }
             ></textarea>
             {formErrors.proposalMessage && (
@@ -513,26 +550,26 @@ const UpdateForm: React.FC = () => {
           </div>
         )}
 
-        {role !== "admin" && (
+        {role !== 'admin' && (
           <div className="flex justify-between mt-4 space-x-2">
             <button
               type="button"
-              onClick={() => setProposalType("update")}
+              onClick={() => setProposalType('update')}
               className={`flex-1 py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                proposalType === "update"
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                proposalType === 'update'
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
               }`}
             >
               Update Site
             </button>
             <button
               type="button"
-              onClick={() => setProposalType("delete")}
+              onClick={() => setProposalType('delete')}
               className={`flex-1 py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
-                proposalType === "delete"
-                  ? "bg-red-600 text-white hover:bg-red-700"
-                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                proposalType === 'delete'
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
               }`}
             >
               Delete Site
@@ -546,12 +583,12 @@ const UpdateForm: React.FC = () => {
           disabled={isSubmitting}
         >
           {isSubmitting
-            ? "Submitting..."
-            : role === "admin"
-            ? "Update Cultural Site"
-            : proposalType === "update"
-            ? "Submit Modification Proposal"
-            : "Submit Deletion Proposal"}
+            ? 'Submitting...'
+            : role === 'admin'
+              ? 'Update Cultural Site'
+              : proposalType === 'update'
+                ? 'Submit Modification Proposal'
+                : 'Submit Deletion Proposal'}
         </button>
       </form>
     </div>

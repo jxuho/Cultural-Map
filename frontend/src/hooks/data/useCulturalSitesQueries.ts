@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import {
   fetchAllCulturalSites,
   fetchCulturalSiteById,
@@ -41,14 +46,14 @@ export const useCulturalSiteDetail = (id: string | undefined | null) => {
  * get nearby OSM cultural sites based on latitude and longitude
  */
 export const useNearbyOsm = (
-  lat: number | null | undefined, 
+  lat: number | null | undefined,
   lon: number | null | undefined,
-  options?: Partial<UseQueryOptions<Place[], ApiError>> 
+  options?: Partial<UseQueryOptions<Place[], ApiError>>,
 ) => {
   const queryResult = useQuery<Place[], ApiError>({
     queryKey: ['nearbyOsm', lat, lon],
     queryFn: () => getNearbyOsm(lat!, lon!),
-    enabled: false, 
+    enabled: false,
     staleTime: 1000 * 60 * 10,
     ...options,
   });
@@ -67,7 +72,7 @@ export const useCreateCulturalSite = () => {
       queryClient.invalidateQueries({ queryKey: ['culturalSites'] });
     },
     onError: (error) => {
-      console.error("Failed to create cultural site:", error);
+      console.error('Failed to create cultural site:', error);
       throw error;
     },
   });
@@ -84,15 +89,22 @@ interface UpdateMutationParams {
 export const useUpdateCulturalSite = () => {
   const queryClient = useQueryClient();
   return useMutation<Place | null, ApiError, UpdateMutationParams>({
-    mutationFn: ({ culturalSiteId, updateData }) => updateCulturalSite(culturalSiteId, updateData),
+    mutationFn: ({ culturalSiteId, updateData }) =>
+      updateCulturalSite(culturalSiteId, updateData),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['culturalSite', variables.culturalSiteId] });
+      queryClient.invalidateQueries({
+        queryKey: ['culturalSite', variables.culturalSiteId],
+      });
       queryClient.invalidateQueries({ queryKey: ['culturalSites'] });
       console.log(`Cultural site ${variables.culturalSiteId} update success!`);
     },
     onError: (error, variables) => {
-      const msg = error.response?.data?.message || error.message || "Unknown error";
-      console.error(`Cultural site ${variables.culturalSiteId} update fail:`, error);
+      const msg =
+        error.response?.data?.message || error.message || 'Unknown error';
+      console.error(
+        `Cultural site ${variables.culturalSiteId} update fail:`,
+        error,
+      );
       alert(`Cultural site update fail: ${msg}`);
     },
   });
@@ -106,12 +118,15 @@ export const useDeleteCulturalSite = () => {
   return useMutation<boolean, ApiError, string>({
     mutationFn: (culturalSiteId: string) => deleteCulturalSite(culturalSiteId),
     onSuccess: (_, culturalSiteId) => {
-      queryClient.invalidateQueries({ queryKey: ['culturalSite', culturalSiteId] });
+      queryClient.invalidateQueries({
+        queryKey: ['culturalSite', culturalSiteId],
+      });
       queryClient.invalidateQueries({ queryKey: ['culturalSites'] });
       console.log(`Cultural site ${culturalSiteId} is deleted!`);
     },
     onError: (error, culturalSiteId) => {
-      const msg = error.response?.data?.message || error.message || "Unknown error";
+      const msg =
+        error.response?.data?.message || error.message || 'Unknown error';
       console.error(`Failed to delete cultural site ${culturalSiteId}:`, error);
       alert(`Failed to delete cultural site: ${msg}`);
     },

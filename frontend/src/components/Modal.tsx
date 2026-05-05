@@ -1,37 +1,37 @@
-import React, { useEffect, useRef } from "react";
-import ReactDOM from "react-dom";
-import useUiStore from "../store/uiStore"; 
+import React, { useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
+import useUiStore from '../store/uiStore';
 
 const Modal = () => {
   const { isModalOpen, modalContent, closeModal } = useUiStore();
-  
+
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Prevent body scrolling when modal opens
   useEffect(() => {
     if (isModalOpen) {
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     }
     return () => {
-      document.body.style.overflow = "unset";
+      document.body.style.overflow = 'unset';
     };
   }, [isModalOpen]);
 
   // Close modal with ESC key
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         closeModal();
       }
     };
-    
+
     if (isModalOpen) {
-      document.addEventListener("keydown", handleEscapeKey);
+      document.addEventListener('keydown', handleEscapeKey);
     }
     return () => {
-      document.removeEventListener("keydown", handleEscapeKey);
+      document.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isModalOpen, closeModal]);
 
@@ -51,7 +51,7 @@ const Modal = () => {
       <div
         ref={modalRef}
         className="relative bg-white p-6 rounded-lg shadow-xl max-w-lg w-full transform transition-all duration-300 ease-out scale-95 opacity-0 data-[state=open]:scale-100 data-[state=open]:opacity-100"
-        data-state={isModalOpen ? "open" : "closed"}
+        data-state={isModalOpen ? 'open' : 'closed'}
       >
         {/* close button */}
         <button
@@ -67,7 +67,7 @@ const Modal = () => {
         {modalContent}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

@@ -8,7 +8,6 @@ interface ProtectedRouteProps {
   requiredRole?: 'admin' | 'user' | string;
 }
 
-
 /**
  * A component to protect routes based on authentication status and user roles.
  * If not authenticated, redirects to /sign-in.

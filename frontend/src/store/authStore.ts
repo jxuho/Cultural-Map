@@ -1,7 +1,7 @@
-import { create } from "zustand";
-import { devtools } from "zustand/middleware";
-import axios from "axios";
-import { User } from "@/types/user";
+import { create } from 'zustand';
+import { devtools } from 'zustand/middleware';
+import axios from 'axios';
+import { User } from '@/types/user';
 
 interface AuthState {
   user: User | null;
@@ -43,9 +43,9 @@ const useAuthStore = create<AuthState>()(
     // Logout action
     logout: async () => {
       try {
-        await api.post("/auth/logout");
+        await api.post('/auth/logout');
       } catch (error) {
-        console.error("Error during logout:", error);
+        console.error('Error during logout:', error);
       } finally {
         set({ user: null, isAuthenticated: false });
       }
@@ -55,10 +55,10 @@ const useAuthStore = create<AuthState>()(
     checkAuthStatus: async () => {
       set({ loading: true });
       try {
-        const response = await api.get("/users/me");
+        const response = await api.get('/users/me');
         set({ user: response.data.data.user, isAuthenticated: true });
       } catch (error) {
-        console.error("Error checking authentication status:", error);
+        console.error('Error checking authentication status:', error);
         set({ user: null, isAuthenticated: false });
       } finally {
         set({ loading: false });

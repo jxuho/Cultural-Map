@@ -1,10 +1,10 @@
-import React from "react";
-import useAuthStore from "../../store/authStore";
-import useUiStore from "../../store/uiStore";
+import React from 'react';
+import useAuthStore from '../../store/authStore';
+import useUiStore from '../../store/uiStore';
 import {
   useCulturalSiteDetail,
   useDeleteCulturalSite,
-} from "../../hooks/data/useCulturalSitesQueries";
+} from '../../hooks/data/useCulturalSitesQueries';
 
 const SidePanelButtons: React.FC = () => {
   // --- Zustand (Auth & UI State) ---
@@ -47,22 +47,22 @@ const SidePanelButtons: React.FC = () => {
   // Handler for admin's "Delete" button
   const deleteThisSiteButtonClickHandler = (): void => {
     if (!selectedPlaceData || !selectedPlaceData._id) {
-      console.error("No site selected for deletion or missing ID.");
+      console.error('No site selected for deletion or missing ID.');
       return;
     }
 
     const confirmDelete = async (): Promise<void> => {
       try {
         await deleteCulturalSiteMutation.mutateAsync(selectedPlaceData._id);
-        alert("Cultural site deleted successfully!");
+        alert('Cultural site deleted successfully!');
         closeModal();
         handleCloseAndCancel(null);
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message ||
           error.message ||
-          "Unknown error occurred during deletion.";
-        console.error("Deletion error:", errorMessage);
+          'Unknown error occurred during deletion.';
+        console.error('Deletion error:', errorMessage);
         alert(`Error deleting site: ${errorMessage}`);
         closeModal();
       }
@@ -107,7 +107,7 @@ const SidePanelButtons: React.FC = () => {
 
   return (
     <div className="flex justify-end p-4 border-t border-gray-200">
-      {role === "admin" ? (
+      {role === 'admin' ? (
         <>
           <button
             onClick={editThisSiteButtonClickHandler}

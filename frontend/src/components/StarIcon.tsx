@@ -1,23 +1,23 @@
 import React from 'react';
 
-
 interface StarIconProps {
-  rating: number; 
+  rating: number;
   index: number;
   className?: string;
   onClick?: (event: React.MouseEvent<SVGSVGElement>) => void;
   displayMode?: 'reviewForm' | 'averageRating';
 }
 
-const FULL_STAR_PATH = "M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1l-2.81 6.63L0 8.24l5.46 3.73L3.82 19z";
-const HALF_STAR_PATH = "M10 1L7.19 7.63 0 8.24l5.46 3.73L3.82 19l6.18-3.73z";
+const FULL_STAR_PATH =
+  'M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1l-2.81 6.63L0 8.24l5.46 3.73L3.82 19z';
+const HALF_STAR_PATH = 'M10 1L7.19 7.63 0 8.24l5.46 3.73L3.82 19l6.18-3.73z';
 
-const StarIcon: React.FC<StarIconProps> = ({ 
-  rating, 
-  index, 
-  className = "", 
-  onClick, 
-  displayMode = 'reviewForm' 
+const StarIcon: React.FC<StarIconProps> = ({
+  rating,
+  index,
+  className = '',
+  onClick,
+  displayMode = 'reviewForm',
 }) => {
   const starValue = index + 1; // The score this star represents (from 1 to 5)
 
@@ -43,23 +43,22 @@ const StarIcon: React.FC<StarIconProps> = ({
     }
 
     const floorNormalizedRating = Math.floor(normalizedRating);
-    hasHalfStar = (normalizedRating - floorNormalizedRating) >= 0.5;
+    hasHalfStar = normalizedRating - floorNormalizedRating >= 0.5;
 
     isFilled = starValue <= floorNormalizedRating;
-    
+
     if (starValue === floorNormalizedRating + 1 && hasHalfStar) {
       isFilled = false; // Currently not filling stars for half stars
     }
   }
 
-  const fillColorClass = isFilled ? "text-yellow-400" : "text-gray-300";
+  const fillColorClass = isFilled ? 'text-yellow-400' : 'text-gray-300';
 
   // Conditional rendering for half stars
-  const renderHalfStarOverlay = (
-    displayMode === 'averageRating' && 
-    starValue === Math.floor(rating) + 1 && 
-    hasHalfStar
-  );
+  const renderHalfStarOverlay =
+    displayMode === 'averageRating' &&
+    starValue === Math.floor(rating) + 1 &&
+    hasHalfStar;
 
   return (
     <svg
@@ -78,10 +77,10 @@ const StarIcon: React.FC<StarIconProps> = ({
           {/* half filled */}
           <path className="text-yellow-400" d={HALF_STAR_PATH}></path>
           {/* the other half is empty */}
-          <path 
-            className="text-gray-300" 
-            d="M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1z" 
-            fill="transparent" 
+          <path
+            className="text-gray-300"
+            d="M10 15.27L16.18 19l-1.64-7.03L20 8.24l-7.19-.61L10 1z"
+            fill="transparent"
           />
         </React.Fragment>
       )}

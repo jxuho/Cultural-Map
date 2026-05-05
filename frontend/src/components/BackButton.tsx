@@ -1,10 +1,7 @@
 import { useNavigate } from 'react-router';
-import { FaArrowLeft } from 'react-icons/fa'; 
+import { FaArrowLeft } from 'react-icons/fa';
 
-const BackButton = ({
-  className = '', 
-  iconSize = '18px', 
-}) => {
+const BackButton = ({ className = '', iconSize = '18px' }) => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -27,7 +24,7 @@ const BackButton = ({
       aria-label="Go Back"
       title="Go back to the previous page"
     >
-      <FaArrowLeft size={iconSize} /> 
+      <FaArrowLeft size={iconSize} />
     </button>
   );
 };

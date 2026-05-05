@@ -2,10 +2,9 @@ import googleImg from '../assets/googleLogo.png';
 import apiClient from '../api/axiosInstance';
 
 const SignInPage = () => {
-  
   const handleGoogleLogin = () => {
     const googleLoginUrl = `${apiClient.defaults.baseURL}/auth/google`;
-    
+
     window.location.replace(googleLoginUrl);
   };
 
@@ -13,12 +12,10 @@ const SignInPage = () => {
     <div className="absolute h-full w-full flex flex-col items-center justify-center bg-background ">
       <div
         className={`w-full h-full min-[600px]:w-110 min-[600px]:h-95 bg-white text-text-dark `}
-        style={{ boxShadow: "0 2px 6px rgba(0,0,0,0.2)" }}
+        style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.2)' }}
       >
         <div className="p-11 w-full h-full flex flex-col overflow-auto">
-          <h2 className="text-xl font-medium pb-4 text-light-text">
-            Welcome!
-          </h2>
+          <h2 className="text-xl font-medium pb-4 text-light-text">Welcome!</h2>
 
           <div className="flex flex-col">
             <h1 className="text-2xl font-semibold mb-2">Sign-in options</h1>
@@ -43,7 +40,7 @@ const SignInPage = () => {
           <div className="flex justify-end py-3 ">
             <button
               className="py-1 px-3 bg-bg-border min-w-27 min-h-8 mr-2 hover:bg-gray-button-hover hover:cursor-pointer"
-              onClick={() => (window.location.pathname = "/")}
+              onClick={() => (window.location.pathname = '/')}
             >
               Back
             </button>

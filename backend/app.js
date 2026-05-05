@@ -4,7 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-// 3. Third-party middleware 
+// 3. Third-party middleware
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
@@ -14,16 +14,16 @@ require('./models/User');
 require('./models/CulturalSite');
 require('./models/Review');
 // 5. Utility files (helper functions/classes used throughout the application)
-const AppError = require('./utils/AppError')
+const AppError = require('./utils/AppError');
 // 6. Controller file (business logic to be used in the router)
-const errorController = require('./controllers/errorController')
+const errorController = require('./controllers/errorController');
 // 7. Passport configuration file (strategy definition)
 // This is the part that defines and initializes the Passport strategy, so it must be loaded before the router.
 require('./config/passport');
 // 8. Router file (API endpoint definition)
 // After all models, utilities, authentication settings, etc. are loaded, the router must be defined.
-const culturalSitesRoutes = require('./routes/culturalSitesRoutes')
-const authRoutes = require('./routes/authRoutes')
+const culturalSitesRoutes = require('./routes/culturalSitesRoutes');
+const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const proposalRoutes = require('./routes/proposalRoutes');
 
@@ -32,14 +32,12 @@ const { loadChemnitzBoundary } = require('./utils/locationUtils');
 
 // cron-related files (scheduling)
 const cron = require('node-cron');
-const { overpassUpdater } = require('./services/overpassService')
+const { overpassUpdater } = require('./services/overpassService');
 
 // Swagger-related packages
 const path = require('path');
 const YAML = require('yamljs');
 const swaggerUi = require('swagger-ui-express');
-
-
 
 const app = express();
 
@@ -55,25 +53,26 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter); // Applies to all routes starting with /api
 
-
 const allowedOrigins = [
   'http://localhost:5173', // Vite default port
   'http://localhost:3000',
-  'https://cultural-heritage-map.vercel.app'
+  'https://cultural-heritage-map.vercel.app',
 ];
 
 app.use(express.json());
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-app.use(cookieParser())
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  }),
+);
+app.use(cookieParser());
 app.use(express.static(`${__dirname}/public`));
 app.use(passport.initialize());
 
@@ -114,7 +113,8 @@ app.use((req, res, next) => {
 
 app.use(errorController);
 
-mongoose.connect(MONGO_URI)
+mongoose
+  .connect(MONGO_URI)
   .then(() => {
     console.log('Connected to MongoDB');
 
@@ -130,18 +130,27 @@ mongoose.connect(MONGO_URI)
     }
 
     // Run cron scheduler
-    cron.schedule('0 0 * * 0', async () => {
-      console.log('weekly Overpass data update task started...');
-      try {
-        await overpassUpdater();
-        console.log('weekly Overpass data update task completed successfully.');
-      } catch (error) {
-        console.error('Error during weekly Overpass data update task:', error);
-      }
-    }, {
-      scheduled: true, // Activate the schedule immediately.
-      timezone: "Europe/Berlin" // Chemnitz is the Berlin time zone, so we specify it explicitly. Change as needed.
-    });
+    cron.schedule(
+      '0 0 * * 0',
+      async () => {
+        console.log('weekly Overpass data update task started...');
+        try {
+          await overpassUpdater();
+          console.log(
+            'weekly Overpass data update task completed successfully.',
+          );
+        } catch (error) {
+          console.error(
+            'Error during weekly Overpass data update task:',
+            error,
+          );
+        }
+      },
+      {
+        scheduled: true, // Activate the schedule immediately.
+        timezone: 'Europe/Berlin', // Chemnitz is the Berlin time zone, so we specify it explicitly. Change as needed.
+      },
+    );
     console.log('Overpass data update scheduled for every Sunday 00:00.');
 
     app.listen(PORT, () => {

@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
-import useUiStore from "../../store/uiStore";
-import useViewport from "./useViewPort";
+import { useCallback, useEffect, useState } from 'react';
+import useUiStore from '../../store/uiStore';
+import useViewport from './useViewPort';
 
-const useSidePanelResizer = (detailRef: React.RefObject<HTMLDivElement | null>) => {
+const useSidePanelResizer = (
+  detailRef: React.RefObject<HTMLDivElement | null>,
+) => {
   const sidePanelWidth = useUiStore((state) => state.sidePanelWidth);
   const setSidePanelWidth = useUiStore((state) => state.setSidePanelWidth);
   const { width: viewportWidth } = useViewport();
@@ -37,15 +39,15 @@ const useSidePanelResizer = (detailRef: React.RefObject<HTMLDivElement | null>) 
 
       setResizerPosition(calculatedPosition);
     },
-    [isResizing, detailRef]
+    [isResizing, detailRef],
   );
 
   useEffect(() => {
-    document.addEventListener("mousemove", resizeHandler);
-    document.addEventListener("mouseup", resizerMouseUpHandler);
+    document.addEventListener('mousemove', resizeHandler);
+    document.addEventListener('mouseup', resizerMouseUpHandler);
     return () => {
-      document.removeEventListener("mousemove", resizeHandler);
-      document.removeEventListener("mouseup", resizerMouseUpHandler);
+      document.removeEventListener('mousemove', resizeHandler);
+      document.removeEventListener('mouseup', resizerMouseUpHandler);
     };
   }, [resizeHandler, resizerMouseUpHandler]);
 

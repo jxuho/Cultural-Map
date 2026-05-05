@@ -6,7 +6,7 @@ const mockReviews = [
     culturalSite: 'site-123',
     user: { _id: 'user-1', name: 'max' },
     rating: 5,
-    comment: 'It\'s a really cool place!',
+    comment: "It's a really cool place!",
     createdAt: new Date().toISOString(),
   },
 ];
@@ -16,7 +16,7 @@ export const reviewHandlers = [
   http.get('*/cultural-sites/:placeId/reviews', () => {
     return HttpResponse.json({
       status: 'success',
-      data: { reviews: mockReviews }
+      data: { reviews: mockReviews },
     });
   }),
 
@@ -26,27 +26,39 @@ export const reviewHandlers = [
     const sort = url.searchParams.get('reviewSort');
     return HttpResponse.json({
       status: 'success',
-      data: { reviews: mockReviews, sortApplied: sort }
+      data: { reviews: mockReviews, sortApplied: sort },
     });
   }),
 
   // 3. Create a review
   http.post('*/cultural-sites/:placeId/reviews', async ({ request }) => {
-    const body = await request.json() as any;
-    return HttpResponse.json({
-      status: 'success',
-      data: { review: { ...body, _id: 'new-rev', createdAt: new Date().toISOString() } }
-    }, { status: 201 });
+    const body = (await request.json()) as any;
+    return HttpResponse.json(
+      {
+        status: 'success',
+        data: {
+          review: {
+            ...body,
+            _id: 'new-rev',
+            createdAt: new Date().toISOString(),
+          },
+        },
+      },
+      { status: 201 },
+    );
   }),
 
   // 4. Edit review
-  http.patch('*/cultural-sites/:placeId/reviews/:reviewId', async ({ request }) => {
-    const body = await request.json() as any;
-    return HttpResponse.json({
-      status: 'success',
-      data: { review: { ...body, _id: 'rev-1' } }
-    });
-  }),
+  http.patch(
+    '*/cultural-sites/:placeId/reviews/:reviewId',
+    async ({ request }) => {
+      const body = (await request.json()) as any;
+      return HttpResponse.json({
+        status: 'success',
+        data: { review: { ...body, _id: 'rev-1' } },
+      });
+    },
+  ),
 
   // 5. Delete review
   http.delete('*/cultural-sites/:placeId/reviews/:reviewId', () => {

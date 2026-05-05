@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
-    "lint": "prettier --check ."
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "author": "",
   "license": "ISC",

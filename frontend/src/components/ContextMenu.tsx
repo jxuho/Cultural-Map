@@ -5,7 +5,7 @@ import {
   useEffect,
   useRef,
   useState,
-} from "react";
+} from 'react';
 import {
   useFloating,
   autoUpdate,
@@ -19,8 +19,8 @@ import {
   useTypeahead,
   FloatingPortal,
   FloatingFocusManager,
-} from "@floating-ui/react";
-import useUiStore from "../store/uiStore";
+} from '@floating-ui/react';
+import useUiStore from '../store/uiStore';
 
 interface MenuItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -33,7 +33,9 @@ interface MenuSeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 interface MenuProps {
-  children: React.ReactElement<MenuItemProps | MenuSeparatorProps>[] | React.ReactElement<MenuItemProps | MenuSeparatorProps>;
+  children:
+    | React.ReactElement<MenuItemProps | MenuSeparatorProps>[]
+    | React.ReactElement<MenuItemProps | MenuSeparatorProps>;
 }
 
 // MenuItem
@@ -51,7 +53,6 @@ export const MenuItem = ({ children, disabled, ...props }: MenuItemProps) => {
   );
 };
 
-
 // MenuSeparator
 export const MenuSeparator = (props: MenuSeparatorProps) => {
   return (
@@ -61,7 +62,6 @@ export const MenuSeparator = (props: MenuSeparatorProps) => {
     />
   );
 };
-
 
 // Menu
 export const Menu = ({ children }: MenuProps) => {
@@ -73,10 +73,10 @@ export const Menu = ({ children }: MenuProps) => {
   const listItemsRef = useRef<(HTMLElement | null)[]>([]);
   const listContentRef = useRef<string[]>(
     Children.map(children, (child) =>
-      isValidElement(child) && typeof child.props.label === "string"
+      isValidElement(child) && typeof child.props.label === 'string'
         ? child.props.label
-        : ""
-    ) || []
+        : '',
+    ) || [],
   );
 
   const { refs, floatingStyles, context } = useFloating({
@@ -85,16 +85,16 @@ export const Menu = ({ children }: MenuProps) => {
     middleware: [
       offset({ mainAxis: 5, alignmentAxis: 4 }),
       flip({
-        fallbackPlacements: ["left-start"],
+        fallbackPlacements: ['left-start'],
       }),
       shift({ padding: 10 }),
     ],
-    placement: "right-start",
-    strategy: "fixed",
+    placement: 'right-start',
+    strategy: 'fixed',
     whileElementsMounted: autoUpdate,
   });
 
-  const role = useRole(context, { role: "menu" });
+  const role = useRole(context, { role: 'menu' });
   const dismiss = useDismiss(context);
   const listNavigation = useListNavigation(context, {
     listRef: listItemsRef,
@@ -139,26 +139,23 @@ export const Menu = ({ children }: MenuProps) => {
       }
     }
 
-    document.addEventListener("contextmenu", onContextMenu);
+    document.addEventListener('contextmenu', onContextMenu);
     return () => {
-      document.removeEventListener("contextmenu", onContextMenu);
+      document.removeEventListener('contextmenu', onContextMenu);
     };
   }, [refs, isContextMenuOpen, closeContextMenu]);
 
   return (
     <FloatingPortal id="root">
       {isOpen && (
-        <FloatingFocusManager
-          context={context}
-          initialFocus={refs.floating}
-        >
+        <FloatingFocusManager context={context} initialFocus={refs.floating}>
           <div
             className="rounded bg-white flex flex-col overflow-hidden z-50 shadow-menu"
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps({
               onContextMenu: (e) => {
-                e.preventDefault(); 
+                e.preventDefault();
               },
             })}
           >
@@ -176,7 +173,7 @@ export const Menu = ({ children }: MenuProps) => {
                       (child.props as MenuItemProps).onClick?.(e as any);
                       setIsOpen(false);
                     },
-                  })
+                  }),
                 )
               );
             })}

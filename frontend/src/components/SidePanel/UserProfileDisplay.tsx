@@ -1,29 +1,34 @@
-import defaultProfileImg from "../../assets/profile_image.svg";
-import { useUserById } from "../../hooks/data/useUserQueries";
-import useUiStore from "../../store/uiStore";
+import defaultProfileImg from '../../assets/profile_image.svg';
+import { useUserById } from '../../hooks/data/useUserQueries';
+import useUiStore from '../../store/uiStore';
 import { FaArrowLeft } from 'react-icons/fa';
 
 const UserProfileDisplay = () => {
   const closeSidePanel = useUiStore((state) => state.closeSidePanel);
-  const closeUserProfile = useUiStore(state => state.closeUserProfile)
-  const userProfileId = useUiStore(state => state.userProfileId);
-
+  const closeUserProfile = useUiStore((state) => state.closeUserProfile);
+  const userProfileId = useUiStore((state) => state.userProfileId);
 
   const { data: selectedUserProfile, isLoading } = useUserById(userProfileId);
-
 
   const handleBackButtonClick = () => {
     console.log('back');
     closeUserProfile();
   };
 
-
- if (isLoading) {
-    return <div className="p-4 text-center text-gray-500">Loading user profile...</div>;
+  if (isLoading) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        Loading user profile...
+      </div>
+    );
   }
 
   if (!selectedUserProfile) {
-    return <div className="p-4 text-center text-gray-500">User profile data is not available.</div>;
+    return (
+      <div className="p-4 text-center text-gray-500">
+        User profile data is not available.
+      </div>
+    );
   }
 
   return (
@@ -31,9 +36,9 @@ const UserProfileDisplay = () => {
       {/* Header Section with Back Button and Close */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <div className="flex-1 flex justify-start">
-              <button
-                onClick={handleBackButtonClick}
-                className={`
+          <button
+            onClick={handleBackButtonClick}
+            className={`
                   flex items-center justify-center
                   w-10 h-10 rounded-full
                   bg-gray-50 text-gray-700
@@ -42,11 +47,12 @@ const UserProfileDisplay = () => {
                   focus:outline-none focus:ring-2 focus:ring-gray-400
                   shadow-md cursor-pointer
                 `}
-                aria-label="Go Back"
-                title="Go back to the previous page"
-              >
-                <FaArrowLeft size='18px' /> {/* Only the icon, no text or conditional class */}
-              </button>
+            aria-label="Go Back"
+            title="Go back to the previous page"
+          >
+            <FaArrowLeft size="18px" />{' '}
+            {/* Only the icon, no text or conditional class */}
+          </button>
         </div>
         <h2 className="text-2xl font-bold text-gray-800 wrap-break-words grow text-center">
           Profile
@@ -72,14 +78,20 @@ const UserProfileDisplay = () => {
               className="rounded-full object-cover w-full h-full"
             />
           ) : (
-            <img src={defaultProfileImg} alt="empty profile image" className="rounded-full object-cover w-full h-full" />
+            <img
+              src={defaultProfileImg}
+              alt="empty profile image"
+              className="rounded-full object-cover w-full h-full"
+            />
           )}
         </div>
         <h3 className="text-xl font-semibold text-gray-800">
-          {selectedUserProfile.username || "Unknown User"}
+          {selectedUserProfile.username || 'Unknown User'}
         </h3>
         {selectedUserProfile.email && (
-          <p className="text-sm text-gray-600 mb-4">{selectedUserProfile.email}</p>
+          <p className="text-sm text-gray-600 mb-4">
+            {selectedUserProfile.email}
+          </p>
         )}
       </div>
 

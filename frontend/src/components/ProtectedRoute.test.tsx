@@ -33,7 +33,7 @@ describe('ProtectedRoute', () => {
             }
           />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   };
 
@@ -89,7 +89,7 @@ describe('ProtectedRoute', () => {
       user: { role: 'user' },
     });
 
-    renderWithRouter(); // no requiredRole 
+    renderWithRouter(); // no requiredRole
     expect(screen.getByText('Protected Content')).toBeInTheDocument();
   });
 });

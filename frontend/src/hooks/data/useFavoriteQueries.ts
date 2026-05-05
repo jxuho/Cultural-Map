@@ -1,8 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addFavorite, deleteFavorite, fetchMyFavorites } from "../../api/favoriteApi";
-import { Place } from "../../types/place";
-import { AxiosError } from "axios";
-import { ApiResponse } from "../../types/api";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  addFavorite,
+  deleteFavorite,
+  fetchMyFavorites,
+} from '../../api/favoriteApi';
+import { Place } from '../../types/place';
+import { AxiosError } from 'axios';
+import { ApiResponse } from '../../types/api';
 
 /**
  * My Favorites List Import Hook
@@ -31,7 +35,11 @@ interface FavoriteMutationParams {
 export const useFavoriteMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Place[] | boolean, AxiosError<ApiResponse<null>>, FavoriteMutationParams>({
+  return useMutation<
+    Place[] | boolean,
+    AxiosError<ApiResponse<null>>,
+    FavoriteMutationParams
+  >({
     mutationFn: async ({ actionType, culturalSiteId }) => {
       if (actionType === 'add') {
         return addFavorite(culturalSiteId);
@@ -43,16 +51,17 @@ export const useFavoriteMutation = () => {
     onSuccess: (_, variables) => {
       // 1. Invalidate my favorites list (update list)
       queryClient.invalidateQueries({ queryKey: ['myFavorites'] });
-      
+
       // 2. Invalidate detailed information on specific cultural assets (reflects favorite status)
-      queryClient.invalidateQueries({ 
-        queryKey: ['culturalSite', variables.culturalSiteId] 
+      queryClient.invalidateQueries({
+        queryKey: ['culturalSite', variables.culturalSiteId],
       });
     },
     onError: (error) => {
       // If there is a message in the API response, output, otherwise the default message
-      const errorMessage = error.response?.data?.message || error.message || "Unknown error";
-      console.error("Favorite action fail:", error);
+      const errorMessage =
+        error.response?.data?.message || error.message || 'Unknown error';
+      console.error('Favorite action fail:', error);
       alert(`Favorite process fail: ${errorMessage}`);
     },
   });

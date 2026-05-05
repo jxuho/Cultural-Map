@@ -12,7 +12,7 @@ const createMockSite = (id: string, name: string) => ({
   address: 'Chemnitz address example',
   favoritesCount: 1,
   averageRating: 4.5, // Fields added by Aggregation
-  reviewCount: 10,    // Fields added by Aggregation
+  reviewCount: 10, // Fields added by Aggregation
 });
 
 let mockFavorites = [createMockSite('site-123', 'ABC Historic Site')];
@@ -24,8 +24,8 @@ export const favoriteHandlers = [
       status: 'success',
       results: mockFavorites.length,
       data: {
-        favoriteSites: mockFavorites
-      }
+        favoriteSites: mockFavorites,
+      },
     });
   }),
 
@@ -33,7 +33,7 @@ export const favoriteHandlers = [
   http.post('*/users/me/favorites/:siteId', ({ params }) => {
     const { siteId } = params as { siteId: string };
     const newSite = createMockSite(siteId, 'new historic site');
-    
+
     // Fake status updates in test environment (optional)
     mockFavorites.push(newSite);
 
@@ -41,25 +41,25 @@ export const favoriteHandlers = [
       status: 'success',
       message: 'Successfully added.',
       data: {
-        user: { _id: 'user-1', favoriteSites: mockFavorites.map(s => s._id) },
+        user: { _id: 'user-1', favoriteSites: mockFavorites.map((s) => s._id) },
         culturalSite: newSite,
         // IMPORTANT: Frontend api/favoriteApi.ts references this path
-        favoriteSites: mockFavorites 
-      }
+        favoriteSites: mockFavorites,
+      },
     });
   }),
 
   // [DELETE] Delete favorites
   http.delete('*/users/me/favorites/:siteId', ({ params }) => {
     const { siteId } = params as { siteId: string };
-    mockFavorites = mockFavorites.filter(s => s._id !== siteId);
+    mockFavorites = mockFavorites.filter((s) => s._id !== siteId);
 
     return HttpResponse.json({
       status: 'success',
       message: 'Successfully removed.',
       data: {
-        user: { _id: 'user-1', favoriteSites: mockFavorites.map(s => s._id) }
-      }
+        user: { _id: 'user-1', favoriteSites: mockFavorites.map((s) => s._id) },
+      },
     });
   }),
 ];

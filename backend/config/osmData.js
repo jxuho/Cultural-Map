@@ -8,18 +8,16 @@
 const CHEMNITZ_RELATION_ID = 62594;
 
 const singleElementQuery = (osmType, osmId) => {
-
   return `[out:json][timeout:25];
             ${osmType}(${osmId});
-            out center;`
-}
+            out center;`;
+};
 
 const baseCulturalSiteQuery = (radius, lat, lon) => {
   const useAround = radius && lat && lon;
-  const around = useAround ? `(around:${radius},${lat},${lon})` : "";
+  const around = useAround ? `(around:${radius},${lat},${lon})` : '';
 
-  const AREA_ID = 3600000000 + CHEMNITZ_RELATION_ID
-
+  const AREA_ID = 3600000000 + CHEMNITZ_RELATION_ID;
 
   return `
   [out:json][timeout:60];
@@ -72,7 +70,6 @@ const baseCulturalSiteQuery = (radius, lat, lon) => {
   out center;
 `;
 };
-
 
 const extendedCulturalSiteQuery = (radius, lat, lon) => {
   const useAround = radius && lat && lon;
@@ -156,18 +153,9 @@ out center;
 `;
 };
 
-
 module.exports = {
   singleElementQuery,
   CHEMNITZ_RELATION_ID,
   baseCulturalSiteQuery,
-  extendedCulturalSiteQuery
+  extendedCulturalSiteQuery,
 };
-
-
-
-
-
-
-
-

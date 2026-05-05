@@ -1,23 +1,22 @@
-import { useState, useMemo } from "react";
-import { BsStarFill } from "react-icons/bs";
-import useAuthStore from "../../store/authStore";
+import { useState, useMemo } from 'react';
+import { BsStarFill } from 'react-icons/bs';
+import useAuthStore from '../../store/authStore';
 import {
   useMyFavorites,
   useFavoriteMutation,
-} from "../../hooks/data/useFavoriteQueries";
-import ErrorMessage from "../ErrorMessage";
-import StarIcon from "../StarIcon";
-import BackButton from "../BackButton";
+} from '../../hooks/data/useFavoriteQueries';
+import ErrorMessage from '../ErrorMessage';
+import StarIcon from '../StarIcon';
+import BackButton from '../BackButton';
 
-
-type SortCriteria = "name" | "averageRating" | "reviewCount";
-type SortOrder = "asc" | "desc";
+type SortCriteria = 'name' | 'averageRating' | 'reviewCount';
+type SortOrder = 'asc' | 'desc';
 
 const FavoriteSites = () => {
   const currentUser = useAuthStore((state) => state.user);
   const [expandedSiteId, setExpandedSiteId] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<SortCriteria>("name");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc"); 
+  const [sortBy, setSortBy] = useState<SortCriteria>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   const {
     data: myFavorites,
@@ -36,17 +35,17 @@ const FavoriteSites = () => {
     event.stopPropagation();
 
     if (!currentUser) {
-      alert("Please signin");
+      alert('Please signin');
       return;
     }
 
     try {
       await favoriteMutation.mutateAsync({
-        actionType: isCurrentlyFavorite ? "delete" : "add",
+        actionType: isCurrentlyFavorite ? 'delete' : 'add',
         culturalSiteId: culturalSiteId,
       });
     } catch (err) {
-      console.error("Error occurred while changing favorite status:", err);
+      console.error('Error occurred while changing favorite status:', err);
     }
   };
 
@@ -64,33 +63,33 @@ const FavoriteSites = () => {
       let valA, valB;
 
       switch (sortBy) {
-        case "name":
-          valA = a.name || "";
-          valB = b.name || "";
+        case 'name':
+          valA = a.name || '';
+          valB = b.name || '';
           break;
-        case "averageRating":
+        case 'averageRating':
           valA = a.averageRating || 0;
           valB = b.averageRating || 0;
           break;
-        case "reviewCount":
+        case 'reviewCount':
           valA = a.reviewCount || 0;
           valB = b.reviewCount || 0;
           break;
-        default: 
-          valA = a.name || "";
-          valB = b.name || "";
+        default:
+          valA = a.name || '';
+          valB = b.name || '';
           break;
       }
 
-      if (typeof valA === "string" && typeof valB === "string") {
-        return sortOrder === "asc"
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return sortOrder === 'asc'
           ? valA.localeCompare(valB)
           : valB.localeCompare(valA);
       } else {
         // For numbers (ratings, review counts)
         const numA = valA as number;
         const numB = valB as number;
-        return sortOrder === "asc" ? numA - numB : numB - numA;
+        return sortOrder === 'asc' ? numA - numB : numB - numA;
       }
     });
     return sortableFavorites;
@@ -98,18 +97,18 @@ const FavoriteSites = () => {
 
   const handleSortChange = (criteria: SortCriteria) => {
     if (sortBy === criteria) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc"); // Toggle order if same criteria
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); // Toggle order if same criteria
     } else {
       setSortBy(criteria);
-      setSortOrder("asc"); // Default to ascending for new criteria
+      setSortOrder('asc'); // Default to ascending for new criteria
     }
   };
 
   const getSortIndicator = (criteria: SortCriteria) => {
     if (sortBy === criteria) {
-      return sortOrder === "asc" ? " ↑" : " ↓";
+      return sortOrder === 'asc' ? ' ↑' : ' ↓';
     }
-    return "";
+    return '';
   };
 
   // --- Loading/Error/Empty Favorites State Handling ---
@@ -138,7 +137,7 @@ const FavoriteSites = () => {
         <div className="grow flex items-center justify-center">
           <ErrorMessage
             message={
-              favoritesError?.message || "Failed to fetch favorite sites."
+              favoritesError?.message || 'Failed to fetch favorite sites.'
             }
           />
         </div>
@@ -181,8 +180,8 @@ const FavoriteSites = () => {
                   onClick={(e) => handleFavoriteChange(e, site._id, true)}
                   className={`text-xl p-2 rounded-full transition-colors duration-200 ${
                     favoriteMutation.isPending
-                      ? "opacity-50 cursor-not-allowed"
-                      : ""
+                      ? 'opacity-50 cursor-not-allowed'
+                      : ''
                   } text-yellow-500 hover:text-yellow-600 hover:cursor-pointer`}
                   disabled={favoriteMutation.isPending}
                 >
@@ -220,18 +219,18 @@ const FavoriteSites = () => {
                     <p className="mb-1">
                       <span className="font-semibold">Category:</span>
                       {site.category
-                        ?.replace(/_/g, " ")
-                        .split(" ")
+                        ?.replace(/_/g, ' ')
+                        .split(' ')
                         .map(
                           (word) =>
                             word.charAt(0).toUpperCase() + word.slice(1),
                         )
-                        .join(" ") || "N/A"}
+                        .join(' ') || 'N/A'}
                     </p>
                   )}
                   {site.address && (
                     <p className="mb-1">
-                      <span className="font-semibold">Address:</span>{" "}
+                      <span className="font-semibold">Address:</span>{' '}
                       {site.address}
                     </p>
                   )}
@@ -296,22 +295,22 @@ const FavoriteSites = () => {
       {/* Sort Buttons for FavoriteSites */}
       <div className="mb-6 flex flex-wrap gap-2 sm:gap-4 justify-start">
         <button
-          onClick={() => handleSortChange("name")}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "name" ? "bg-blue-600 text-white cursor-pointer" : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"}`}
+          onClick={() => handleSortChange('name')}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'name' ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
         >
-          Sort by Name{getSortIndicator("name")}
+          Sort by Name{getSortIndicator('name')}
         </button>
         <button
-          onClick={() => handleSortChange("averageRating")}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "averageRating" ? "bg-blue-600 text-white cursor-pointer" : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"}`}
+          onClick={() => handleSortChange('averageRating')}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'averageRating' ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
         >
-          Sort by Average Rating{getSortIndicator("averageRating")}
+          Sort by Average Rating{getSortIndicator('averageRating')}
         </button>
         <button
-          onClick={() => handleSortChange("reviewCount")}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === "reviewCount" ? "bg-blue-600 text-white cursor-pointer" : "bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer"}`}
+          onClick={() => handleSortChange('reviewCount')}
+          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'reviewCount' ? 'bg-blue-600 text-white cursor-pointer' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
         >
-          Sort by Review Count{getSortIndicator("reviewCount")}
+          Sort by Review Count{getSortIndicator('reviewCount')}
         </button>
       </div>
 

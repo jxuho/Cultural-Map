@@ -1,27 +1,27 @@
-import { useRef, useMemo, useEffect, useCallback } from "react";
+import { useRef, useMemo, useEffect, useCallback } from 'react';
 import {
   MapContainer,
   TileLayer,
   ZoomControl,
   useMapEvents,
   useMap,
-} from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { LatLngTuple, LatLngBoundsExpression } from "leaflet";
+} from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import { LatLngTuple, LatLngBoundsExpression } from 'leaflet';
 
-import "leaflet.markercluster/dist/MarkerCluster.css";
-import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
-import useFilterStore from "../../store/filterStore.ts";
-import useUiStore from "../../store/uiStore";
+import useFilterStore from '../../store/filterStore.ts';
+import useUiStore from '../../store/uiStore';
 
-import { useAllCulturalSites } from "../../hooks/data/useCulturalSitesQueries";
-import CurrentLocationButton from "./CurrentLocationButton";
+import { useAllCulturalSites } from '../../hooks/data/useCulturalSitesQueries';
+import CurrentLocationButton from './CurrentLocationButton';
 
-import CulturalSiteMarkers from "./CulturalSiteMarkers";
-import useViewport from "../../hooks/ui/useViewPort";
+import CulturalSiteMarkers from './CulturalSiteMarkers';
+import useViewport from '../../hooks/ui/useViewPort';
 
-import { Place } from "@/types/place.ts";
+import { Place } from '@/types/place.ts';
 
 const MapEventsHandler = () => {
   const openContextMenu = useUiStore((state) => state.openContextMenu);

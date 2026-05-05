@@ -13,7 +13,7 @@ router.use(authController.protect);
 router.patch(
   '/updateRole/:userId',
   authController.restrictTo('admin'),
-  authController.updateUserRole
+  authController.updateUserRole,
 );
 
 // Get my information
@@ -26,7 +26,6 @@ router.delete('/deleteMe', userController.deleteMe);
 router.get('/:userId', userController.getUserById);
 // Get all user information
 router.get('/', authController.restrictTo('admin'), userController.getAllUsers);
-
 
 // Look up favorites (when viewing the favorites list in your user profile)
 // /api/v1/users/me/favorites
@@ -41,6 +40,5 @@ router.post('/me/favorites/:siteId', userController.addFavoriteSite);
 router.delete('/me/favorites/:siteId', userController.removeFavoriteSite);
 
 router.get('/me/reviews', userController.getMyReviews);
-
 
 module.exports = router;
