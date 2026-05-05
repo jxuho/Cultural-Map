@@ -32,9 +32,6 @@ pids
 build/ # React project build folder
 dist/ # Express project build folder or other build folder
 
-# Dependency directories
-package-lock.json
-yarn.lock
 
 # Docker
 docker-compose.override.yml
