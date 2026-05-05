@@ -54,11 +54,10 @@ const importGeojson = async (performReverseGeocoding) => {
         }
 
         try {
-          const culturalSiteData =
-            await processOsmElementForCulturalSite(
-              osmElementLike,
-              performReverseGeocoding,
-            );
+          const culturalSiteData = await processOsmElementForCulturalSite(
+            osmElementLike,
+            performReverseGeocoding,
+          );
 
           culturalSitesToInsert.push(culturalSiteData);
         } catch (error) {
@@ -79,11 +78,10 @@ const importGeojson = async (performReverseGeocoding) => {
         }
 
         try {
-          const culturalSiteData =
-            await processOsmElementForCulturalSite(
-              element,
-              performReverseGeocoding,
-            );
+          const culturalSiteData = await processOsmElementForCulturalSite(
+            element,
+            performReverseGeocoding,
+          );
 
           culturalSitesToInsert.push(culturalSiteData);
         } catch (error) {
@@ -99,28 +97,19 @@ const importGeojson = async (performReverseGeocoding) => {
       return;
     }
 
-    const result = await CulturalSite.insertMany(
-      culturalSitesToInsert,
-      {
-        ordered: false, // Duplicate error, I keep going
-      },
-    );
+    const result = await CulturalSite.insertMany(culturalSitesToInsert, {
+      ordered: false, // Duplicate error, I keep going
+    });
 
-    console.log(
-      `Successfully inserted ${result.length} new CulturalSites.`,
-    );
+    console.log(`Successfully inserted ${result.length} new CulturalSites.`);
   } catch (error) {
     console.error('Error importing data:', error);
 
     // Cleaning up duplicate key error logs
     if (error.writeErrors) {
-      const duplicateErrors = error.writeErrors.filter(
-        (e) => e.code === 11000,
-      );
+      const duplicateErrors = error.writeErrors.filter((e) => e.code === 11000);
 
-      console.warn(
-        `Skipped ${duplicateErrors.length} duplicate entries.`,
-      );
+      console.warn(`Skipped ${duplicateErrors.length} duplicate entries.`);
     }
   }
 };
@@ -130,8 +119,7 @@ const importGeojson = async (performReverseGeocoding) => {
  */
 async function getLatestCulturalSitesFile() {
   const dataDir = path.join(__dirname, '../data');
-  const fileNamePattern =
-    /^chemnitz_cultural_sites_(\d{13})\.(geo)?json$/;
+  const fileNamePattern = /^chemnitz_cultural_sites_(\d{13})\.(geo)?json$/;
 
   try {
     const files = await fsAsync.readdir(dataDir);
@@ -167,8 +155,7 @@ async function getLatestCulturalSitesFile() {
 // When running CLI, determine whether to reverse geocode using the --no-reverse-geocode option.
 if (require.main === module) {
   const args = process.argv.slice(2);
-  const shouldPerformReverseGeocoding =
-    !args.includes('--no-reverse-geocode');
+  const shouldPerformReverseGeocoding = !args.includes('--no-reverse-geocode');
 
   importGeojson(shouldPerformReverseGeocoding);
 }
