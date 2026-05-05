@@ -36,3 +36,6 @@ dist/ # Express project build folder or other build folder
 # Docker
 docker-compose.override.yml
 docker/data/
+
+# Local development data
+data/*.json
