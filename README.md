@@ -158,45 +158,59 @@ GitHub Actions → Linting & Formatting → Vitest/RTL → PR Validation.
 ## 💻 Local Development
 
 <details>
-<summary>Setup instructions</summary>
+<summary>Setup instructions (Docker & Manual)</summary>
 
-### 1. Environment Variables
+### 🐳 1. Running with Docker (Recommended)
+The easiest way to get the entire stack (Frontend, Backend, Database) up and running is using Docker Compose.
 
-Create a `.env` file in `/backend`:
+**Step 1: Environment Variables**
+Create a `.env` file in the `/backend` directory with your credentials:
 ```env
-MONGO_URI=your_mongodb_atlas_uri
+MONGO_URI=mongodb://mongodb:27017/dbw
 GOOGLE_CLIENT_ID=your_id
 GOOGLE_CLIENT_SECRET=your_secret
-GOOGLE_CALLBACK_URL=/api/v1/auth/google/callback
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/v1/auth/google/callback
 JWT_SECRET=your_jwt_secret
 PORT=5000
 NODE_ENV=dev
 ```
 
-### 2. Install Dependencies
+**Step 2: Launch the App**
 ```bash
+docker-compose up --build
+```
+- Auto-Seeding: The backend is configured to automatically fetch 500+ cultural sites from the Overpass API and populate the database if it's empty on startup.
+- Frontend: http://localhost:3000
+- Backend & API Docs: http://localhost:5000/api-docs
+
+### 🛠 2. Manual Setup (Alternative)
+If you prefer to run the services individually without Docker:
+
+**Step 1: Install Dependencies**
+```bash
+# Install frontend dependencies
 cd frontend && npm install
+
+# Install backend dependencies
 cd ../backend && npm install
 ```
 
-### 3. Seed the Database
+**Step 2: Run Development Servers**
 ```bash
-cd backend
-node scripts/fetchAndSaveCulturalSites.js   # Fetch from Overpass API
-node scripts/importGeojson.js --no-reverse-geocode  # Import to MongoDB
-```
+# Backend (http://localhost:5000)
+cd backend && npm run dev
 
-### 4. Run Dev Servers
-```bash
 # Frontend (http://localhost:3000)
 cd frontend && npm run dev
-
-# Backend (http://localhost:5000)
-cd backend && npm start
 ```
+Note on Data: Even in manual mode, the server will perform Auto-Seeding on its first run if the connected database is empty. No manual script execution is required.
 
-### 5. Run Tests
+### 🧪 3. Running Tests
 ```bash
+# Frontend Tests
 cd frontend && npm run test
+
+# Backend Tests
+cd backend && npm run test
 ```
 </details>
