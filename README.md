@@ -9,6 +9,7 @@
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat-square&logo=mongodb&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Tested_with-Vitest-6E9F18?style=flat-square&logo=vitest&logoColor=white)
 
+
 An interactive full-stack web application for discovering and exploring cultural heritage sites in Chemnitz. Built with a React + TypeScript frontend and a Node.js/Express backend following the MVC pattern, with real-time geospatial data from OpenStreetMap.
 
 ### 🔗 **[Live Demo](https://cultural-heritage-map.vercel.app/)** · **[API Docs (Swagger)](https://cultural-heritage-map.onrender.com/api-docs/)**
@@ -53,6 +54,7 @@ An interactive full-stack web application for discovering and exploring cultural
 | 🔐 RBAC | Role-based access control separating `user` and `admin` permissions |
 | 👤 Auth | Google OAuth 2.0 + JWT via Passport.js with httpOnly cookies |
 | 📡 Live Data Sync | Weekly cron job syncs data from OpenStreetMap via Overpass API |
+| 🤖 CI/CD Pipeline	| Automated linting, formatting (Prettier), and testing via GitHub Actions for every push/PR |
 | ✅ Testing | Component and integration tests with Vitest + React Testing Library |
 | 📱 Responsive | Mobile-first layout, tested across breakpoints |
 | 📄 API Docs | Full OpenAPI/Swagger specification for all endpoints |
@@ -74,7 +76,10 @@ An interactive full-stack web application for discovering and exploring cultural
 - **Passport.js** — Handled both JWT and OAuth 2.0 strategies cleanly within a single middleware layer
 
 ### Infrastructure
-- **Frontend:** Vercel | **Backend:** Render | **Database:** MongoDB Atlas
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** MongoDB Atlas
+- **CI/CD:** GitHub Actions (Automated Lint/Format/Test)
 
 ---
 
