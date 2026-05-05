@@ -46,6 +46,18 @@ An interactive full-stack web application for discovering and exploring cultural
 
 ---
 
+
+## 🚀 Quick Start
+```bash
+git clone https://github.com/jxuho/cultural-heritage-map.git
+cd cultural-heritage-map
+cp backend/.env.example backend/.env   # please enter the values
+docker-compose up --build
+```
+
+---
+
+
 ## ✨ Features
 
 | Feature | Details |
@@ -80,6 +92,7 @@ An interactive full-stack web application for discovering and exploring cultural
 - **Backend:** Render
 - **Database:** MongoDB Atlas
 - **CI/CD:** GitHub Actions (Automated Lint/Format/Test)
+- **Containerization:** Docker Compose (local dev, 3-service stack)
 
 ---
 
@@ -154,6 +167,7 @@ GitHub Actions → Linting & Formatting → Vitest/RTL → PR Validation.
 - [ ] Improve Lighthouse performance score by code-splitting the JS bundle and adding `preconnect` hints for the backend origin
 
 ---
+
 
 ## 💻 Local Development
 
