@@ -12,7 +12,7 @@ const Footer = () => {
           OpenStreetMap contributors
         </a>
         . Powered by Nominatim, Overpass API. &copy; {new Date().getFullYear()}
-        ChemnitzCulturalSitesApp.
+        CulturalHeritageMap.
       </div>
     </footer>
   );
