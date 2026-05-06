@@ -280,6 +280,18 @@ paths:
       responses:
         200:
           description: Successfully logged out.
+  /auth/refresh:
+    get:
+      summary: Refresh JWT tokens
+      tags:
+        - Authentication
+      operationId: refreshToken
+      description: Issues a new access token using a valid refresh token.
+      responses:
+        200:
+          description: New access token issued successfully.
+        401:
+          description: Invalid or expired refresh token.
   /cultural-sites/nearby-osm:
     get:
       summary: Get nearby cultural sites from OSM database for a lon/lat coordinates

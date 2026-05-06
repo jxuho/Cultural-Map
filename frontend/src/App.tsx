@@ -24,11 +24,7 @@ const App = () => {
   const loading = useAuthStore((state) => state.loading);
 
   useEffect(() => {
-    const { isAuthenticated } = useAuthStore.getState();
-
-    if (!isAuthenticated) {
-      checkAuthStatus();
-    }
+    checkAuthStatus();
   }, [checkAuthStatus]);
 
   // Display a loading spinner while authentication status is being determined

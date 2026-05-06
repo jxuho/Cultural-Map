@@ -3,114 +3,123 @@ const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const jwt = require('jsonwebtoken');
 
-// 1. JWT Token Generation
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+// 1. Token generation utility
+const signAccessToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '15m',
   });
 };
 
-// 2. Common Cookie Options
-const getCookieOptions = (res) => {
-  const isProduction = process.env.NODE_ENV === 'production';
-  return {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
-    ),
+const signRefreshToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
+  });
+};
+
+// 2. Setting common cookie options (enhanced security)
+const setRefreshTokenCookie = (res, token) => {
+  // Convert to number, otherwise use 7 days (default)
+  const days = Number(process.env.JWT_REFRESH_COOKIE_EXPIRES_IN) || 7;
+
+  const cookieOptions = {
+    // Check if it is a number when calculating milliseconds
+    expires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    // Apply secure flag in production or when behind an HTTPS proxy
-    secure: isProduction || res.req.headers['x-forwarded-proto'] === 'https',
-    // Support cross-domain cookie transmission (Render <-> Local or different domains)
-    sameSite: isProduction ? 'none' : 'Lax',
+    secure: process.env.NODE_ENV === 'production' || res.req.headers['x-forwarded-proto'] === 'https',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Lax',
     path: '/',
   };
+
+  res.cookie('refreshToken', token, cookieOptions);
 };
 
-// 3. For Standard Login: Set Cookie and Send JSON Response
-const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id);
-  const cookieOptions = getCookieOptions(res);
-
-  res.cookie('jwt', token, cookieOptions);
-
-  // Remove password from output for security
-  user.password = undefined;
-
-  res.status(statusCode).json({
-    status: 'success',
-    data: { user },
-  });
-};
-
-// 4. Google OAuth Callback: Set Cookie and Redirect
+/**
+ * 3. Google OAuth Callback
+ * Strategy: Store only the refresh token in a cookie and redirect to the front.
+ */
 const googleAuthCallback = asyncHandler(async (req, res, next) => {
   if (!req.user) {
     return next(new AppError('Google authentication failed.', 401));
   }
 
-  const token = signToken(req.user._id);
-  const cookieOptions = getCookieOptions(res);
+  // Generate refresh token and set cookies
+  const refreshToken = signRefreshToken(req.user._id);
+  setRefreshTokenCookie(res, refreshToken);
 
-  // Set the JWT cookie
-  res.cookie('jwt', token, cookieOptions);
-
-  // Set frontend URL based on environment
-  const isProduction = process.env.NODE_ENV === 'production';
-  const frontendUrl = isProduction
+  // Frontend URL settings
+  const frontendUrl = process.env.NODE_ENV === 'production'
     ? 'https://cultural-heritage-map.vercel.app/'
     : 'http://localhost:3000';
 
-  // Redirect directly to frontend instead of sending JSON
+  // Redirect (does not include access token -secure)
   res.redirect(frontendUrl);
 });
 
-// 5. Authentication Middleware: Prioritize reading token from cookies
+/**
+ * 4. Token Refresh
+ * Called when the frontend is loaded or when a 401 error occurs, a new Access Token is issued.
+ */
+const refresh = asyncHandler(async (req, res, next) => {
+  const { refreshToken } = req.cookies;
+
+  // Check if there is no token or the 'loggedout' string set when logging out.
+  if (!refreshToken || refreshToken === 'loggedout') {
+    return next(new AppError('No refresh token found. Please log in.', 401));
+  }
+
+  try {
+    const decoded = await jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next(new AppError('The user no longer exists.', 401));
+    }
+
+    const accessToken = signAccessToken(currentUser._id);
+
+    res.status(200).json({
+      status: 'success',
+      accessToken,
+      data: { user: currentUser }
+    });
+  } catch (err) {
+    return next(new AppError('Invalid refresh token. Please log in again.', 401));
+  }
+});
+
+/**
+ * 5. Protect Middleware (Access Token 검증)
+ */
 const protect = asyncHandler(async (req, res, next) => {
   let token;
-
-  // Check if token exists in cookies (Priority 1)
-  if (req.cookies && req.cookies.jwt) {
-    token = req.cookies.jwt;
-  }
-  // Check Authorization header (Priority 2 - useful for Postman/API testing)
-  else if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
 
   if (!token) {
-    return next(
-      new AppError('You are not logged in! Please log in to get access.', 401),
-    );
+    return next(new AppError('Please log in to access this resource.', 401));
   }
 
-  // Verify token
-  const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+  // Access Token Verification
+  const decoded = await jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-  // Check if user still exists
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
-    return next(
-      new AppError('The user belonging to this token no longer exists.', 401),
-    );
+    return next(new AppError('User not found.', 401));
   }
 
-  // Grant access to protected route
   req.user = currentUser;
   next();
 });
 
-// 6. Logout: Clear Cookie
+/**
+ * 6. Logout
+ */
 const logout = (req, res) => {
-  res.cookie('jwt', 'loggedout', {
-    expires: new Date(Date.now() + 10 * 1000), // Expire in 10 seconds
+  res.cookie('refreshToken', 'loggedout', {
+    expires: new Date(Date.now() + 1000),
     httpOnly: true,
-    // Options must match the set cookie options to be cleared correctly by the browser
-    secure:
-      process.env.NODE_ENV === 'production' ||
-      res.req.headers['x-forwarded-proto'] === 'https',
+    secure: process.env.NODE_ENV === 'production' || res.req.headers['x-forwarded-proto'] === 'https',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Lax',
     path: '/',
   });
@@ -173,4 +182,5 @@ module.exports = {
   restrictTo,
   logout,
   updateUserRole,
+  refresh,
 };

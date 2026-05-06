@@ -26,4 +26,7 @@ router.get(
 // Logout route (delete JWT cookie)
 router.post('/logout', authController.logout);
 
+// Token refresh route (issue new access token using refresh token)
+router.get('/refresh', authController.refresh);
+
 module.exports = router;
