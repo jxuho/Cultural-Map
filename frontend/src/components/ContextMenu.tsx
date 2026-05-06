@@ -153,6 +153,7 @@ export const Menu = ({ children }: MenuProps) => {
             className="rounded bg-white flex flex-col overflow-hidden z-50 shadow-menu"
             ref={refs.setFloating}
             style={floatingStyles}
+            data-testid="map-context-menu"
             {...getFloatingProps({
               onContextMenu: (e) => {
                 e.preventDefault();

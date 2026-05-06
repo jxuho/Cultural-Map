@@ -57,14 +57,14 @@ const Header: React.FC = () => {
         </div>
 
         {/*central logo */}
-        <div className="absolute left-1/2 -translate-x-1/2">
+        <header className="absolute left-1/2 -translate-x-1/2">
           <a
             href="/"
             className="font-bold text-white hover:cursor-pointer text-base sm:text-lg md:text-xl lg:text-2xl whitespace-nowrap"
           >
             Cultural Heritage Map
           </a>
-        </div>
+        </header>
 
         {/*Account Management Button */}
         <div className="flex items-center pr-4">

@@ -24,8 +24,11 @@ const App = () => {
   const loading = useAuthStore((state) => state.loading);
 
   useEffect(() => {
-    // Always re-validate login status on component mount
-    checkAuthStatus();
+    const { isAuthenticated } = useAuthStore.getState();
+
+    if (!isAuthenticated) {
+      checkAuthStatus();
+    }
   }, [checkAuthStatus]);
 
   // Display a loading spinner while authentication status is being determined

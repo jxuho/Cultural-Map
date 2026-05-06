@@ -46,7 +46,7 @@ const SidePanel = () => {
   if (!isSidePanelOpen) return null;
 
   return (
-    <div
+    <aside
       ref={detailRef}
       className="absolute z-30 right-0 top-0 h-full shadow-lg bg-white flex flex-col"
       style={{
@@ -61,7 +61,7 @@ const SidePanel = () => {
 
       <SidePanelContent />
       <SidePanelButtons />
-    </div>
+    </aside>
   );
 };
 
