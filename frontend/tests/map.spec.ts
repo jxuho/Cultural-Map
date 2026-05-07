@@ -17,7 +17,9 @@ test.describe('Map and Marker Interaction', () => {
     await expect(page.locator('.leaflet-container')).toBeVisible();
   });
 
-  test('Clicking a cluster should zoom in and show individual markers', async ({ page }) => {
+  test('Clicking a cluster should zoom in and show individual markers', async ({
+    page,
+  }) => {
     const mapContainer = page.locator('.leaflet-container');
     await mapContainer.focus();
 
@@ -29,7 +31,7 @@ test.describe('Map and Marker Interaction', () => {
 
     const cluster = page.locator('.leaflet-marker-cluster').first();
     const anyMarker = page.locator('.leaflet-marker-icon').first();
-    
+
     // Ensure at least one marker is visible before proceeding
     await expect(anyMarker).toBeVisible({ timeout: 10000 });
 
@@ -49,7 +51,7 @@ test.describe('Map and Marker Interaction', () => {
     // If markers are clustered, click to expand them
     if (await cluster.isVisible()) {
       await cluster.click();
-      await page.waitForTimeout(500); 
+      await page.waitForTimeout(500);
     }
 
     const marker = page.locator('.leaflet-marker-icon').first();
@@ -62,7 +64,9 @@ test.describe('Map and Marker Interaction', () => {
     await expect(sidePanel).toBeVisible();
   });
 
-  test('Account button shows login prompt when not logged in', async ({ page }) => {
+  test('Account button shows login prompt when not logged in', async ({
+    page,
+  }) => {
     // Mock unauthorized status
     await page.route('**/auth/refresh', (route) => {
       route.fulfill({
@@ -79,8 +83,10 @@ test.describe('Map and Marker Interaction', () => {
     await accountBtn.click();
 
     // Verify login invitation modal content
-    await expect(page.getByText("You're not logged in.Please log in")).toBeVisible();
-    
+    await expect(
+      page.getByText("You're not logged in.Please log in"),
+    ).toBeVisible();
+
     const signInBtn = page.getByRole('button', { name: /sign in/i });
     await expect(signInBtn).toBeVisible();
 
@@ -91,7 +97,9 @@ test.describe('Map and Marker Interaction', () => {
 });
 
 test.describe('Guest User Constraints', () => {
-  test('Guest users should not see context menu on right-click', async ({ page }) => {
+  test('Guest users should not see context menu on right-click', async ({
+    page,
+  }) => {
     // Force non-logged-in state
     await page.route(
       (url) => url.pathname.includes('auth/refresh'),
@@ -100,11 +108,13 @@ test.describe('Guest User Constraints', () => {
           status: 401,
           body: JSON.stringify({ status: 'fail' }),
         });
-      }
+      },
     );
 
     await page.goto('/');
-    await expect(page.getByText('Loading the Map...')).not.toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Loading the Map...')).not.toBeVisible({
+      timeout: 15000,
+    });
 
     // Right-click empty map area
     const map = page.locator('.leaflet-container');
@@ -138,14 +148,18 @@ test.describe('Authenticated User Features', () => {
             },
           }),
         });
-      }
+      },
     );
 
     await page.goto('/');
-    await expect(page.getByText('Loading the Map...')).not.toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('Loading the Map...')).not.toBeVisible({
+      timeout: 15000,
+    });
   });
 
-  test('Logged-in user should see context menu on right-click', async ({ page }) => {
+  test('Logged-in user should see context menu on right-click', async ({
+    page,
+  }) => {
     const map = page.locator('.leaflet-container');
 
     // Right-click empty map area

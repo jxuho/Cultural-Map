@@ -158,7 +158,7 @@ const MapComponent = () => {
   ];
 
   return (
-    <div className="h-full w-full relative" id='map'>
+    <div className="h-full w-full relative" id="map">
       <MapContainer
         center={initialPosition}
         zoom={14}

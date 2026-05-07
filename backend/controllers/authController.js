@@ -25,7 +25,9 @@ const setRefreshTokenCookie = (res, token) => {
     // Check if it is a number when calculating milliseconds
     expires: new Date(Date.now() + days * 24 * 60 * 60 * 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' || res.req.headers['x-forwarded-proto'] === 'https',
+    secure:
+      process.env.NODE_ENV === 'production' ||
+      res.req.headers['x-forwarded-proto'] === 'https',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Lax',
     path: '/',
   };
@@ -47,9 +49,10 @@ const googleAuthCallback = asyncHandler(async (req, res, next) => {
   setRefreshTokenCookie(res, refreshToken);
 
   // Frontend URL settings
-  const frontendUrl = process.env.NODE_ENV === 'production'
-    ? 'https://cultural-heritage-map.vercel.app/'
-    : 'http://localhost:3000';
+  const frontendUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://cultural-heritage-map.vercel.app/'
+      : 'http://localhost:3000';
 
   // Redirect (does not include access token -secure)
   res.redirect(frontendUrl);
@@ -68,7 +71,10 @@ const refresh = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decoded = await jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const decoded = await jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET,
+    );
 
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
@@ -80,10 +86,12 @@ const refresh = asyncHandler(async (req, res, next) => {
     res.status(200).json({
       status: 'success',
       accessToken,
-      data: { user: currentUser }
+      data: { user: currentUser },
     });
   } catch (err) {
-    return next(new AppError('Invalid refresh token. Please log in again.', 401));
+    return next(
+      new AppError('Invalid refresh token. Please log in again.', 401),
+    );
   }
 });
 
@@ -92,7 +100,10 @@ const refresh = asyncHandler(async (req, res, next) => {
  */
 const protect = asyncHandler(async (req, res, next) => {
   let token;
-  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
     token = req.headers.authorization.split(' ')[1];
   }
 
@@ -119,7 +130,9 @@ const logout = (req, res) => {
   res.cookie('refreshToken', 'loggedout', {
     expires: new Date(Date.now() + 1000),
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production' || res.req.headers['x-forwarded-proto'] === 'https',
+    secure:
+      process.env.NODE_ENV === 'production' ||
+      res.req.headers['x-forwarded-proto'] === 'https',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Lax',
     path: '/',
   });

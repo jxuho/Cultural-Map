@@ -5,6 +5,20 @@
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cultural Heritage Map</title>
+
+    <!-- 1. Preconnect to Backend (Render) -->
+    <!-- Reduces connection setup time for your API and Auth requests -->
+    <link rel="preconnect" href="https://cultural-heritage-map.onrender.com" />
+    <link
+      rel="dns-prefetch"
+      href="https://cultural-heritage-map.onrender.com"
+    />
+
+    <!-- 2. Preconnect to Map Tile Server (OpenStreetMap) -->
+    <!-- Speeds up the loading of map images -->
+    <link rel="preconnect" href="https://a.tile.openstreetmap.org" />
+    <link rel="preconnect" href="https://b.tile.openstreetmap.org" />
+    <link rel="preconnect" href="https://c.tile.openstreetmap.org" />
   </head>
   <body>
     <div id="root"></div>

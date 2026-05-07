@@ -69,7 +69,7 @@ describe('authStore', () => {
         accessToken: 'new-access-token',
         data: { user: { _id: '1', username: 'tester' } },
       };
-      
+
       (api.get as any).mockResolvedValueOnce({ data: mockResponse });
 
       await useAuthStore.getState().checkAuthStatus();
@@ -83,7 +83,9 @@ describe('authStore', () => {
     });
 
     test('When an authentication check fails, the state must be reset.', async () => {
-      (api.get as any).mockRejectedValueOnce(new Error('Expired Refresh Token'));
+      (api.get as any).mockRejectedValueOnce(
+        new Error('Expired Refresh Token'),
+      );
 
       await useAuthStore.getState().checkAuthStatus();
 
@@ -106,7 +108,7 @@ describe('authStore', () => {
       expect(state.user).toBeNull();
       expect(state.accessToken).toBeNull();
       expect(state.isAuthenticated).toBe(false);
-      
+
       // Thanks to stubGlobal, you can safely check window.location.href
       expect(window.location.href).toBe('/sign-in');
     });

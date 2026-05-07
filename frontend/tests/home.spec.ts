@@ -1,14 +1,15 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Homepage Test', () => {
-  
   // Actions to take before running each test
   test.beforeEach(async ({ page }) => {
     // Go to the baseURL (http://localhost:3000) set in playwright.config.ts
     await page.goto('/');
   });
 
-  test('Page title and main UI elements should be displayed', async ({ page }) => {
+  test('Page title and main UI elements should be displayed', async ({
+    page,
+  }) => {
     // 1. Check page title (regular expression can be used)
     await expect(page).toHaveTitle(/Cultural Heritage Map/);
 
@@ -23,5 +24,4 @@ test.describe('Homepage Test', () => {
     const mapContainer = page.locator('.leaflet-container');
     await expect(mapContainer).toBeVisible();
   });
-
 });

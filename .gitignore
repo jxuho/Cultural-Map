@@ -39,3 +39,11 @@ docker/data/
 
 # Local development data
 data/*.json
+
+# Playwright
+frontend/node_modules/
+frontend/test-results/
+frontend/playwright-report/
+frontend/blob-report/
+frontend/playwright/.cache/
+frontend/playwright/.auth/
