@@ -1,23 +1,36 @@
 import { Routes, Route } from 'react-router';
-import HomePage from './pages/HomePage';
-import MainLayout from './layouts/MainLayout';
+import { useEffect, lazy, Suspense } from 'react'; // lazy, Suspense 추가
 import useAuthStore from './store/authStore';
-import { useEffect } from 'react';
-import Modal from './components/Modal';
-import SignInPage from './pages/SignInPage';
-import MyAccountPage from './pages/MyAccountPage';
+
+import MainLayout from './layouts/MainLayout';
 import LoadingSpinner from './components/LoadingSpinner';
-import UpdateProfile from './components/MyAccount/UpdateProfile';
 import ProtectedRoute from './components/ProtectedRoute';
-import ProfileView from './components/MyAccount/ProfileView';
-import MyReviews from './components/MyAccount/MyReviews';
-import FavoriteSites from './components/MyAccount/FavoriteSites';
-import Proposals from './components/MyAccount/Proposals';
-import DeleteAccount from './components/MyAccount/DeleteAccount';
-import ListPage from './pages/ListPage';
-import UsersManagementPage from './components/MyAccount/UsersManagementPage';
-import MyProposalsList from './components/MyAccount/MyProposalsList';
-import NotFoundPage from './pages/NotFoundPage';
+import Modal from './components/Modal';
+
+const HomePage = lazy(() => import('./pages/HomePage'));
+const SignInPage = lazy(() => import('./pages/SignInPage'));
+const MyAccountPage = lazy(() => import('./pages/MyAccountPage'));
+const ListPage = lazy(() => import('./pages/ListPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+const ProfileView = lazy(() => import('./components/MyAccount/ProfileView'));
+const UpdateProfile = lazy(
+  () => import('./components/MyAccount/UpdateProfile'),
+);
+const MyReviews = lazy(() => import('./components/MyAccount/MyReviews'));
+const FavoriteSites = lazy(
+  () => import('./components/MyAccount/FavoriteSites'),
+);
+const Proposals = lazy(() => import('./components/MyAccount/Proposals'));
+const DeleteAccount = lazy(
+  () => import('./components/MyAccount/DeleteAccount'),
+);
+const UsersManagementPage = lazy(
+  () => import('./components/MyAccount/UsersManagementPage'),
+);
+const MyProposalsList = lazy(
+  () => import('./components/MyAccount/MyProposalsList'),
+);
 
 const App = () => {
   const checkAuthStatus = useAuthStore((state) => state.checkAuthStatus);
@@ -27,58 +40,48 @@ const App = () => {
     checkAuthStatus();
   }, [checkAuthStatus]);
 
-  // Display a loading spinner while authentication status is being determined
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <>
       <Modal />
-      <Routes>
-        {/* Public route for signing in */}
-        <Route path="/sign-in" element={<SignInPage />} />
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/sign-in" element={<SignInPage />} />
 
-        {/* Main layout with nested routes */}
-        <Route path="/" element={<MainLayout />}>
-          {/* Public home page */}
-          <Route index element={<HomePage />} />
-          {/* Public list page */}
-          <Route path="list" element={<ListPage />} />
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="list" element={<ListPage />} />
 
-          {/* Protected routes for authenticated users */}
-          {/* All routes nested here require authentication. */}
-          {/* Individual routes can further specify a requiredRole. */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="my-account" element={<MyAccountPage />}>
-              <Route index element={<ProfileView />} />{' '}
-              {/* Default for my-account */}
-              <Route path="update-profile" element={<UpdateProfile />} />
-              <Route path="reviews" element={<MyReviews />} />
-              <Route path="favorite-sites" element={<FavoriteSites />} />
-              <Route path="delete-account" element={<DeleteAccount />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="my-account" element={<MyAccountPage />}>
+                <Route index element={<ProfileView />} />
+                <Route path="update-profile" element={<UpdateProfile />} />
+                <Route path="reviews" element={<MyReviews />} />
+                <Route path="favorite-sites" element={<FavoriteSites />} />
+                <Route path="delete-account" element={<DeleteAccount />} />
+              </Route>
+            </Route>
+
+            <Route element={<ProtectedRoute requiredRole="user" />}>
+              <Route
+                path="/my-account/my-proposals"
+                element={<MyProposalsList />}
+              />
+            </Route>
+
+            <Route element={<ProtectedRoute requiredRole="admin" />}>
+              <Route path="/my-account/proposals" element={<Proposals />} />
+              <Route
+                path="/my-account/users"
+                element={<UsersManagementPage />}
+              />
             </Route>
           </Route>
 
-          {/* Routes specifically for 'user' role */}
-          <Route element={<ProtectedRoute requiredRole="user" />}>
-            <Route
-              path="/my-account/my-proposals"
-              element={<MyProposalsList />}
-            />
-          </Route>
-
-          {/* Routes specifically for 'admin' role */}
-          <Route element={<ProtectedRoute requiredRole="admin" />}>
-            <Route path="/my-account/proposals" element={<Proposals />} />
-            <Route path="/my-account/users" element={<UsersManagementPage />} />
-          </Route>
-        </Route>
-
-        {/* 404 Page - This route must be the last one */}
-        {/* '*' matches any path that hasn't been matched by the routes above */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
     </>
   );
 };
