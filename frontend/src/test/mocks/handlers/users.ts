@@ -5,10 +5,26 @@ const mockUsers = [
     _id: 'user-1',
     username: 'max',
     email: 'user1@test.com',
+    googleId: 'google-123',
+    profileImage: '',
     role: 'user',
     bio: 'hello',
+    favoriteSites: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
-  { _id: 'admin-1', username: 'admin', email: 'admin@test.com', role: 'admin' },
+  {
+    _id: 'admin-1',
+    username: 'admin',
+    email: 'admin@test.com',
+    googleId: 'google-234',
+    profileImage: '',
+    role: 'admin',
+    bio: 'hello admin',
+    favoriteSites: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
 ];
 
 export const userHandlers = [
@@ -58,3 +74,19 @@ export const userHandlers = [
     });
   }),
 ];
+
+(http.get('*/auth/refresh', ({ cookies }) => {
+  // If refreshToken is not present in cookie or is 'loggedout', 401 is returned (reflects backend logic)
+  if (!cookies.refreshToken || cookies.refreshToken === 'loggedout') {
+    return new HttpResponse(null, { status: 401 });
+  }
+
+  return HttpResponse.json({
+    status: 'success',
+    accessToken: 'mock-access-token',
+    data: { user: mockUsers[0] },
+  });
+}),
+  http.post('*/auth/logout', () => {
+    return HttpResponse.json({ status: 'success' });
+  }));
