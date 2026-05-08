@@ -106,10 +106,25 @@ const culturalSiteSchema = new mongoose.Schema(
       default: true,
       select: false,
     },
+    averageRating: {
+      type: Number,
+      default: 0,
+      min: [0, 'Rating must be above 0'],
+      max: [5, 'Rating must be below 5'],
+      // 소수점 한 자리까지 반올림 (예: 4.666 -> 4.7)
+      set: (val) => Math.round(val * 10) / 10,
+    },
+    reviewCount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true, // createdAt, updatedAt Automatically add timestamps
   },
 );
+
+culturalSiteSchema.index({ averageRating: -1 });
+culturalSiteSchema.index({ reviewCount: -1 });
 
 module.exports = mongoose.model('CulturalSite', culturalSiteSchema);
