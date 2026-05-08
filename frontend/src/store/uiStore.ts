@@ -21,7 +21,7 @@ interface UiState {
   selectedPlace: Place | null;
   sidePanelWidth: number;
   setSidePanelWidth: (width: number) => void;
-  openSidePanel: (placeInfo: Place) => void;
+  openSidePanel: (placeInfo: Place | null) => void;
   closeSidePanel: () => void;
   clearSelectedPlace: () => void;
   isUserProfileOpen: boolean;

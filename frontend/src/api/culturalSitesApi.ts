@@ -10,7 +10,7 @@ export const fetchAllCulturalSites = async (
   try {
     const response = await axiosInstance.get<
       ApiResponse<{ culturalSites: Place[] }>
-    >('/cultural-sites', { params: { limit: 17101, ...params } });
+    >('/cultural-sites', { params: { limit: 20000, ...params } });
     return response.data.data.culturalSites || [];
   } catch (error) {
     const err = error as AxiosError;
@@ -43,7 +43,6 @@ export const getNearbyOsm = async (
   lon: number,
 ): Promise<Place[]> => {
   if (!lat || !lon) throw new Error('Latitude and Longitude are required.');
-
   try {
     const response = await axiosInstance.get<
       ApiResponse<{ osmCulturalSites: Place[] }>

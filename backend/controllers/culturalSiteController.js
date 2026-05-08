@@ -9,7 +9,7 @@ const {
   addSourceIdToExclusion,
 } = require('../services/excludeSourceIdService');
 const { isPointInCity, isValidLatLng } = require('../utils/locationUtils');
-const { extendedCulturalSiteQuery } = require('../config/osmData');
+const { extendedCulturalSiteQuery, CITY_RELATION_IDS } = require('../config/osmData');
 const { queryOverpass } = require('../services/overpassService');
 const {
   processOsmElementForCulturalSite,
@@ -19,292 +19,42 @@ const {
   CULTURAL_CATEGORY,
 } = require('../config/culturalSiteConfig');
 
-// const getAllCulturalSites = asyncHandler(async (req, res, next) => {
-//   // 1. Initialize aggregation pipeline
-//   let pipeline = [];
-
-//   // ---Calculate additional fields in the aggregation pipeline (rating, review count) ---
-//   // 2. Join review data to calculate average rating and review count
-//   pipeline.push(
-//     {
-//       $lookup: {
-//         from: 'reviews', // Collection name for Review model (lowercase, plural)
-//         localField: 'reviews', // 'reviews' field of CulturalSite
-//         foreignField: '_id', // '_id' field of Review
-//         as: 'reviewsData', // Field name to store joined review data
-//       },
-//     },
-//     {
-//       $addFields: {
-//         averageRating: { $ifNull: [{ $avg: '$reviewsData.rating' }, 0] },
-//         reviewCount: { $size: '$reviewsData' }, // Calculate review count
-//       },
-//     },
-//   );
-
-//   // 3. Add sorting functionality (by rating, favorites, review count)
-//   // http://localhost:5000/api/v1/cultural-sites?sort=averageRating,-favoritesCount,reviewCount
-//   let sortStage = {};
-//   if (req.query.sort) {
-//     const sortByFields = req.query.sort.split(','); // Split by comma
-//     sortByFields.forEach((field) => {
-//       field = field.trim();
-//       if (field.startsWith('-')) {
-//         sortStage[field.substring(1)] = -1; // Descending
-//       } else {
-//         sortStage[field] = 1; // Ascending
-//       }
-//     });
-//   } else {
-//     // Default sort: latest first
-//     sortStage = { createdAt: -1 };
-//   }
-//   pipeline.push({ $sort: sortStage });
-
-//   // 4. Pagination (calculate total count beforehand)
-//   // Pattern to get total count and actual data together in an aggregation pipeline (Recommended!)
-//   // Currently, the limit is temporarily set to 1000. If exceeded, viewport-based rendering, etc., is required.
-//   const page = parseInt(req.query.page) || 1;
-//   const limit = parseInt(req.query.limit) || 17101;
-//   const skip = (page - 1) * limit;
-
-//   const totalResultsPipeline = [...pipeline]; // Copy current filtering pipeline
-//   totalResultsPipeline.push({ $count: 'total' }); // Add stage to count total results
-
-//   let totalResultDoc = await CulturalSite.aggregate(totalResultsPipeline);
-//   const totalResults = totalResultDoc.length > 0 ? totalResultDoc[0].total : 0;
-//   const totalPages = Math.ceil(totalResults / limit);
-
-//   // Add pagination stages for actual data retrieval
-//   pipeline.push({ $skip: skip }, { $limit: limit });
-
-//   // 8. Final field selection ($project) -include only necessary fields
-//   pipeline.push({
-//     $project: {
-//       name: 1,
-//       description: 1,
-//       category: 1,
-//       location: 1,
-//       address: 1,
-//       website: 1,
-//       imageUrl: 1,
-//       openingHours: 1,
-//       licenseInfo: 1,
-//       sourceId: 1,
-//       favoritesCount: 1,
-//       proposedBy: 1,
-//       registeredBy: 1,
-//       createdAt: 1,
-//       updatedAt: 1,
-//       averageRating: 1, // Include calculated average rating
-//       reviewCount: 1, // Include calculated review count
-//     },
-//   });
-
-//   const culturalSites = await CulturalSite.aggregate(pipeline);
-
-//   res.status(200).json({
-//     status: 'success',
-//     results: culturalSites.length, // Number of documents on the current page
-//     totalResults: totalResults, // Total number of documents matching all search criteria
-//     page: page,
-//     totalPages: totalPages,
-//     limit: limit,
-//     data: {
-//       culturalSites: culturalSites,
-//     },
-//   });
-// });
-
-
-// // version 2: Get all cultural sites with optimized aggregation pipeline and data thinning for map rendering
-// const getAllCulturalSites = asyncHandler(async (req, res, next) => {
-//   let pipeline = [];
-
-//   // 1. 리뷰 데이터 조인 (별점 계산용)
-//   pipeline.push(
-//     {
-//       $lookup: {
-//         from: 'reviews',
-//         localField: 'reviews',
-//         foreignField: '_id',
-//         as: 'reviewsData',
-//       },
-//     },
-//     {
-//       $addFields: {
-//         averageRating: { $ifNull: [{ $avg: '$reviewsData.rating' }, 0] },
-//         reviewCount: { $size: '$reviewsData' },
-//       },
-//     }
-//   );
-
-//   // 2. 정렬 로직 
-//   let sortStage = {};
-//   if (req.query.sort) {
-//     const sortByFields = req.query.sort.split(','); // Split by comma
-//     sortByFields.forEach((field) => {
-//       field = field.trim();
-//       if (field.startsWith('-')) {
-//         sortStage[field.substring(1)] = -1; // Descending
-//       } else {
-//         sortStage[field] = 1; // Ascending
-//       }
-//     });
-//   } else {
-//     // Default sort: latest first
-//     sortStage = { createdAt: -1 };
-//   }
-//   pipeline.push({ $sort: sortStage });
-
-//   // 3. 페이지네이션 (기존 유지)
-//   const page = parseInt(req.query.page) || 1;
-//   const limit = parseInt(req.query.limit) || 17101;
-//   const skip = (page - 1) * limit;
-
-//   const totalResultsPipeline = [...pipeline];
-//   totalResultsPipeline.push({ $count: 'total' });
-//   let totalResultDoc = await CulturalSite.aggregate(totalResultsPipeline);
-//   const totalResults = totalResultDoc.length > 0 ? totalResultDoc[0].total : 0;
-
-//   pipeline.push({ $skip: skip }, { $limit: limit });
-
-//   // 🌟 핵심: 필드 최소화 (Data Thinning)
-//   // 지도 마커를 그리는 데 불필요한 description, website, openingHours 등을 제거합니다.
-//   pipeline.push({
-//     $project: {
-//       name: 1,
-//       category: 1,
-//       location: 1,
-//       averageRating: 1,
-//       reviewCount: 1,
-//       imageUrl: 1, // 리스트 뷰나 간단 미리보기용
-//       // description, address, website 등 무거운 필드는 제외!
-//     },
-//   });
-
-//   const culturalSites = await CulturalSite.aggregate(pipeline);
-
-//   res.status(200).json({
-//     status: 'success',
-//     results: culturalSites.length,
-//     totalResults: totalResults,
-//     data: {
-//       culturalSites,
-//     },
-//   });
-// });
-
-
-
-// version 3: Get all cultural sites with optimized aggregation pipeline and data thinning for map rendering + dynamic filtering by average rating
-
-// todo: 평점 필터링 기능 추가 (예: minRating=4), 프론트엔드에서 평점 필터링 UI도 필요, 평점 필터링은 aggregation pipeline에서 averageRating 계산 이후에 $match로 처리하는 것이 가장 효율적입니다., 평점 필터링이 추가되면, totalResults도 필터링된 결과 기준으로 계산되어야 합니다. (현재는 평점 필터링이 없는 상태에서 totalResults를 계산하고 있습니다.), 평점 필터링이 추가되면, totalResults도 필터링된 결과 기준으로 계산되어야 합니다. (현재는 평점 필터링이 없는 상태에서 totalResults를 계산하고 있습니다.), 평점 필터링이 추가되면, totalResults도 필터링된 결과 기준으로 계산되어야 합니다. (현재는 평점 필터링이 없는 상태에서 totalResults를 계산하고 있습니다.)
-// const getAllCulturalSites = asyncHandler(async (req, res, next) => {
-//   let pipeline = [];
-
-//   // 1. 리뷰 데이터 조인 및 평점 계산 (필터링/정렬을 위해 선행되어야 함)
-//   pipeline.push(
-//     {
-//       $lookup: {
-//         from: 'reviews',
-//         localField: 'reviews',
-//         foreignField: '_id',
-//         as: 'reviewsData',
-//       },
-//     },
-//     {
-//       $addFields: {
-//         averageRating: { $ifNull: [{ $avg: '$reviewsData.rating' }, 0] },
-//         reviewCount: { $size: '$reviewsData' },
-//       },
-//     }
-//   );
-
-//   // 2. 동적 필터링 추가 (평점 필터링 예시)
-//   // URL 예시: /api/v1/cultural-sites?minRating=4
-//   if (req.query.minRating) {
-//     pipeline.push({
-//       $match: { averageRating: { $gte: parseFloat(req.query.minRating) } }
-//     });
-//   }
-
-//   // 3. 정렬 로직 (기존 로직 유지하되 계산된 필드 활용)
-//   // URL 예시: /api/v1/cultural-sites?sort=-averageRating (평점 높은 순)
-//   let sortStage = {};
-//   if (req.query.sort) {
-//     const sortByFields = req.query.sort.split(',');
-//     sortByFields.forEach((field) => {
-//       field = field.trim();
-//       const direction = field.startsWith('-') ? -1 : 1;
-//       const fieldName = field.startsWith('-') ? field.substring(1) : field;
-//       sortStage[fieldName] = direction;
-//     });
-//   } else {
-//     sortStage = { createdAt: -1 };
-//   }
-//   pipeline.push({ $sort: sortStage });
-
-//   // 4. 페이지네이션 처리를 위한 전체 개수 계산 (필터링된 결과 기준)
-//   const totalResultsPipeline = [...pipeline];
-//   totalResultsPipeline.push({ $count: 'total' });
-//   const totalResultDoc = await CulturalSite.aggregate(totalResultsPipeline);
-//   const totalResults = totalResultDoc.length > 0 ? totalResultDoc[0].total : 0;
-
-//   // 5. 페이지네이션 적용
-//   const page = parseInt(req.query.page) || 1;
-//   const limit = parseInt(req.query.limit) || 17101;
-//   const skip = (page - 1) * limit;
-//   pipeline.push({ $skip: skip }, { $limit: limit });
-
-//   // 6. 🌟 최종 결과물 압축 (Data Thinning)
-//   // 여기서 description 등을 빼더라도, 이미 위에서 계산과 정렬은 끝났습니다.
-//   pipeline.push({
-//     $project: {
-//       name: 1,
-//       category: 1,
-//       location: 1,
-//       averageRating: 1,
-//       reviewCount: 1,
-//       imageUrl: 1,
-//       // 상세 데이터는 포함하지 않음
-//     },
-//   });
-
-//   const culturalSites = await CulturalSite.aggregate(pipeline);
-
-//   res.status(200).json({
-//     status: 'success',
-//     results: culturalSites.length,
-//     totalResults,
-//     data: { culturalSites },
-//   });
-// });
-
 
 const getAllCulturalSites = asyncHandler(async (req, res, next) => {
-  // 1. 더 이상 무거운 pipeline push($lookup)가 필요 없습니다!
-  
+  // 1. 페이지네이션 설정
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 17101;
+  const limit = parseInt(req.query.limit) || 20000; // 전체 데이터 호출 대응
   const skip = (page - 1) * limit;
 
-  // 2. 단순히 find() 쿼리만으로 정렬/필터링이 가능합니다.
-  // 예: CulturalSite.find({ averageRating: { $gte: 4 } }).sort('-averageRating')
-  
+  // 2. 정렬 설정 (비정규화된 필드 averageRating, reviewCount 사용 가능)
+  let sortStr = '-createdAt';
+  if (req.query.sort) {
+    sortStr = req.query.sort.split(',').join(' ');
+  }
+
+  // 3. 쿼리 실행
+  // - 별도의 $lookup이나 $addFields 없이 바로 find()를 사용하여 성능 극대화
+  // - select()를 통해 지도 마커에 불필요한 무거운 필드(description 등) 제외
   const culturalSites = await CulturalSite.find()
-    .sort(req.query.sort ? req.query.sort.split(',').join(' ') : '-createdAt')
+    .sort(sortStr)
     .skip(skip)
     .limit(limit)
-    .select('name category location averageRating reviewCount imageUrl'); // 🌟 최적화: 필요한 필드만 선택
+    .select('name category location averageRating reviewCount imageUrl');
 
+  // 4. 전체 개수 확인 (페이지네이션용)
   const totalResults = await CulturalSite.countDocuments();
+  const totalPages = Math.ceil(totalResults / limit);
 
+  // 5. 응답 전송
   res.status(200).json({
     status: 'success',
     results: culturalSites.length,
     totalResults,
-    data: { culturalSites },
+    page,
+    totalPages,
+    data: {
+      culturalSites,
+    },
   });
 });
 
@@ -717,7 +467,13 @@ const getNearbyOsmCulturalSites = asyncHandler(async (req, res, next) => {
   }
 
   // 3. Create Overpass query
-  const overpassQuery = extendedCulturalSiteQuery(radius, parsedLat, parsedLon);
+  const currentCityAreaId = CITY_RELATION_IDS[currentCity];
+  if (!currentCityAreaId) {
+    return next(
+      new AppError(`OSM area ID for city "${currentCity}" is not defined.`, 400),
+    );
+  }
+  const overpassQuery = extendedCulturalSiteQuery(currentCityAreaId, radius, parsedLat, parsedLon);
 
   // 4. Overpass API call
   let osmData;
