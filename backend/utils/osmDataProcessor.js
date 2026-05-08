@@ -79,7 +79,7 @@ const determineCulturalSiteAddress = async (tags, lat, lon, name, sourceId) => {
           addressdetails: 1,
         },
         headers: {
-          'User-Agent': 'ChemnitzCulturalSitesApp/1.0 (jxuholee@gmail.com)',
+          'User-Agent': 'CulturalHeritageMap/2.0 (jxuholee@gmail.com)',
         },
       });
       const nominatimData = nominatimResponse.data;

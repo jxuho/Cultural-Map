@@ -14,7 +14,7 @@ const {
 const { singleElementQuery } = require('../config/osmData');
 const {
   isValidLatLng,
-  isPointInChemnitz,
+  isPointInCity,
   areCoordinatesMatching,
 } = require('../utils/locationUtils');
 const mongoose = require('mongoose');
@@ -23,6 +23,7 @@ const User = require('../models/User');
 
 // Create Proposal by User
 const createProposal = asyncHandler(async (req, res, next) => {
+  const currentCity = process.env.CITY_NAME || 'berlin';
   const { proposalType, proposalMessage, ...rawData } = req.body;
   if (!proposalType) {
     return next(new AppError('Proposal type (proposalType) is required.', 400));
@@ -184,14 +185,15 @@ const createProposal = asyncHandler(async (req, res, next) => {
           );
         }
         if (
-          !isPointInChemnitz(
+          !isPointInCity(
             rawData.location.coordinates[1],
             rawData.location.coordinates[0],
+            currentCity
           )
         ) {
           return next(
             new AppError(
-              'The provided location information (location) is outside Chemnitz.',
+              `The provided location information (location) is outside ${currentCity}.`,
               400,
             ),
           );
@@ -209,7 +211,7 @@ const createProposal = asyncHandler(async (req, res, next) => {
         if (!areCoordinatesMatching(clientCoord, osmCoord)) {
           return next(
             new AppError(
-              'The provided location information does not match the actual OSM node. Please select the exact location on the map.',
+              `The provided location information does not match the actual OSM node. Please select the exact location on the map.`,
               400,
             ),
           );

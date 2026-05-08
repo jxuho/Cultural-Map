@@ -27,8 +27,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const proposalRoutes = require('./routes/proposalRoutes');
 
-// chemnitz boundary load
-const { loadChemnitzBoundary } = require('./utils/locationUtils');
+const { loadCityBoundary } = require('./utils/locationUtils');
 
 const seedIfEmpty = require('./utils/seedIfEmpty');
 
@@ -111,37 +110,35 @@ mongoose
       await seedIfEmpty();
     }
 
-    // chemnitz boundary load
-    try {
-      loadChemnitzBoundary();
-      console.log('Chemnitz boundary data loaded successfully.');
-    } catch (error) {
-      console.error('Failed to load Chemnitz boundary data:', error);
-      // If the boundary data load fails, the server will not start, or
-      // You can add appropriate error handling logic.
-      // process.exit(1); //Consider it a fatal error and terminate the app
-    }
+    // boundary load
+    // 1. 현재 타겟 도시 설정 (기본값: berlin)
+    const currentCity = process.env.CITY_NAME || 'berlin';
 
+    // 2. 도시 경계 로드
+    try {
+      loadCityBoundary(currentCity);
+      console.log(`${currentCity.toUpperCase()} boundary data loaded successfully.`);
+    } catch (error) {
+      console.error(`Failed to load ${currentCity} boundary data:`, error);
+      // 필수 데이터라면 서버를 끄는 것도 방법이지만, 
+      // 일단 로그만 남기고 진행하도록 유연하게 대처합니다.
+    }
     // Run cron scheduler
     cron.schedule(
       '0 0 * * 0',
       async () => {
-        console.log('weekly Overpass data update task started...');
+        console.log(`Weekly Overpass data update task for ${currentCity} started...`);
         try {
-          await overpassUpdater();
-          console.log(
-            'weekly Overpass data update task completed successfully.',
-          );
+          // overpassUpdater 내부에서 currentCity를 받도록 수정되어야 함
+          await overpassUpdater(currentCity);
+          console.log(`Weekly Overpass data update task for ${currentCity} completed successfully.`);
         } catch (error) {
-          console.error(
-            'Error during weekly Overpass data update task:',
-            error,
-          );
+          console.error(`Error during weekly Overpass update for ${currentCity}:`, error);
         }
       },
       {
-        scheduled: true, // Activate the schedule immediately.
-        timezone: 'Europe/Berlin', // Chemnitz is the Berlin time zone, so we specify it explicitly. Change as needed.
+        scheduled: true,
+        timezone: 'Europe/Berlin',
       },
     );
     console.log('Overpass data update scheduled for every Sunday 00:00.');

@@ -10,7 +10,7 @@ export const fetchAllCulturalSites = async (
   try {
     const response = await axiosInstance.get<
       ApiResponse<{ culturalSites: Place[] }>
-    >('/cultural-sites', { params: { limit: 1000, ...params } });
+    >('/cultural-sites', { params: { limit: 17101, ...params } });
     return response.data.data.culturalSites || [];
   } catch (error) {
     const err = error as AxiosError;

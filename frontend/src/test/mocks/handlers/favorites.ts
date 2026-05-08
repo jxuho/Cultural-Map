@@ -9,7 +9,7 @@ const createMockSite = (id: string, name: string) => ({
     type: 'Point',
     coordinates: [126.9774, 37.5663],
   },
-  address: 'Chemnitz address example',
+  address: 'address example',
   favoritesCount: 1,
   averageRating: 4.5, // Fields added by Aggregation
   reviewCount: 10, // Fields added by Aggregation

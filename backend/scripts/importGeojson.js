@@ -5,16 +5,18 @@ const CulturalSite = require('../models/CulturalSite');
 const {
   processOsmElementForCulturalSite,
 } = require('../utils/osmDataProcessor');
+const { default: mongoose } = require('mongoose');
 
 /**
  * Import GeoJSON /OSM data into MongoDB
  * @param {boolean} performReverseGeocoding
+ * @param {string} cityName
  */
-const importGeojson = async (performReverseGeocoding) => {
+const importGeojson = async (performReverseGeocoding, cityName = 'berlin') => {
   try {
     console.log('Importing GeoJSON...');
 
-    const dataPath = await getLatestCulturalSitesFile();
+    const dataPath = await getLatestCulturalSitesFile(cityName);
     if (!dataPath) {
       console.error('No valid GeoJSON file found.');
       return;
@@ -117,13 +119,15 @@ const importGeojson = async (performReverseGeocoding) => {
 /**
  * Find latest data file
  */
-async function getLatestCulturalSitesFile() {
+/**
+ * @param {string} cityName 
+ */
+async function getLatestCulturalSitesFile(cityName = 'berlin') {
   const dataDir = path.join(__dirname, '../data');
-  const fileNamePattern = /^chemnitz_cultural_sites_(\d{13})\.(geo)?json$/;
+  const fileNamePattern = new RegExp(`^${cityName.toLowerCase()}_cultural_sites_(\\d{13})\\.(geo)?json$`);
 
   try {
     const files = await fsAsync.readdir(dataDir);
-
     let latestFile = null;
     let latestTimestamp = 0;
 
@@ -152,12 +156,37 @@ async function getLatestCulturalSitesFile() {
   }
 }
 
-// When running CLI, determine whether to reverse geocode using the --no-reverse-geocode option.
-if (require.main === module) {
+async function runScript() {
   const args = process.argv.slice(2);
+  const cityName = args.find(arg => !arg.startsWith('--')) || 'berlin';
   const shouldPerformReverseGeocoding = !args.includes('--no-reverse-geocode');
 
-  importGeojson(shouldPerformReverseGeocoding);
+  try {
+    // 1. 환경 변수로부터 URI 가져오기
+    const mongoUri = process.env.MONGO_URI;
+    console.log(`📡 Connecting to MongoDB: ${mongoUri}`);
+
+    // 2. 명시적 연결 수행 (중요!)
+    await mongoose.connect(mongoUri);
+    console.log('✅ Connected to MongoDB successfully.');
+
+    // 3. 임포트 로직 실행
+    await importGeojson(shouldPerformReverseGeocoding, cityName);
+
+    console.log('🎉 Data import process finished.');
+  } catch (err) {
+    console.error('❌ Critical error during script execution:', err);
+  } finally {
+    // 4. 프로세스 종료를 위해 연결 닫기
+    await mongoose.connection.close();
+    console.log('👋 MongoDB connection closed.');
+    process.exit(0);
+  }
+}
+
+// 스크립트 직접 실행 시
+if (require.main === module) {
+  runScript();
 }
 
 module.exports = importGeojson;

@@ -8,7 +8,7 @@ const AppError = require('../utils/AppError');
 const {
   addSourceIdToExclusion,
 } = require('../services/excludeSourceIdService');
-const { isPointInChemnitz, isValidLatLng } = require('../utils/locationUtils');
+const { isPointInCity, isValidLatLng } = require('../utils/locationUtils');
 const { extendedCulturalSiteQuery } = require('../config/osmData');
 const { queryOverpass } = require('../services/overpassService');
 const {
@@ -65,7 +65,7 @@ const getAllCulturalSites = asyncHandler(async (req, res, next) => {
   // Pattern to get total count and actual data together in an aggregation pipeline (Recommended!)
   // Currently, the limit is temporarily set to 1000. If exceeded, viewport-based rendering, etc., is required.
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 1000;
+  const limit = parseInt(req.query.limit) || 17101;
   const skip = (page - 1) * limit;
 
   const totalResultsPipeline = [...pipeline]; // Copy current filtering pipeline
@@ -485,7 +485,7 @@ const deleteCulturalSiteById = asyncHandler(async (req, res, next) => {
  */
 const getNearbyOsmCulturalSites = asyncHandler(async (req, res, next) => {
   const { lon, lat, noReverseGeocode } = req.query; // Added noReverseGeocode query parameter
-
+  const currentCity = process.env.CITY_NAME || 'berlin';
   // Determine the flag for reverse geocoding
   // If noReverseGeocode is 'true' (string), then set performReverseGeocoding to false.
   // Otherwise, it defaults to true.
@@ -505,12 +505,12 @@ const getNearbyOsmCulturalSites = asyncHandler(async (req, res, next) => {
   const parsedLon = parseFloat(lon);
   const radius = 50; // 50m radius (used for Overpass queries)
 
-  // 2. See inside Chemnitz city limits (optional)
+  // 2. See inside ${currentCity} city limits (optional)
   try {
-    if (!isPointInChemnitz(parsedLat, parsedLon)) {
+    if (!isPointInCity(parsedLat, parsedLon, currentCity)) {
       return next(
         new AppError(
-          'Since the input location is not inside the boundary when Chemnitz, the surrounding OSM cultural heritage cannot be searched.',
+          `Since the input location is not inside the boundary when ${currentCity}, the surrounding OSM cultural heritage cannot be searched.`,
           400,
         ),
       );
@@ -612,6 +612,7 @@ const getNearbyOsmCulturalSites = asyncHandler(async (req, res, next) => {
  * Request Body: { ... culturalSiteData (CulturalSite Schema compliant) ... }
  */
 const saveCulturalSiteToDb = asyncHandler(async (req, res, next) => {
+  const currentCity = process.env.CITY_NAME || 'berlin';
   if (!req.user || req.user.role !== 'admin') {
     return next(
       new AppError(
@@ -644,12 +645,12 @@ const saveCulturalSiteToDb = asyncHandler(async (req, res, next) => {
 
   const [parsedLon, parsedLat] = culturalSiteData.location.coordinates;
 
-  // 1. Internal confirmation of Chemnitz city boundary (final verification when saving in DB)
+  // 1. Internal confirmation of ${currentCity} city boundary (final verification when saving in DB)
   try {
-    if (!isPointInChemnitz(parsedLat, parsedLon)) {
+    if (!isPointInCity(parsedLat, parsedLon, currentCity)) {
       return next(
         new AppError(
-          'The entered location is not within the Chemnitz city boundary. Only cultural heritage within Chemnitz can be registered.',
+          `The entered location is not within the ${currentCity} city boundary. Only cultural heritage within ${currentCity} can be registered.`,
           400,
         ),
       );

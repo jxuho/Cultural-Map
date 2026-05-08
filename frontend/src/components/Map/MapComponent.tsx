@@ -80,6 +80,19 @@ const MapCenterUpdater = () => {
 const MapComponent = () => {
   const mapRef = useRef(null);
 
+  const initialLat = parseFloat(
+    import.meta.env.VITE_MAP_INITIAL_LAT || '52.5163',
+  );
+  const initialLng = parseFloat(
+    import.meta.env.VITE_MAP_INITIAL_LNG || '13.3777',
+  );
+  const initialZoom = parseInt(import.meta.env.VITE_MAP_INITIAL_ZOOM || '12');
+
+  const swLat = parseFloat(import.meta.env.VITE_MAP_BOUND_SW_LAT || '52.338');
+  const swLng = parseFloat(import.meta.env.VITE_MAP_BOUND_SW_LNG || '13.088');
+  const neLat = parseFloat(import.meta.env.VITE_MAP_BOUND_NE_LAT || '52.675');
+  const neLng = parseFloat(import.meta.env.VITE_MAP_BOUND_NE_LNG || '13.761');
+
   const openSidePanel = useUiStore((state) => state.openSidePanel);
   const handleOpenSidePanel = useCallback(
     (site: Place) => {
@@ -151,18 +164,18 @@ const MapComponent = () => {
     );
   }
 
-  const initialPosition: LatLngTuple = [50.8303, 12.91895]; // Chemnitz Lat, Lng
+  const initialPosition: LatLngTuple = [initialLat, initialLng];
   const mapMaxBounds: LatLngBoundsExpression = [
-    [50.7, 12.7],
-    [50.95, 13.1],
+    [swLat, swLng],
+    [neLat, neLng],
   ];
 
   return (
     <div className="h-full w-full relative" id="map">
       <MapContainer
         center={initialPosition}
-        zoom={14}
-        minZoom={13}
+        zoom={initialZoom}
+        minZoom={8}
         maxBounds={mapMaxBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}

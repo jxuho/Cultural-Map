@@ -1,79 +1,7 @@
 import React from 'react';
 import { Marker } from 'react-leaflet';
-import L, { PointTuple } from 'leaflet';
-import ReactDOMServer from 'react-dom/server';
-import {
-  FaLandmark,
-  FaPalette,
-  FaBuilding,
-  FaUtensils,
-  FaTheaterMasks,
-  FaUsers,
-  FaBook,
-  FaFilm,
-  FaQuestionCircle,
-} from 'react-icons/fa';
-import { categoryBorderColors } from '../../config/colors';
 import { Place } from '@/types/place';
-
-const categoryIconComponents: { [key: string]: React.ReactNode } = {
-  artwork: <FaPalette />,
-  gallery: <FaBuilding />,
-  museum: <FaLandmark />,
-  restaurant: <FaUtensils />,
-  theatre: <FaTheaterMasks />,
-  arts_centre: <FaUsers />,
-  community_centre: <FaUsers />,
-  library: <FaBook />,
-  cinema: <FaFilm />,
-  other: <FaQuestionCircle />,
-};
-
-const createCustomIcon = (category: string, isSelected = false) => {
-  const IconComponent =
-    categoryIconComponents[category] || categoryIconComponents.other;
-
-  const backgroundColor = isSelected ? 'red' : 'white';
-  const defaultBorderColor =
-    categoryBorderColors[category] || categoryBorderColors.other;
-  const borderColor = isSelected ? 'red' : defaultBorderColor;
-  const iconColor = isSelected ? 'white' : '#333';
-  const boxShadow = isSelected
-    ? '0 2px 8px rgba(255,0,0,0.5)'
-    : '0 2px 5px rgba(0,0,0,0.3)';
-  const size = isSelected ? '35px' : '30px';
-  const fontSize = isSelected ? '22px' : '18px';
-
-  const iconHtml = ReactDOMServer.renderToString(
-    <div
-      style={{
-        backgroundColor: backgroundColor,
-        borderRadius: '50%',
-        width: size,
-        height: size,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: boxShadow,
-        fontSize: fontSize,
-        color: iconColor,
-        border: `3.5px solid ${borderColor}`,
-      }}
-    >
-      {IconComponent}
-    </div>,
-  );
-
-  const iconSize: PointTuple = isSelected ? [35, 35] : [30, 30];
-  const iconAnchor: PointTuple = isSelected ? [17.5, 17.5] : [15, 15];
-
-  return L.divIcon({
-    html: iconHtml,
-    className: `custom-div-icon ${isSelected ? 'selected' : ''}`,
-    iconSize: iconSize,
-    iconAnchor: iconAnchor,
-  });
-};
+import { getCustomIcon } from '../../utils/iconFactory';
 
 // Components for individual markers
 const MemoizedCulturalSiteMarker = React.memo(
@@ -86,11 +14,10 @@ const MemoizedCulturalSiteMarker = React.memo(
     openSidePanel: (site: Place) => void;
     isSelected: boolean;
   }) => {
-    const iconToRender = createCustomIcon(culturalSite.category, isSelected);
+    const iconToRender = getCustomIcon(culturalSite.category, isSelected);
 
     return (
       <Marker
-        key={culturalSite._id}
         position={[
           culturalSite.location.coordinates[1],
           culturalSite.location.coordinates[0],

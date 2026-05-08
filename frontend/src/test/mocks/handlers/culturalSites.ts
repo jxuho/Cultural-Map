@@ -10,7 +10,7 @@ const mockCulturalSites = [
       type: 'Point',
       coordinates: [126.974, 37.564],
     },
-    address: 'chemnitzer str. 123, 09111 Chemnitz, Germany',
+    address: 'city str. 123, 09111 city, Germany',
     website: 'https://example.com',
     imageUrl: 'https://example.com/image.jpg',
     openingHours: '09:00 - 18:00',

@@ -1,64 +1,60 @@
-/**
- * Based on the ../data/chemnitz_boundary.geojson file,
- * The isPointInChemnitz function determines whether the received latitude and longitude fall within chemnitz.
- */
 const turf = require('@turf/turf');
 const fs = require('fs');
 const path = require('path');
 
-let chemnitzBoundary = null;
+// 여러 도시의 경계를 저장할 캐시 객체
+let cityBoundaries = {};
 
 /**
- * Load the Chemnitz city limits GeoJSON file.
- * Ensures that files are loaded only once. (Run in app.js.)
+ * 특정 도시의 경계 GeoJSON 파일을 로드합니다.
+ * @param {string} cityName - 도시 이름 (예: 'berlin', 'chemnitz')
  */
-const loadChemnitzBoundary = () => {
-  if (!chemnitzBoundary) {
+const loadCityBoundary = (cityName = 'berlin') => {
+  const cityKey = cityName.toLowerCase();
+  
+  if (!cityBoundaries[cityKey]) {
     try {
       const boundaryPath = path.join(
         __dirname,
-        '../data/chemnitz_boundary.geojson',
+        `../data/${cityKey}_boundary.geojson`, // 파일명이 berlin_boundary.geojson 형태여야 함
       );
+      
+      if (!fs.existsSync(boundaryPath)) {
+        console.warn(`Boundary file for ${cityName} not found at ${boundaryPath}`);
+        return null;
+      }
+
       const geojsonData = fs.readFileSync(boundaryPath, 'utf8');
-      chemnitzBoundary = JSON.parse(geojsonData);
-      // If the GeoJSON file is a FeatureCollection, it uses the geometry of the first Feature.
-      // In the case of a single feature, geometry is used directly.
-      if (
-        chemnitzBoundary.type === 'FeatureCollection' &&
-        chemnitzBoundary.features.length > 0
-      ) {
-        chemnitzBoundary = chemnitzBoundary.features[0];
+      let boundary = JSON.parse(geojsonData);
+
+      if (boundary.type === 'FeatureCollection' && boundary.features.length > 0) {
+        boundary = boundary.features[0];
       }
-      // Check if geometry in GeoJSON is Polygon or MultiPolygon
-      if (
-        !['Polygon', 'MultiPolygon'].includes(chemnitzBoundary.geometry.type)
-      ) {
-        throw new Error(
-          'Chemnitz boundary GeoJSON must contain a Polygon or MultiPolygon geometry.',
-        );
+
+      if (!['Polygon', 'MultiPolygon'].includes(boundary.geometry.type)) {
+        throw new Error(`${cityName} boundary must be a Polygon or MultiPolygon.`);
       }
+
+      cityBoundaries[cityKey] = boundary;
+      console.log(`✅ Loaded boundary for: ${cityName}`);
     } catch (error) {
-      console.error('Error loading Chemnitz boundary GeoJSON:', error);
-      throw new Error('Failed to load Chemnitz boundary data.');
+      console.error(`Error loading boundary for ${cityName}:`, error);
+      return null;
     }
   }
+  return cityBoundaries[cityKey];
 };
 
 /**
- * Checks if a given latitude, longitude point is inside the city limits of Chemnitz.
- * @param {number} lat -latitude
- * @param {number} lng -hardness
- * @returns {boolean} -true if the point is inside the boundary, false otherwise.
+ * 좌표가 특정 도시의 경계 내부에 있는지 확인합니다.
  */
-const isPointInChemnitz = (lat, lng) => {
-  if (!chemnitzBoundary) {
-    loadChemnitzBoundary();
-  }
+const isPointInCity = (lat, lng, cityName = 'berlin') => {
+  const boundary = loadCityBoundary(cityName);
+  if (!boundary) return false; // 경계 파일이 없으면 일단 false (혹은 true로 기본값 설정 가능)
 
   const point = turf.point([lng, lat]);
-  return turf.booleanPointInPolygon(point, chemnitzBoundary);
+  return turf.booleanPointInPolygon(point, boundary);
 };
-
 /**
  * Checks whether the given latitude (lat) and longitude (lng) values ​​are within a valid geographic range.
  * @param {*} lng -longitude (string or number)
@@ -110,8 +106,8 @@ function areCoordinatesMatching(clientCoord, osmCoord, toleranceInMeters = 10) {
 }
 
 module.exports = {
-  loadChemnitzBoundary,
-  isPointInChemnitz,
+  loadCityBoundary,
+  isPointInCity,
   isValidLatLng,
   areCoordinatesMatching,
 };
