@@ -672,6 +672,31 @@ const saveCulturalSiteToDb = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getDistrictStats = asyncHandler(async (req, res) => {
+  const stats = await CulturalSite.aggregate([
+    {
+      // active한 사이트만 필터링 (필요시)
+      $match: { active: true }
+    },
+    {
+      // address.district 필드를 기준으로 그룹화
+      $group: {
+        _id: '$address.district',
+        count: { $sum: 1 },
+        // 각 구의 대표 좌표를 하나 가져오거나, 
+        // 미리 정의된 구별 중심 좌표를 프론트에서 써도 됩니다.
+      }
+    },
+    { $sort: { count: -1 } }
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    data: stats
+  });
+});
+
+
 module.exports = {
   getAllCulturalSites,
   getCulturalSiteById,
@@ -679,4 +704,5 @@ module.exports = {
   updateCulturalSiteById,
   deleteCulturalSiteById,
   getNearbyOsmCulturalSites,
+  getDistrictStats,
 };

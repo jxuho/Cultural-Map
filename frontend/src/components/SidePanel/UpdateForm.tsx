@@ -13,7 +13,7 @@ interface UpdateFormData {
   category: string;
   imageUrl: string;
   openingHours: string;
-  address: string;
+  address: string; 
   website: string;
   proposalMessage: string;
   location: {
@@ -62,9 +62,7 @@ const UpdateForm: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [proposalType, setProposalType] = useState<'update' | 'delete'>(
-    'update',
-  );
+  const [proposalType, setProposalType] = useState<'update' | 'delete'>('update');
   const [backendError, setBackendError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,7 +75,8 @@ const UpdateForm: React.FC = () => {
         category: data.category || '',
         imageUrl: data.imageUrl || '',
         openingHours: data.openingHours || '',
-        address: data.address || '',
+        // 주소 객체에서 fullAddress만 추출하여 문자열로 세팅
+        address: typeof data.address === 'object' ? data.address.fullAddress : String(data.address || ''),
         website: data.website || '',
         proposalMessage: '',
         location: data.location ? { ...data.location, type: 'Point' } : null,
@@ -134,11 +133,7 @@ const UpdateForm: React.FC = () => {
       const hasChanges = (
         Object.keys(formData) as Array<keyof UpdateFormData>
       ).some((key) => {
-        if (
-          ['_id', 'proposalMessage', 'initialData', 'proposalType'].includes(
-            key,
-          )
-        ) {
+        if (['_id', 'proposalMessage', 'initialData', 'proposalType'].includes(key)) {
           return false;
         }
         if (key === 'location') {
@@ -148,6 +143,12 @@ const UpdateForm: React.FC = () => {
             currentCoords?.[0] !== initialCoords?.[0] ||
             currentCoords?.[1] !== initialCoords?.[1]
           );
+        }
+        if (key === 'address') {
+            const initialAddress = typeof formData.initialData?.address === 'object' 
+                ? formData.initialData.address.fullAddress 
+                : formData.initialData?.address;
+            return formData.address !== initialAddress;
         }
         return formData[key] !== (formData.initialData as any)[key];
       });
@@ -171,12 +172,20 @@ const UpdateForm: React.FC = () => {
       return;
     }
 
+    // 백엔드 스키마 구조에 맞게 변환 (city 포함)
     const currentSiteData = {
       name: formData.name,
       description: formData.description,
       category: formData.category,
       location: formData.location,
-      address: formData.address,
+      address: {
+        fullAddress: formData.address,
+        district: "",
+        street: "",
+        houseNumber: "",
+        postcode: "",
+        city: "Berlin" // 필수 필드 추가
+      },
       website: formData.website,
       imageUrl: formData.imageUrl,
       openingHours: formData.openingHours,
@@ -197,6 +206,7 @@ const UpdateForm: React.FC = () => {
 
         if (proposalType === 'update') {
           const proposedChanges: any = {};
+          // 변경된 필드만 추출
           for (const key in currentSiteData) {
             const k = key as keyof typeof currentSiteData;
             if (k === 'location') {
@@ -208,6 +218,13 @@ const UpdateForm: React.FC = () => {
               ) {
                 proposedChanges.location = currentSiteData.location;
               }
+            } else if (k === 'address') {
+                const initialAddrStr = typeof formData.initialData?.address === 'object' 
+                    ? formData.initialData.address.fullAddress 
+                    : formData.initialData?.address;
+                if (formData.address !== initialAddrStr) {
+                    proposedChanges.address = currentSiteData.address;
+                }
             } else if (
               currentSiteData[k] !== (formData.initialData as any)[k]
             ) {
@@ -483,31 +500,34 @@ const UpdateForm: React.FC = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Latitude (Read-Only)
-            </label>
-            <input
-              type="text"
-              value={formData.location?.coordinates[1] || ''}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-            {formErrors.location && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.location}</p>
-            )}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+                <label className="block text-sm font-medium text-gray-700">
+                Latitude (Read-Only)
+                </label>
+                <input
+                type="text"
+                value={formData.location?.coordinates[1] || ''}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
+                readOnly
+                />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700">
+                Longitude (Read-Only)
+                </label>
+                <input
+                type="text"
+                value={formData.location?.coordinates[0] || ''}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
+                readOnly
+                />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Longitude (Read-Only)
-            </label>
-            <input
-              type="text"
-              value={formData.location?.coordinates[0] || ''}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-          </div>
+          {formErrors.location && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.location}</p>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Original OSM ID (Read-Only)
@@ -579,7 +599,7 @@ const UpdateForm: React.FC = () => {
 
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
           disabled={isSubmitting}
         >
           {isSubmitting

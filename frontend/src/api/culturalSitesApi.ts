@@ -102,3 +102,17 @@ export const deleteCulturalSite = async (
     throw err;
   }
 };
+
+
+export const fetchDistrictStats = async (): Promise<Record<string, number>> => {
+  try {
+    const response = await axiosInstance.get<
+      ApiResponse<{ districtStats: Record<string, number> }>
+    >('/cultural-sites/district-stats');
+    return response.data.data.districtStats || {};
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error('Error fetching district stats:', err);
+    throw err;
+  }
+};

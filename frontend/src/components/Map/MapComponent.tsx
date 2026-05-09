@@ -87,6 +87,7 @@ const MapComponent = () => {
     import.meta.env.VITE_MAP_INITIAL_LNG || '13.3777',
   );
   const initialZoom = parseInt(import.meta.env.VITE_MAP_INITIAL_ZOOM || '12');
+  const minZoom = parseInt(import.meta.env.VITE_MAP_MIN_ZOOM || '12');
 
   const swLat = parseFloat(import.meta.env.VITE_MAP_BOUND_SW_LAT || '52.338');
   const swLng = parseFloat(import.meta.env.VITE_MAP_BOUND_SW_LNG || '13.088');
@@ -132,17 +133,20 @@ const MapComponent = () => {
 
       // Compare each field to your search term.
       const matchesSearch =
-        site.name.toLowerCase().includes(lowerCaseSearchQuery) ||
-        (site.description &&
-          site.description.toLowerCase().includes(lowerCaseSearchQuery)) ||
-        (site.category &&
-          site.category.toLowerCase().includes(lowerCaseSearchQuery)) ||
-        (site.address &&
-          site.address.toLowerCase().includes(lowerCaseSearchQuery)) ||
-        (site.website &&
-          site.website.toLowerCase().includes(lowerCaseSearchQuery)) ||
+        site.name?.toLowerCase().includes(lowerCaseSearchQuery) ||
+        site.description?.toLowerCase().includes(lowerCaseSearchQuery) ||
+        site.category?.toLowerCase().includes(lowerCaseSearchQuery) ||
+        (site.address
+          ? (
+              site.address.fullAddress ||
+              `${site.address.street || ''} ${site.address.houseNumber || ''}, ${site.address.postcode || ''} ${site.address.city || ''}`
+            )
+              .toLowerCase()
+              .includes(lowerCaseSearchQuery)
+          : false) ||
+        site.website?.toLowerCase().includes(lowerCaseSearchQuery) ||
         (site.sourceId &&
-          String(site.sourceId).toLowerCase().includes(lowerCaseSearchQuery)); // sourceId can be a number, so convert it to a string
+          String(site.sourceId).toLowerCase().includes(lowerCaseSearchQuery));
 
       return matchesCategory && matchesSearch;
     });
@@ -175,7 +179,7 @@ const MapComponent = () => {
       <MapContainer
         center={initialPosition}
         zoom={initialZoom}
-        minZoom={8}
+        minZoom={minZoom}
         maxBounds={mapMaxBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}

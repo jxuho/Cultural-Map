@@ -18,7 +18,7 @@ interface FormData {
   category: string;
   imageUrl: string;
   openingHours: string;
-  address: string;
+  address: string; // UI 입력 및 관리를 위해 string 유지
   website: string;
   proposalMessage: string;
   location: LocationData | null;
@@ -67,13 +67,18 @@ const CreateForm: React.FC = () => {
   // --- Effects ---
   useEffect(() => {
     if (createFormData) {
+      // 주소 데이터가 객체인지 문자열인지 확인하여 안전하게 로드
+      const initialAddress = typeof createFormData.address === 'object' 
+        ? createFormData.address.fullAddress 
+        : (createFormData.address || '');
+
       setFormData({
         name: createFormData.name || '',
         description: createFormData.description || '',
         category: createFormData.category || '',
         imageUrl: createFormData.imageUrl || '',
         openingHours: createFormData.openingHours || '',
-        address: createFormData.address || '',
+        address: initialAddress,
         website: createFormData.website || '',
         proposalMessage: '',
         location: createFormData.location || null,
@@ -132,6 +137,7 @@ const CreateForm: React.FC = () => {
       return;
     }
 
+    // 백엔드 Address 스키마에 맞게 데이터 구조화
     const commonSiteData = {
       name: formData.name,
       description: formData.description,
@@ -140,7 +146,14 @@ const CreateForm: React.FC = () => {
         type: 'Point' as const,
         coordinates: formData.location!.coordinates,
       },
-      address: formData.address,
+      address: {
+        fullAddress: formData.address,
+        district: "", // 필요 시 추출 로직 추가 가능
+        street: "",
+        houseNumber: "",
+        postcode: "",
+        city: "",
+      },
       website: formData.website,
       imageUrl: formData.imageUrl,
       openingHours: formData.openingHours,
@@ -258,10 +271,7 @@ const CreateForm: React.FC = () => {
 
         {/* Name */}
         <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Name *
           </label>
           <input
@@ -279,10 +289,7 @@ const CreateForm: React.FC = () => {
 
         {/* Description */}
         <div>
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Description
           </label>
           <textarea
@@ -297,10 +304,7 @@ const CreateForm: React.FC = () => {
 
         {/* Category */}
         <div>
-          <label
-            htmlFor="category"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
             Category *
           </label>
           <select
@@ -324,10 +328,7 @@ const CreateForm: React.FC = () => {
 
         {/* Image URL */}
         <div>
-          <label
-            htmlFor="imageUrl"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
             Image URL
           </label>
           <input
@@ -343,10 +344,7 @@ const CreateForm: React.FC = () => {
 
         {/* Opening Hours */}
         <div>
-          <label
-            htmlFor="openingHours"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="openingHours" className="block text-sm font-medium text-gray-700">
             Opening Hours
           </label>
           <input
@@ -362,10 +360,7 @@ const CreateForm: React.FC = () => {
 
         {/* Address */}
         <div>
-          <label
-            htmlFor="address"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
             Address *
           </label>
           <input
@@ -383,10 +378,7 @@ const CreateForm: React.FC = () => {
 
         {/* Website */}
         <div>
-          <label
-            htmlFor="website"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="website" className="block text-sm font-medium text-gray-700">
             Website
           </label>
           <input

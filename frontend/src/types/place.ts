@@ -7,7 +7,7 @@ export interface Place {
     type: 'Point';
     coordinates: [number, number];
   };
-  address?: string;
+  address?: Address;
   website?: string;
   imageUrl?: string;
   openingHours?: string;
@@ -23,4 +23,18 @@ export interface Place {
 
   averageRating?: number;
   reviewCount?: number;
+}
+
+export interface Address {
+  fullAddress: string;
+  street: string;
+  houseNumber: string;
+  postcode: string;
+  district: string;
+  city: string;
+}
+
+export interface DistrictStat {
+  _id: string;
+  count: number;
 }

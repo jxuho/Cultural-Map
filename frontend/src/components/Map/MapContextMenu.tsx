@@ -28,7 +28,7 @@ const MapContextMenu = () => {
   // Function to be called when the "Search this area" button is clicked
   const queryThisArea = () => {
     if (selectedLatLng?.lat && selectedLatLng?.lng) {
-      openSidePanel(null);
+      openSidePanel(null); 
       setNearbySitesLoading(true);
       setNearbySitesError(null);
       refetchNearbyOsm(); // Start importing nearby OSM data

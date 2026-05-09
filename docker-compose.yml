@@ -3,9 +3,9 @@ services:
     image: mongo:latest
     container_name: mongodb_dev
     ports:
-      - "27018:27017" # 로컬의 27017 포트와 연결
+      - "27018:27017"
+    command: ["--replSet", "rs0"]
     volumes:
       - mongo_data:/data/db
-
 volumes:
   mongo_data:

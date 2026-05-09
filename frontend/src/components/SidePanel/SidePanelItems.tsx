@@ -269,10 +269,12 @@ const SidePanelItems = ({
                   .join(' ') || 'N/A'}
               </p>
             )}
-            {selectedPlaceData.address && (
+            {selectedPlaceData.address?.fullAddress && (
               <p className="text-sm text-gray-700 mb-2 leading-relaxed">
                 <span className="font-semibold text-blue-600">Address: </span>
-                {selectedPlaceData.address}
+                {selectedPlaceData.address.fullAddress
+                  ? selectedPlaceData.address.fullAddress
+                  : `${selectedPlaceData.address.street || ''} ${selectedPlaceData.address.houseNumber || ''}, ${selectedPlaceData.address.postcode || ''} ${selectedPlaceData.address.city || 'Berlin'}`}
               </p>
             )}
             {selectedPlaceData.website && (

@@ -209,7 +209,7 @@ const ListPage: React.FC = () => {
                   <strong>Category: </strong>
                   {formatCategoryName(site.category)}
                 </p>
-                <p className="text-gray-600 text-sm mb-2">{site.address}</p>
+                <p className="text-gray-600 text-sm mb-2">{site.address?.fullAddress || 'Address not available'}</p>
                 {site.description && (
                   <p className="text-gray-800 text-sm line-clamp-3 italic">
                     {site.description}

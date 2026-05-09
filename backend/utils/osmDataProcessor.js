@@ -51,84 +51,132 @@ const determineCulturalSiteDescription = (tags, name) => {
  * @param {string} sourceId -sourceId of OSM element.
  * @returns {Promise<string>} Address determined.
  */
-const determineCulturalSiteAddress = async (tags, lat, lon, name, sourceId) => {
-  let address = '';
-  if (tags['addr:street'] && tags['addr:housenumber']) {
-    address = `${tags['addr:street']} ${tags['addr:housenumber']}`;
-  } else if (tags['addr:full']) {
-    address = tags['addr:full'];
-  } else if (tags.address) {
-    address = tags.address;
-  } else if (tags.street && tags.housenumber) {
-    address = `${tags.street} ${tags.housenumber}`;
-  }
-  if (tags['addr:postcode'] && address) address += `, ${tags['addr:postcode']}`;
-  if (tags['addr:city'] && address) address += `, ${tags['addr:city']}`;
-  else if (!address && tags.city) address = tags.city;
+// const determineCulturalSiteAddress = async (tags, lat, lon, name, sourceId) => {
+//   let address = '';
+//   if (tags['addr:street'] && tags['addr:housenumber']) {
+//     address = `${tags['addr:street']} ${tags['addr:housenumber']}`;
+//   } else if (tags['addr:full']) {
+//     address = tags['addr:full'];
+//   } else if (tags.address) {
+//     address = tags.address;
+//   } else if (tags.street && tags.housenumber) {
+//     address = `${tags.street} ${tags.housenumber}`;
+//   }
+//   if (tags['addr:postcode'] && address) address += `, ${tags['addr:postcode']}`;
+//   if (tags['addr:city'] && address) address += `, ${tags['addr:city']}`;
+//   else if (!address && tags.city) address = tags.city;
 
-  // If there is no address information, try reverse geocoding through the Nominatim API.
-  if (!address && lat && lon) {
-    try {
-      const nominatimResponse = await axios.get(NOMINATIM_API_URL, {
-        params: {
-          lat: lat,
-          lon: lon,
-          format: 'json',
-          'accept-language': 'en',
-          zoom: 18,
-          addressdetails: 1,
-        },
-        headers: {
-          'User-Agent': 'CulturalHeritageMap/2.0 (jxuholee@gmail.com)',
-        },
-      });
-      const nominatimData = nominatimResponse.data;
+//   // If there is no address information, try reverse geocoding through the Nominatim API.
+//   if (!address && lat && lon) {
+//     try {
+//       const nominatimResponse = await axios.get(NOMINATIM_API_URL, {
+//         params: {
+//           lat: lat,
+//           lon: lon,
+//           format: 'json',
+//           'accept-language': 'en',
+//           zoom: 18,
+//           addressdetails: 1,
+//         },
+//         headers: {
+//           'User-Agent': 'CulturalHeritageMap/2.0 (jxuholee@gmail.com)',
+//         },
+//       });
+//       const nominatimData = nominatimResponse.data;
 
-      if (nominatimData && nominatimData.address) {
-        const addr = nominatimData.address;
-        let inferredAddress = '';
+//       if (nominatimData && nominatimData.address) {
+//         const addr = nominatimData.address;
+//         let inferredAddress = '';
 
-        // Organize addresses by priority
-        if (addr.road && addr.house_number) {
-          inferredAddress = `${addr.road} ${addr.house_number}`;
-        } else if (addr.road) {
-          inferredAddress = addr.road;
-        } else if (addr.building) {
-          inferredAddress = addr.building;
-        } else if (addr.hamlet) {
-          inferredAddress = addr.hamlet;
-        } else if (addr.village) {
-          inferredAddress = addr.village;
-        } else if (addr.town) {
-          inferredAddress = addr.town;
-        } else if (addr.city) {
-          inferredAddress = addr.city;
-        }
+//         // Organize addresses by priority
+//         if (addr.road && addr.house_number) {
+//           inferredAddress = `${addr.road} ${addr.house_number}`;
+//         } else if (addr.road) {
+//           inferredAddress = addr.road;
+//         } else if (addr.building) {
+//           inferredAddress = addr.building;
+//         } else if (addr.hamlet) {
+//           inferredAddress = addr.hamlet;
+//         } else if (addr.village) {
+//           inferredAddress = addr.village;
+//         } else if (addr.town) {
+//           inferredAddress = addr.town;
+//         } else if (addr.city) {
+//           inferredAddress = addr.city;
+//         }
 
-        if (addr.postcode && inferredAddress)
-          inferredAddress += `, ${addr.postcode}`;
-        if (addr.city && inferredAddress && addr.city !== inferredAddress)
-          inferredAddress += `, ${addr.city}`;
-        else if (!inferredAddress && addr.city) inferredAddress = addr.city;
+//         if (addr.postcode && inferredAddress)
+//           inferredAddress += `, ${addr.postcode}`;
+//         if (addr.city && inferredAddress && addr.city !== inferredAddress)
+//           inferredAddress += `, ${addr.city}`;
+//         else if (!inferredAddress && addr.city) inferredAddress = addr.city;
 
-        if (inferredAddress) {
-          address = inferredAddress;
-          console.log(
-            `Inferred address for ${name} (ID: ${sourceId}): ${address}`,
-          );
-        }
-      }
-    } catch (nominatimError) {
-      console.warn(
-        `Could not infer address for ${name} (ID: ${sourceId}) at [${lon}, ${lat}]:`,
-        nominatimError.message,
-      );
-    }
-  }
-  return address;
-};
+//         if (inferredAddress) {
+//           address = inferredAddress;
+//           console.log(
+//             `Inferred address for ${name} (ID: ${sourceId}): ${address}`,
+//           );
+//         }
+//       }
+//     } catch (nominatimError) {
+//       console.warn(
+//         `Could not infer address for ${name} (ID: ${sourceId}) at [${lon}, ${lat}]:`,
+//         nominatimError.message,
+//       );
+//     }
+//   }
+//   return address;
+// };
 
 // Determine address without reverse geocodig
+
+const determineCulturalSiteAddress = async (tags, lat, lon, name, sourceId) => {
+  const cityName = process.env.CITY_NAME || 'berlin';
+  // 기본 주소 객체 구조
+  let addressObj = {
+    fullAddress: '',
+    street: tags['addr:street'] || tags.street || '',
+    houseNumber: tags['addr:housenumber'] || tags.housenumber || '',
+    postcode: tags['addr:postcode'] || '',
+    district: '', // 이후에 공간 연산으로 채울 예정
+    city: (tags['addr:city'] || cityName).toLowerCase()
+  };
+
+  // 기존 태그 기반 fullAddress 생성 로직
+  if (addressObj.street && addressObj.houseNumber) {
+    addressObj.fullAddress = `${addressObj.street} ${addressObj.houseNumber}`;
+  } else if (tags['addr:full']) {
+    addressObj.fullAddress = tags['addr:full'];
+  }
+
+  // 주소 정보가 부족할 때만 Nominatim 호출
+  if (!addressObj.fullAddress && lat && lon) {
+    try {
+      const nominatimResponse = await axios.get(NOMINATIM_API_URL, {
+        params: { lat, lon, format: 'json', 'accept-language': 'en', zoom: 18, addressdetails: 1 },
+        headers: { 'User-Agent': 'CulturalHeritageMap/2.0' },
+      });
+      const addr = nominatimResponse.data.address;
+
+      if (addr) {
+        addressObj.street = addr.road || addr.pedestrian || addressObj.street;
+        addressObj.houseNumber = addr.house_number || addressObj.houseNumber;
+        addressObj.postcode = addr.postcode || addressObj.postcode;
+        // Nominatim이 제공하는 'suburb'나 'city_district'를 district 후보로 사용 가능
+        addressObj.district = addr.suburb || addr.city_district || '';
+
+        // fullAddress 조립
+        addressObj.fullAddress = addressObj.houseNumber
+          ? `${addressObj.street} ${addressObj.houseNumber}`
+          : addressObj.street;
+      }
+    } catch (err) {
+      console.warn(`Address inference failed for ${sourceId}`);
+    }
+  }
+  return addressObj;
+};
+
 const determineCulturalSiteAddressFromTags = (tags) => {
   let address = '';
   if (tags['addr:street'] && tags['addr:housenumber']) {
@@ -193,6 +241,7 @@ const processOsmElementForCulturalSite = async (
   osmElement,
   performReverseGeocoding = true,
 ) => {
+  const cityName = process.env.CITY_NAME || 'berlin';
   // Added new parameter with default true
   const { type, id, tags } = osmElement;
 
@@ -255,15 +304,25 @@ const processOsmElementForCulturalSite = async (
   const name = determineCulturalSiteName(tags, sourceId);
   const description = determineCulturalSiteDescription(tags, name);
   // Conditionally call determineCulturalSiteAddress based on the flag
+  // const address = performReverseGeocoding
+  //   ? await determineCulturalSiteAddress(
+  //     tags,
+  //     parsedLat,
+  //     parsedLon,
+  //     name,
+  //     sourceId,
+  //   )
+  //   : determineCulturalSiteAddressFromTags(tags); // New helper to only get address from tags
   const address = performReverseGeocoding
-    ? await determineCulturalSiteAddress(
-        tags,
-        parsedLat,
-        parsedLon,
-        name,
-        sourceId,
-      )
-    : determineCulturalSiteAddressFromTags(tags); // New helper to only get address from tags
+  ? await determineCulturalSiteAddress(tags, parsedLat, parsedLon, name, sourceId)
+  : { 
+      fullAddress: determineCulturalSiteAddressFromTags(tags), 
+      street: tags['addr:street'] || '',
+      houseNumber: tags['addr:housenumber'] || '',
+      postcode: tags['addr:postcode'] || '',
+      district: '', // 초기값은 비워두고 마이그레이션/공간쿼리로 채움
+      city: (tags['addr:city'] || cityName).toLowerCase()
+    };
   const category = mapCulturalSiteCategory(tags); // Apply changed category mapping logic
 
   // 5. Final confirmation of required fields
@@ -282,7 +341,7 @@ const processOsmElementForCulturalSite = async (
       type: 'Point',
       coordinates: [parsedLon, parsedLat],
     },
-    address,
+    address, // 이제 객체입니다.
     website: tags.website || tags.url || '',
     imageUrl: tags.image || tags.thumbnail || '',
     openingHours: tags.opening_hours || '',

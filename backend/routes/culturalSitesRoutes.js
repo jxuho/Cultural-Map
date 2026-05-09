@@ -30,6 +30,9 @@ router.get('/', culturalSitesController.getAllCulturalSites);
 // Single inquiry
 router.get('/:id', culturalSitesController.getCulturalSiteById);
 
+// Get district-wise cultural site statistics
+router.get('/stats/districts', culturalSitesController.getDistrictStats);
+
 // Cultural heritage information update (for administrators, authentication required)
 router.put(
   '/:id',

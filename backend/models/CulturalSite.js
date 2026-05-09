@@ -48,9 +48,12 @@ const culturalSiteSchema = new mongoose.Schema(
       },
     },
     address: {
-      type: String,
-      trim: true,
-      // required: true // commented for quick database setup
+      fullAddress: String, 
+      street: String,      
+      houseNumber: String, 
+      postcode: String,    
+      district: String,    
+      city: { type: String, default: 'Berlin' }
     },
     website: {
       type: String,

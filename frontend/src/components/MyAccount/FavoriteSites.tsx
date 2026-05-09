@@ -230,8 +230,17 @@ const FavoriteSites = () => {
                   )}
                   {site.address && (
                     <p className="mb-1">
-                      <span className="font-semibold">Address:</span>{' '}
-                      {site.address}
+                      <span className="font-semibold">Address:</span>
+                      {site.address.fullAddress
+                        ? site.address.fullAddress
+                        : [
+                            site.address.street,
+                            site.address.houseNumber,
+                            site.address.postcode,
+                            site.address.city,
+                          ]
+                            .filter(Boolean)
+                            .join(', ')}
                     </p>
                   )}
                   {site.website && (

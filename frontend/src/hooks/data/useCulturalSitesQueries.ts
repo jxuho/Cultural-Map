@@ -11,9 +11,10 @@ import {
   createCulturalSite,
   deleteCulturalSite,
   updateCulturalSite,
+  fetchDistrictStats,
 } from '../../api/culturalSitesApi';
-import { Place } from '../../types/place';
-import { AxiosError } from 'axios';
+import { DistrictStat, Place } from '../../types/place';
+import axios, { AxiosError } from 'axios';
 import { ApiResponse } from '@/types/api';
 
 // define a common error type for API responses
@@ -22,10 +23,11 @@ type ApiError = AxiosError<ApiResponse<null>>;
 /**
  * fetch all cultural sites with optional query parameters (e.g., pagination, filters)
  */
-export const useAllCulturalSites = (params?: Record<string, any>) => {
-  return useQuery<Place[], ApiError>({
+export const useAllCulturalSites = (enabled: boolean = true, params?: Record<string, any>) => {
+  return useQuery<Place[], Error>({
     queryKey: ['culturalSites', params],
-    queryFn: () => fetchAllCulturalSites(params),
+    queryFn: () => fetchAllCulturalSites(params), // API 호출 함수
+    enabled, // 여기서 boolean 값을 사용
     staleTime: 1000 * 60 * 5,
   });
 };
@@ -132,3 +134,39 @@ export const useDeleteCulturalSite = () => {
     },
   });
 };
+
+
+// // hooks/data/useCulturalSitesQueries.ts 에 추가
+// export const useDistrictStats = (enabled: boolean) => {
+//   return useQuery({
+//     queryKey: ['districtStats'],
+//     queryFn: () => axios.get('/api/v1/cultural-sites/stats/districts').then(res => res.data.data),
+//     enabled
+//   });
+// };
+
+export const useDistrictStats = (enabled: boolean = true) => {
+  return useQuery<DistrictStat[], Error>({
+    queryKey: ['districtStats'],
+    queryFn: async () => {
+      // 1. 먼저 API에서 데이터를 가져옵니다 (Record<string, number> 형태라고 가정)
+      const data: Record<string, number> = await fetchDistrictStats();
+      
+      // 2. 객체 { "Mitte": 100 } 를 배열 [{ _id: "Mitte", count: 100 }] 로 변환합니다.
+      return Object.entries(data).map(([districtName, count]) => ({
+        _id: districtName,
+        count: count
+      }));
+    },
+    enabled,
+    staleTime: 1000 * 60 * 5,
+  });
+};
+
+// export const useDistrictStats = (enabled: boolean) => {
+//   return useQuery({
+//     queryKey: ['districtStats'],
+//     queryFn: fetchDistrictStats,
+//     enabled,
+//   });
+// };

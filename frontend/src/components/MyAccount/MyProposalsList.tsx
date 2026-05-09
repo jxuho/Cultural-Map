@@ -178,9 +178,10 @@ const MyProposalsList = () => {
                     <strong>Category:</strong> {proposal.culturalSite.category}
                   </p>
                 )}
-                {proposal.culturalSite.address && (
+                {proposal.culturalSite.address?.fullAddress && (
                   <p className="text-gray-700 mb-1">
-                    <strong>Address:</strong> {proposal.culturalSite.address}
+                    <strong>Address:</strong>{' '}
+                    {proposal.culturalSite.address.fullAddress}
                   </p>
                 )}
                 {proposal.culturalSite.website && (

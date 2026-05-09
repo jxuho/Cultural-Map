@@ -182,7 +182,7 @@ The easiest way to get the entire stack (Frontend, Backend, Database) up and run
 **Step 1: Environment Variables**
 Create a `.env` file in the `/backend` directory with your credentials:
 ```env
-MONGO_URI=mongodb://mongodb:27017/dbw
+MONGO_URI=mongodb://mongodb:27017/cultural-heritage
 GOOGLE_CLIENT_ID=your_id
 GOOGLE_CLIENT_SECRET=your_secret
 GOOGLE_CALLBACK_URL=http://localhost:5000/api/v1/auth/google/callback
