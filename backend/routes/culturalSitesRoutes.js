@@ -24,14 +24,15 @@ router.post(
   culturalSitesController.saveCulturalSiteToDb,
 );
 
+// District metadata for map LOD
+router.get('/district-stats', culturalSitesController.getDistrictStats);
+router.get('/district-boundaries', culturalSitesController.getDistrictBoundaries);
+
 // Full query + filtering (query: category, name)
 router.get('/', culturalSitesController.getAllCulturalSites);
 
-// Single inquiry
+// Single inquiry (keep after static routes)
 router.get('/:id', culturalSitesController.getCulturalSiteById);
-
-// Get district-wise cultural site statistics
-router.get('/stats/districts', culturalSitesController.getDistrictStats);
 
 // Cultural heritage information update (for administrators, authentication required)
 router.put(

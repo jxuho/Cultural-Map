@@ -3,6 +3,7 @@ import {
   useMutation,
   useQueryClient,
   UseQueryOptions,
+  keepPreviousData,
 } from '@tanstack/react-query';
 import {
   fetchAllCulturalSites,
@@ -12,9 +13,11 @@ import {
   deleteCulturalSite,
   updateCulturalSite,
   fetchDistrictStats,
+  fetchDistrictBoundaries,
+  DistrictBoundaryGeoJson,
 } from '../../api/culturalSitesApi';
 import { DistrictStat, Place } from '../../types/place';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { ApiResponse } from '@/types/api';
 
 // define a common error type for API responses
@@ -29,6 +32,7 @@ export const useAllCulturalSites = (enabled: boolean = true, params?: Record<str
     queryFn: () => fetchAllCulturalSites(params), // API 호출 함수
     enabled, // 여기서 boolean 값을 사용
     staleTime: 1000 * 60 * 5,
+    placeholderData: keepPreviousData,
   });
 };
 
@@ -148,18 +152,19 @@ export const useDeleteCulturalSite = () => {
 export const useDistrictStats = (enabled: boolean = true) => {
   return useQuery<DistrictStat[], Error>({
     queryKey: ['districtStats'],
-    queryFn: async () => {
-      // 1. 먼저 API에서 데이터를 가져옵니다 (Record<string, number> 형태라고 가정)
-      const data: Record<string, number> = await fetchDistrictStats();
-      
-      // 2. 객체 { "Mitte": 100 } 를 배열 [{ _id: "Mitte", count: 100 }] 로 변환합니다.
-      return Object.entries(data).map(([districtName, count]) => ({
-        _id: districtName,
-        count: count
-      }));
-    },
+    queryFn: fetchDistrictStats,
     enabled,
     staleTime: 1000 * 60 * 5,
+  });
+};
+
+export const useDistrictBoundaries = (enabled: boolean = true) => {
+  return useQuery<DistrictBoundaryGeoJson, Error>({
+    queryKey: ['districtBoundaries'],
+    queryFn: fetchDistrictBoundaries,
+    enabled,
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 4,
   });
 };
 

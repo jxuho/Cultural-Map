@@ -2,6 +2,8 @@ const CulturalSite = require('../models/CulturalSite');
 const Review = require('../models/Review');
 const User = require('../models/User');
 const ExcludeSourceId = require('../models/ExcludeSourceId');
+const fs = require('fs/promises');
+const path = require('path');
 const asyncHandler = require('../utils/asyncHandler');
 const mongoose = require('mongoose');
 const AppError = require('../utils/AppError');
@@ -19,6 +21,27 @@ const {
   CULTURAL_CATEGORY,
 } = require('../config/culturalSiteConfig');
 
+let districtBoundariesCache = null;
+
+const parseBboxParams = (query) => {
+  const bboxRaw = query.bbox;
+  if (!bboxRaw || typeof bboxRaw !== 'string') {
+    return null;
+  }
+
+  const values = bboxRaw.split(',').map((value) => Number(value.trim()));
+  if (values.length !== 4 || values.some(Number.isNaN)) {
+    return null;
+  }
+
+  const [minLng, minLat, maxLng, maxLat] = values;
+  if (minLng >= maxLng || minLat >= maxLat) {
+    return null;
+  }
+
+  return { minLng, minLat, maxLng, maxLat };
+};
+
 
 const getAllCulturalSites = asyncHandler(async (req, res, next) => {
   // 1. 페이지네이션 설정
@@ -35,14 +58,28 @@ const getAllCulturalSites = asyncHandler(async (req, res, next) => {
   // 3. 쿼리 실행
   // - 별도의 $lookup이나 $addFields 없이 바로 find()를 사용하여 성능 극대화
   // - select()를 통해 지도 마커에 불필요한 무거운 필드(description 등) 제외
-  const culturalSites = await CulturalSite.find()
+  const bbox = parseBboxParams(req.query);
+  const queryFilter = {};
+
+  if (bbox) {
+    queryFilter.location = {
+      $geoWithin: {
+        $box: [
+          [bbox.minLng, bbox.minLat],
+          [bbox.maxLng, bbox.maxLat],
+        ],
+      },
+    };
+  }
+
+  const culturalSites = await CulturalSite.find(queryFilter)
     .sort(sortStr)
     .skip(skip)
     .limit(limit)
     .select('name category location averageRating reviewCount imageUrl');
 
   // 4. 전체 개수 확인 (페이지네이션용)
-  const totalResults = await CulturalSite.countDocuments();
+  const totalResults = await CulturalSite.countDocuments(queryFilter);
   const totalPages = Math.ceil(totalResults / limit);
 
   // 5. 응답 전송
@@ -696,6 +733,36 @@ const getDistrictStats = asyncHandler(async (req, res) => {
   });
 });
 
+const getDistrictBoundaries = asyncHandler(async (req, res, next) => {
+  if (!districtBoundariesCache) {
+    const boundaryFilePath = path.join(
+      __dirname,
+      '..',
+      'data',
+      'berlin_district_boundary.geojson',
+    );
+
+    try {
+      const rawGeojson = await fs.readFile(boundaryFilePath, 'utf8');
+      districtBoundariesCache = JSON.parse(rawGeojson);
+    } catch (error) {
+      return next(
+        new AppError(
+          `Failed to load district boundaries: ${error.message}`,
+          500,
+        ),
+      );
+    }
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      districtBoundaries: districtBoundariesCache,
+    },
+  });
+});
+
 
 module.exports = {
   getAllCulturalSites,
@@ -705,4 +772,5 @@ module.exports = {
   deleteCulturalSiteById,
   getNearbyOsmCulturalSites,
   getDistrictStats,
+  getDistrictBoundaries,
 };

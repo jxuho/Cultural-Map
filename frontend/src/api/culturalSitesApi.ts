@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance';
-import { Place } from '../types/place';
+import { DistrictStat, Place } from '../types/place';
 import { ApiResponse } from '@/types/api';
 import { AxiosError } from 'axios';
 
@@ -104,15 +104,45 @@ export const deleteCulturalSite = async (
 };
 
 
-export const fetchDistrictStats = async (): Promise<Record<string, number>> => {
+export const fetchDistrictStats = async (): Promise<DistrictStat[]> => {
   try {
-    const response = await axiosInstance.get<
-      ApiResponse<{ districtStats: Record<string, number> }>
-    >('/cultural-sites/district-stats');
-    return response.data.data.districtStats || {};
+    const response = await axiosInstance.get<ApiResponse<DistrictStat[]>>(
+      '/cultural-sites/district-stats',
+    );
+    return response.data.data || [];
   } catch (error) {
     const err = error as AxiosError;
     console.error('Error fetching district stats:', err);
+    throw err;
+  }
+};
+
+export interface DistrictBoundaryFeature {
+  type: 'Feature';
+  properties: {
+    name?: string;
+    [key: string]: unknown;
+  };
+  geometry: {
+    type: 'Polygon' | 'MultiPolygon';
+    coordinates: number[][][] | number[][][][];
+  };
+}
+
+export interface DistrictBoundaryGeoJson {
+  type: 'FeatureCollection';
+  features: DistrictBoundaryFeature[];
+}
+
+export const fetchDistrictBoundaries = async (): Promise<DistrictBoundaryGeoJson> => {
+  try {
+    const response = await axiosInstance.get<
+      ApiResponse<{ districtBoundaries: DistrictBoundaryGeoJson }>
+    >('/cultural-sites/district-boundaries');
+    return response.data.data.districtBoundaries;
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error('Error fetching district boundaries:', err);
     throw err;
   }
 };

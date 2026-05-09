@@ -1,0 +1,1 @@
+import{j as o}from"./index-YxlM4hlx.js";import{O as t}from"./react-vendor-Cbb_LNMj.js";import{G as r}from"./GoToTopButton-CWUHKMwe.js";import"./leaflet-vendor-CUbpRM1C.js";import"./ui-vendor-C02SrXoj.js";const e=()=>o.jsxs("div",{className:"w-full h-full p-4 md:p-12 mx-auto max-w-420 overflow-auto",children:[o.jsx(t,{}),o.jsx(r,{})]});export{e as default};

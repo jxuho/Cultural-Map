@@ -70,3 +70,17 @@ export const getCustomIcon = (category: string, isSelected = false): L.DivIcon =
   cache[category] = icon;
   return icon;
 };
+
+export const preloadIcons = () => {
+  const categories = Object.keys(categoryIconComponents);
+  
+  // 'other' 카테고리가 매핑에 없을 경우를 대비해 명시적 추가 가능
+  const allCategories = categories.includes('other') ? categories : [...categories, 'other'];
+
+  allCategories.forEach((category) => {
+    // 일반 상태 아이콘 생성 및 캐싱
+    getCustomIcon(category, false);
+    // 선택 상태(Selected) 아이콘 생성 및 캐싱
+    getCustomIcon(category, true);
+  });
+};
