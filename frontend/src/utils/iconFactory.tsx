@@ -2,7 +2,7 @@ import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
 import React from 'react';
 import { 
-  FaLandmark, FaPalette, FaBuilding, FaUtensils, 
+  FaLandmark, FaPalette, FaImages, FaUtensils, 
   FaTheaterMasks, FaUsers, FaBook, FaFilm, FaQuestionCircle 
 } from 'react-icons/fa';
 import { categoryBorderColors } from '../config/colors';
@@ -10,7 +10,7 @@ import { categoryBorderColors } from '../config/colors';
 // 1. 카테고리별 아이콘 컴포넌트 매핑
 const categoryIconComponents: Record<string, React.ReactNode> = {
   artwork: <FaPalette />,
-  gallery: <FaBuilding />,
+  gallery: <FaImages />,
   museum: <FaLandmark />,
   restaurant: <FaUtensils />,
   theatre: <FaTheaterMasks />,
@@ -84,3 +84,64 @@ export const preloadIcons = () => {
     getCustomIcon(category, true);
   });
 };
+
+export const getClusterIcon = (count: number): L.DivIcon => {
+  // 클러스터 원 사이즈 (기존과 동일)
+  const size = count < 100 ? 35 : count < 500 ? 45 : 55;
+
+  // 색상: 차분한 톤
+  const color = count < 100
+    ? '#7fb3d5'   // 연한 파랑
+    : count < 500
+      ? '#f0b67f' // 연한 주황
+      : '#d67f7f'; // 연한 빨강
+
+  // 글자 크기 (원 크기에 비례)
+  const fontSize = size / 2.5;
+
+  return L.divIcon({
+    html: `<div style="
+        background-color: ${color};
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: ${fontSize}px;
+        border: 3px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        transition: all 0.2s ease;
+      ">${count}</div>`,
+    className: 'custom-cluster-icon',
+    iconSize: L.point(size, size),
+    iconAnchor: L.point(size / 2, size / 2),
+  });
+};
+
+
+// export const getClusterIcon = (count: number): L.DivIcon => {
+//   const size = count < 100 ? 35 : count < 1000 ? 45 : 55;
+//   const color = count < 100 ? '#51afef' : count < 1000 ? '#e5c07b' : '#e06c75';
+
+//   return L.divIcon({
+//     html: `<div style="
+//         background-color: ${color};
+//         width: ${size}px;
+//         height: ${size}px;
+//         border-radius: 50%;
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+//         color: white;
+//         font-weight: bold;
+//         border: 3px solid white;
+//         box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+//       ">${count}</div>`,
+//     className: 'custom-cluster-icon',
+//     iconSize: L.point(size, size),
+//     iconAnchor: L.point(size / 2, size / 2),
+//   });
+// };
