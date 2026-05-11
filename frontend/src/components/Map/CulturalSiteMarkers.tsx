@@ -1,6 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import { Marker, useMap, useMapEvents } from 'react-leaflet';
-import Supercluster from 'supercluster';
 import { Place } from '@/types/place';
 import { getClusterIcon } from '../../utils/iconFactory';
 import MemoizedCulturalSiteMarker from './MemoizedCulturalSiteMarker';
@@ -11,42 +15,69 @@ interface Props {
   selectedPlace: Place | null;
 }
 
-const CulturalSiteMarkers = ({ sites, openSidePanel, selectedPlace }: Props) => {
+type ClusterFeature = {
+  id: number;
+  geometry: {
+    coordinates: [number, number];
+  };
+  properties: {
+    cluster?: boolean;
+    point_count?: number;
+    siteId?: string;
+    site?: Place;
+  };
+};
+
+const CulturalSiteMarkers = ({
+  sites,
+  openSidePanel,
+  selectedPlace,
+}: Props) => {
   const map = useMap();
-  const [clusters, setClusters] = useState<any[]>([]);
+  const workerRef = useRef<Worker | null>(null);
 
-  // 1. Supercluster 인스턴스 초기화 (사이트 데이터가 바뀔 때만 재색인)
-  const index = useMemo(() => {
-    const sc = new Supercluster({
-      radius: 120,
-      maxZoom: 16, // 이 줌 이상에서는 클러스터링 해제
+  const [clusters, setClusters] = useState<ClusterFeature[]>([]);
+
+  // 🧠 1. Worker 초기화
+  useEffect(() => {
+    const worker = new Worker(
+      new URL('./cluster.worker.ts', import.meta.url),
+      { type: 'module' }
+    );
+
+    workerRef.current = worker;
+
+    worker.onmessage = (e) => {
+      const { type, clusters } = e.data;
+
+      if (type === 'CLUSTERS') {
+        setClusters(clusters);
+      }
+    };
+
+    return () => {
+      worker.terminate();
+      workerRef.current = null;
+    };
+  }, []);
+
+  // 🧠 2. Worker에 초기 데이터 전달 (index build)
+  useEffect(() => {
+    if (!workerRef.current || sites.length === 0) return;
+
+    workerRef.current.postMessage({
+      type: 'INIT',
+      sites,
     });
-
-    // 데이터를 GeoJSON Feature 형태로 변환
-    const points = sites.map((site) => ({
-      type: 'Feature' as const,
-      properties: {
-        cluster: false,
-        siteId: site._id,
-        category: site.category,
-        site: site, // 나중에 개별 마커 렌더링 시 필요
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [site.location.coordinates[0], site.location.coordinates[1]],
-      },
-    }));
-
-    sc.load(points);
-    return sc;
   }, [sites]);
 
-  // 2. 현재 뷰포트 내의 클러스터/마커 계산 함수
+  // 🧠 3. viewport 변경 시 cluster 요청
   const updateClusters = useCallback(() => {
+    if (!workerRef.current) return;
+
     const bounds = map.getBounds();
     const zoom = Math.round(map.getZoom());
 
-    // Supercluster용 bbox 형식: [west, south, east, north]
     const bbox: [number, number, number, number] = [
       bounds.getWest(),
       bounds.getSouth(),
@@ -54,53 +85,66 @@ const CulturalSiteMarkers = ({ sites, openSidePanel, selectedPlace }: Props) => 
       bounds.getNorth(),
     ];
 
-    const currentClusters = index.getClusters(bbox, zoom);
-    setClusters(currentClusters);
-  }, [index, map]);
+    workerRef.current.postMessage({
+      type: 'CLUSTER',
+      bbox,
+      zoom,
+    });
+  }, [map]);
 
-  // 3. 지도 이동/줌 이벤트 발생 시 클러스터 업데이트
+  // 🧠 4. 지도 이벤트 연결
   useMapEvents({
-    moveend: () => updateClusters(),
-    zoomend: () => updateClusters(),
+    moveend: updateClusters,
+    zoomend: updateClusters,
   });
 
-  // 초기 렌더링 시 실행
+  // 🧠 5. 초기 1회 실행
   useEffect(() => {
     updateClusters();
   }, [updateClusters]);
 
+  // 🧠 6. render
   return (
     <>
       {clusters.map((cluster) => {
-        const [longitude, latitude] = cluster.geometry.coordinates;
-        const { cluster: isCluster, point_count: pointCount, siteId, category, site } = cluster.properties;
+        const [lng, lat] = cluster.geometry.coordinates;
 
+        const {
+          cluster: isCluster,
+          point_count,
+          siteId,
+          site,
+        } = cluster.properties;
+
+        // 🔵 cluster marker
         if (isCluster) {
-          // 클러스터 렌더링
           return (
             <Marker
               key={`cluster-${cluster.id}`}
-              position={[latitude, longitude]}
-              icon={getClusterIcon(pointCount)}
+              position={[lat, lng]}
+              icon={getClusterIcon(point_count || 0)}
               eventHandlers={{
                 click: () => {
-                  const expansionZoom = Math.min(
-                    index.getClusterExpansionZoom(cluster.id),
-                    18
-                  );
-                  map.setView([latitude, longitude], expansionZoom);
+                  // 👉 Worker에서 expansionZoom까지 옮길 수도 있지만
+                  // 현재는 UX 단순화를 위해 +2 zoom 방식 사용
+                  const currentZoom = map.getZoom();
+                  const nextZoom = Math.min(currentZoom + 2, 18);
+
+                  map.setView([lat, lng], nextZoom);
                 },
               }}
             />
           );
         }
 
-        // 개별 마커 렌더링 (MemoizedCulturalSiteMarker 재사용)
-        const isSelected = !!selectedPlace && selectedPlace._id === siteId;
+        // 🟢 individual marker
+        const isSelected =
+          !!selectedPlace && selectedPlace._id === siteId;
+
         return (
           <MemoizedCulturalSiteMarker
             key={`site-${siteId}`}
-            culturalSite={site}
+            culturalSite={site!}
             openSidePanel={openSidePanel}
             isSelected={isSelected}
           />
