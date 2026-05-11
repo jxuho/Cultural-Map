@@ -1,9 +1,8 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, use } from 'react';
 import { Marker, useMap, useMapEvents } from 'react-leaflet';
 import Supercluster from 'supercluster';
-import L from 'leaflet';
 import { Place } from '@/types/place';
-import { getCustomIcon, getClusterIcon } from '../../utils/iconFactory';
+import { getClusterIcon } from '../../utils/iconFactory';
 import MemoizedCulturalSiteMarker from './MemoizedCulturalSiteMarker';
 
 interface Props {

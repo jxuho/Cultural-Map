@@ -35,6 +35,7 @@ const DistrictMarkers = ({
       layer.bindTooltip(`${districtName}: ${districtCount} sites`, {
         direction: 'center',
         className: 'district-lod-tooltip',
+        sticky: true,
       });
     });
   }, [stats]);
@@ -65,6 +66,7 @@ const DistrictMarkers = ({
           {
             direction: 'center',
             className: 'district-lod-tooltip',
+            sticky: true,
           }
         );
 
