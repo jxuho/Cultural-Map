@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo, use } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { Marker, useMap, useMapEvents } from 'react-leaflet';
 import Supercluster from 'supercluster';
 import { Place } from '@/types/place';

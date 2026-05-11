@@ -269,17 +269,17 @@ const MapComponent = () => {
   return (
     <div className="h-full w-full relative" id="map">
       {shouldShowClusterLoadingOverlay && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-white/75 text-gray-600 pointer-events-none">
+        <div className="absolute inset-0 z-1000 flex items-center justify-center bg-white/75 text-gray-600 pointer-events-none">
           Loading the Map...
         </div>
       )}
       {shouldShowClusterUpdatingBadge && (
-        <div className="absolute top-3 right-3 z-[1000] rounded-full bg-white/90 px-3 py-1 text-xs text-gray-600 shadow">
+        <div className="absolute top-3 right-3 z-1000 rounded-full bg-white/90 px-3 py-1 text-xs text-gray-600 shadow">
           Updating markers...
         </div>
       )}
       {shouldShowClusterErrorOverlay && (
-        <div className="absolute top-3 left-1/2 z-[1000] -translate-x-1/2 rounded-md bg-red-100 px-3 py-2 text-sm text-red-700 shadow">
+        <div className="absolute top-3 left-1/2 z-1000 -translate-x-1/2 rounded-md bg-red-100 px-3 py-2 text-sm text-red-700 shadow">
           Failed to load map data: {error?.message ?? 'Unknown error'}
         </div>
       )}
