@@ -15,18 +15,9 @@ interface Props {
   selectedPlace: Place | null;
 }
 
-type ClusterFeature = {
-  id: number;
-  geometry: {
-    coordinates: [number, number];
-  };
-  properties: {
-    cluster?: boolean;
-    point_count?: number;
-    siteId?: string;
-    site?: Place;
-  };
-};
+type ClusterFeature = any;
+
+const DEBOUNCE_DELAY = 120;
 
 const CulturalSiteMarkers = ({
   sites,
@@ -35,10 +26,14 @@ const CulturalSiteMarkers = ({
 }: Props) => {
   const map = useMap();
   const workerRef = useRef<Worker | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [clusters, setClusters] = useState<ClusterFeature[]>([]);
+  const [expansionZoomMap, setExpansionZoomMap] = useState<Map<number, number>>(new Map());
 
-  // 🧠 1. Worker 초기화
+  // =========================
+  // 1️⃣ Worker init
+  // =========================
   useEffect(() => {
     const worker = new Worker(
       new URL('./cluster.worker.ts', import.meta.url),
@@ -48,10 +43,18 @@ const CulturalSiteMarkers = ({
     workerRef.current = worker;
 
     worker.onmessage = (e) => {
-      const { type, clusters } = e.data;
+      const { type, clusters, zoom } = e.data;
 
       if (type === 'CLUSTERS') {
         setClusters(clusters);
+      }
+
+      if (type === 'EXPANSION_ZOOM_RESULT') {
+        setExpansionZoomMap((prev) => {
+          const next = new Map(prev);
+          next.set(e.data.clusterId, zoom);
+          return next;
+        });
       }
     };
 
@@ -61,7 +64,9 @@ const CulturalSiteMarkers = ({
     };
   }, []);
 
-  // 🧠 2. Worker에 초기 데이터 전달 (index build)
+  // =========================
+  // 2️⃣ INIT sites
+  // =========================
   useEffect(() => {
     if (!workerRef.current || sites.length === 0) return;
 
@@ -71,8 +76,10 @@ const CulturalSiteMarkers = ({
     });
   }, [sites]);
 
-  // 🧠 3. viewport 변경 시 cluster 요청
-  const updateClusters = useCallback(() => {
+  // =========================
+  // 3️⃣ Debounced cluster request
+  // =========================
+  const requestClusters = useCallback(() => {
     if (!workerRef.current) return;
 
     const bounds = map.getBounds();
@@ -92,18 +99,43 @@ const CulturalSiteMarkers = ({
     });
   }, [map]);
 
-  // 🧠 4. 지도 이벤트 연결
+  const debouncedUpdateClusters = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      requestClusters();
+    }, DEBOUNCE_DELAY);
+  }, [requestClusters]);
+
+  // =========================
+  // 4️⃣ map events
+  // =========================
   useMapEvents({
-    moveend: updateClusters,
-    zoomend: updateClusters,
+    moveend: debouncedUpdateClusters,
+    zoomend: debouncedUpdateClusters,
   });
 
-  // 🧠 5. 초기 1회 실행
   useEffect(() => {
-    updateClusters();
-  }, [updateClusters]);
+    requestClusters();
+  }, [requestClusters]);
 
-  // 🧠 6. render
+  // =========================
+  // 5️⃣ request expansion zoom
+  // =========================
+  const requestExpansionZoom = useCallback((clusterId: number) => {
+    if (!workerRef.current) return;
+
+    workerRef.current.postMessage({
+      type: 'EXPANSION_ZOOM',
+      clusterId,
+    });
+  }, []);
+
+  // =========================
+  // 6️⃣ render
+  // =========================
   return (
     <>
       {clusters.map((cluster) => {
@@ -116,7 +148,7 @@ const CulturalSiteMarkers = ({
           site,
         } = cluster.properties;
 
-        // 🔵 cluster marker
+        // 🔵 cluster
         if (isCluster) {
           return (
             <Marker
@@ -125,26 +157,29 @@ const CulturalSiteMarkers = ({
               icon={getClusterIcon(point_count || 0)}
               eventHandlers={{
                 click: () => {
-                  // 👉 Worker에서 expansionZoom까지 옮길 수도 있지만
-                  // 현재는 UX 단순화를 위해 +2 zoom 방식 사용
-                  const currentZoom = map.getZoom();
-                  const nextZoom = Math.min(currentZoom + 2, 18);
+                  const zoom =
+                    expansionZoomMap.get(cluster.id) ??
+                    (map.getZoom() + 2);
 
-                  map.setView([lat, lng], nextZoom);
+                  if (!expansionZoomMap.has(cluster.id)) {
+                    requestExpansionZoom(cluster.id);
+                  }
+
+                  map.setView([lat, lng], Math.min(zoom, 18));
                 },
               }}
             />
           );
         }
 
-        // 🟢 individual marker
+        // 🟢 marker
         const isSelected =
           !!selectedPlace && selectedPlace._id === siteId;
 
         return (
           <MemoizedCulturalSiteMarker
             key={`site-${siteId}`}
-            culturalSite={site!}
+            culturalSite={site}
             openSidePanel={openSidePanel}
             isSelected={isSelected}
           />
