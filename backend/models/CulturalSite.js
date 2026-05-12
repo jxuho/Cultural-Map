@@ -128,6 +128,7 @@ const culturalSiteSchema = new mongoose.Schema(
 );
 
 culturalSiteSchema.index({ averageRating: -1 });
-culturalSiteSchema.index({ reviewCount: -1 });
+culturalSiteSchema.index({ reviewCount: -1 });  
+culturalSiteSchema.index({ category: 1 });
 
 module.exports = mongoose.model('CulturalSite', culturalSiteSchema);
