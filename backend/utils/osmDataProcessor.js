@@ -13,20 +13,131 @@ const { CULTURAL_CATEGORY } = require('../config/culturalSiteConfig');
  * @param {string} sourceId -sourceId of OSM element.
  * @returns {string} Name decided.
  */
+// const determineCulturalSiteName = (tags, sourceId) => {
+//   if (tags.name) {
+//     return tags.name;
+//   } else if (tags.artwork_type) {
+//     return tags.artwork_type;
+//   } else if (tags.description) {
+//     return tags.description;
+//   } else if (tags.tourism) {
+//     return tags.tourism;
+//   } else if (tags.amenity) {
+//     return tags.amenity;
+//   } else {
+//     return `Unnamed Site (ID: ${sourceId})`;
+//   }
+// };
+
+
+
 const determineCulturalSiteName = (tags, sourceId) => {
-  if (tags.name) {
-    return tags.name;
-  } else if (tags.artwork_type) {
-    return tags.artwork_type;
-  } else if (tags.description) {
-    return tags.description;
-  } else if (tags.tourism) {
-    return tags.tourism;
-  } else if (tags.amenity) {
-    return tags.amenity;
-  } else {
-    return `Unnamed Site (ID: ${sourceId})`;
+  // 1. Best case: explicit name
+  if (tags.name && tags.name.trim()) {
+    return tags.name.trim();
   }
+
+  // 2. Determine mapped category
+  const category = mapCulturalSiteCategory(tags);
+
+  // Helper
+  const capitalize = (str) =>
+    str
+      ?.replace(/_/g, ' ')
+      ?.replace(/\b\w/g, (c) => c.toUpperCase());
+
+  // 3. Category-based naming strategy
+  switch (category) {
+    case 'museums_galleries':
+      if (tags.museum) return `${capitalize(tags.museum)} Museum`;
+      if (tags.gallery) return `${capitalize(tags.gallery)} Gallery`;
+      return 'Unnamed Museum or Gallery';
+
+    case 'monument':
+      if (tags.monument_type) {
+        return `${capitalize(tags.monument_type)} Monument`;
+      }
+      return 'Unnamed Monument';
+
+    case 'memorial':
+      if (tags.memorial) {
+        return `${capitalize(tags.memorial)} Memorial`;
+      }
+      return 'Unnamed Memorial';
+
+    case 'castle':
+      return 'Unnamed Castle';
+
+    case 'religious_heritage':
+      if (tags.religion && tags.building) {
+        return `${capitalize(tags.religion)} ${capitalize(tags.building)}`;
+      }
+      if (tags.building) {
+        return capitalize(tags.building);
+      }
+      return 'Unnamed Religious Heritage Site';
+
+    case 'cultural_venues':
+      if (tags.amenity) {
+        return capitalize(tags.amenity);
+      }
+      return 'Unnamed Cultural Venue';
+
+    case 'public_art':
+      if (tags.artwork_type) {
+        return `${capitalize(tags.artwork_type)} Artwork`;
+      }
+      return 'Unnamed Public Artwork';
+
+    case 'archaeological_sites':
+      if (tags.site_type) {
+        return `${capitalize(tags.site_type)} Archaeological Site`;
+      }
+      return 'Unnamed Archaeological Site';
+
+    case 'industrial_heritage':
+      if (tags.highway === 'street_lamp' || tags.amenity === 'street_lamp') {
+        return capitalize("Street Lamp");
+      } 
+      return 'Unnamed Industrial Heritage Site';
+
+    case 'heritage_buildings':
+      if (tags.building) {
+        return capitalize(tags.building);
+      }
+      return 'Unnamed Heritage Building';
+
+    case 'gardens_parks':
+      if (tags.leisure) {
+        return capitalize(tags.leisure);
+      }
+      return 'Unnamed Garden or Park';
+
+    case 'historic_ensemble':
+      return 'Historic Ensemble';
+
+    default:
+      break;
+  }
+
+  // 4. Generic fallback priority
+  const fallbackKeys = [
+    'historic',
+    'building',
+    'tourism',
+    'amenity',
+    'artwork_type',
+    'memorial',
+  ];
+
+  for (const key of fallbackKeys) {
+    if (tags[key]) {
+      return capitalize(tags[key]);
+    }
+  }
+
+  // 5. Final fallback
+  return `Unnamed Site (${sourceId})`;
 };
 
 /**
@@ -41,94 +152,6 @@ const determineCulturalSiteDescription = (tags, name) => {
   return description;
 };
 
-// When information is received, a message is displayed
-/**
- * The address of the CulturalSite is determined through OSM element tags or Nominatim reverse geocoding.
- * @param {object} tags -tags object of OSM element.
- * @param {number} lat -Latitude.
- * @param {number} lon -Hardness.
- * @param {string} name -Name of CulturalSite.
- * @param {string} sourceId -sourceId of OSM element.
- * @returns {Promise<string>} Address determined.
- */
-// const determineCulturalSiteAddress = async (tags, lat, lon, name, sourceId) => {
-//   let address = '';
-//   if (tags['addr:street'] && tags['addr:housenumber']) {
-//     address = `${tags['addr:street']} ${tags['addr:housenumber']}`;
-//   } else if (tags['addr:full']) {
-//     address = tags['addr:full'];
-//   } else if (tags.address) {
-//     address = tags.address;
-//   } else if (tags.street && tags.housenumber) {
-//     address = `${tags.street} ${tags.housenumber}`;
-//   }
-//   if (tags['addr:postcode'] && address) address += `, ${tags['addr:postcode']}`;
-//   if (tags['addr:city'] && address) address += `, ${tags['addr:city']}`;
-//   else if (!address && tags.city) address = tags.city;
-
-//   // If there is no address information, try reverse geocoding through the Nominatim API.
-//   if (!address && lat && lon) {
-//     try {
-//       const nominatimResponse = await axios.get(NOMINATIM_API_URL, {
-//         params: {
-//           lat: lat,
-//           lon: lon,
-//           format: 'json',
-//           'accept-language': 'en',
-//           zoom: 18,
-//           addressdetails: 1,
-//         },
-//         headers: {
-//           'User-Agent': 'CulturalHeritageMap/2.0 (jxuholee@gmail.com)',
-//         },
-//       });
-//       const nominatimData = nominatimResponse.data;
-
-//       if (nominatimData && nominatimData.address) {
-//         const addr = nominatimData.address;
-//         let inferredAddress = '';
-
-//         // Organize addresses by priority
-//         if (addr.road && addr.house_number) {
-//           inferredAddress = `${addr.road} ${addr.house_number}`;
-//         } else if (addr.road) {
-//           inferredAddress = addr.road;
-//         } else if (addr.building) {
-//           inferredAddress = addr.building;
-//         } else if (addr.hamlet) {
-//           inferredAddress = addr.hamlet;
-//         } else if (addr.village) {
-//           inferredAddress = addr.village;
-//         } else if (addr.town) {
-//           inferredAddress = addr.town;
-//         } else if (addr.city) {
-//           inferredAddress = addr.city;
-//         }
-
-//         if (addr.postcode && inferredAddress)
-//           inferredAddress += `, ${addr.postcode}`;
-//         if (addr.city && inferredAddress && addr.city !== inferredAddress)
-//           inferredAddress += `, ${addr.city}`;
-//         else if (!inferredAddress && addr.city) inferredAddress = addr.city;
-
-//         if (inferredAddress) {
-//           address = inferredAddress;
-//           console.log(
-//             `Inferred address for ${name} (ID: ${sourceId}): ${address}`,
-//           );
-//         }
-//       }
-//     } catch (nominatimError) {
-//       console.warn(
-//         `Could not infer address for ${name} (ID: ${sourceId}) at [${lon}, ${lat}]:`,
-//         nominatimError.message,
-//       );
-//     }
-//   }
-//   return address;
-// };
-
-// Determine address without reverse geocodig
 
 const determineCulturalSiteAddress = async (tags, lat, lon, name, sourceId) => {
   const cityName = process.env.CITY_NAME || 'berlin';
@@ -340,6 +363,7 @@ const processOsmElementForCulturalSite = async (
 
   // 5. Final confirmation of required fields
   if (!name || !category || isNaN(parsedLat) || isNaN(parsedLon) || !sourceId) {
+    console.error(`Missing Info - Name: ${!!name}, Cat: ${!!category}, Lat: ${!isNaN(parsedLat)}`);
     throw new AppError(
       'Essential cultural heritage information (name, category, location, sourceId) cannot be extracted from OSM data.',
       400,
@@ -354,7 +378,7 @@ const processOsmElementForCulturalSite = async (
       type: 'Point',
       coordinates: [parsedLon, parsedLat],
     },
-    address, // 이제 객체입니다.
+    address, 
     website: tags.website || tags.url || '',
     imageUrl: tags.image || tags.thumbnail || '',
     openingHours: tags.opening_hours || '',
