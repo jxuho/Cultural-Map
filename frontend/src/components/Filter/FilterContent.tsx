@@ -1,8 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import useFilterStore from '../../store/filterStore.ts';
 import { CULTURAL_CATEGORY } from '../../config/culturalSiteConfig.ts';
 import debounce from 'lodash.debounce';
 import { categoryBorderColors } from '../../config/colors.ts';
+
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { RotateCcw, Search, X } from 'lucide-react';
 
 interface FilterContentProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen: boolean;
@@ -15,15 +19,13 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
       (state) => state.selectedCategories,
     );
     const toggleCategory = useFilterStore((state) => state.toggleCategory);
-    const searchQuery = useFilterStore((state) => state.searchQuery);
     const setSearchQuery = useFilterStore((state) => state.setSearchQuery);
-    const [localSearchInput, setLocalSearchInput] = React.useState(searchQuery);
+    const searchQuery = useFilterStore((state) => state.searchQuery);
+    const resetFilters = useFilterStore((state) => state.resetFilters);
+    const [localSearchInput, setLocalSearchInput] = useState(searchQuery);
 
     const debouncedSetSearchQuery = useMemo(
-      () =>
-        debounce((value) => {
-          setSearchQuery(value);
-        }, 300),
+      () => debounce((value) => setSearchQuery(value), 300),
       [setSearchQuery],
     );
 
@@ -38,104 +40,93 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
     const handleClearSearch = () => {
       setLocalSearchInput('');
       setSearchQuery('');
-      debouncedSetSearchQuery.cancel();
     };
 
-    const isPositioned =
-      floatingStyles &&
-      typeof floatingStyles.left === 'number' &&
-      typeof floatingStyles.top === 'number';
+    const handleResetAll = () => {
+      resetFilters();
+      setLocalSearchInput('');
+    };
+    const isFiltered = selectedCategories.length > 0 || searchQuery.length > 0;
 
     return (
       <div
         ref={ref}
         style={floatingStyles}
         className={`
-          bg-white shadow-lg rounded-lg p-2
-          transition-opacity duration-300
-          ${
-            isOpen && isPositioned
-              ? 'opacity-100 pointer-events-auto'
-              : 'opacity-0 pointer-events-none'
-          }
+          z-50 bg-popover text-popover-foreground shadow-xl rounded-xl p-4 border
+          w-[95vw] sm:w-[600px] max-w-[calc(100vw-32px)]
+          ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
         `}
         {...props}
       >
-        <div className="flex flex-wrap justify-center gap-2 pb-2">
+        {/* Top header area: title and reset button */}
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h3 className="text-sm font-semibold text-muted-foreground">
+            Filters
+          </h3>
+          {isFiltered && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleResetAll}
+              className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <RotateCcw className="w-3 h-3 mr-1" />
+              Reset All
+            </Button>
+          )}
+        </div>
+        {/* Category filter area */}
+        <div className="flex flex-wrap gap-2 mb-4">
           {CULTURAL_CATEGORY.map((category) => {
-            const isCategorySelected = selectedCategories.includes(category);
-            // Use the imported categoryBorderColors
-            const categorySpecificBorderColor =
-              categoryBorderColors[category] || categoryBorderColors.other;
-
-            // Define inline style for the border color
-            const buttonBorderStyle = {
-              borderColor: isCategorySelected
-                ? categorySpecificBorderColor
-                : 'transparent',
-              borderWidth: '3px', // Ensure border width is applied
-              borderStyle: 'solid', // Ensure border style is applied
-            };
+            const isSelected = selectedCategories.includes(category);
+            const color = categoryBorderColors[category] || '#64748b';
 
             return (
-              <button
+              <Button
                 key={category}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleCategory(category);
-                }}
-                // Apply inline style for border
-                style={buttonBorderStyle}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors
-                  ${
-                    isCategorySelected
-                      ? // Keep default background/text and add shadow when selected
-                        `bg-gray-100 text-gray-700 shadow-md`
-                      : // If not selected, use default gray background and no explicit shadow
-                        `bg-gray-100 text-gray-700 hover:bg-gray-200`
-                  }`}
+                variant={isSelected ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => toggleCategory(category)}
+                style={isSelected ? { backgroundColor: color } : {}}
+                className={`
+                  rounded-full transition-all text-xs h-8 px-4
+                  ${isSelected ? 'hover:opacity-90 border-none shadow-md' : 'hover:bg-accent'}
+                `}
               >
                 {category
                   .replace(/_/g, ' ')
                   .replace(/\b\w/g, (c) => c.toUpperCase())}
-              </button>
+              </Button>
             );
           })}
         </div>
 
-        <div className="p-2 relative">
-          <input
-            type="text"
+        {/* Search area */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
             value={localSearchInput}
             onChange={handleSearchInputChange}
-            placeholder="Search by name or description..."
-            className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 pr-10"
+            placeholder="Search for place name"
+            className="pl-9 pr-10 h-10 bg-muted/50 border-none focus-visible:ring-1 focus-visible:bg-background"
           />
           {localSearchInput && (
-            <button
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={handleClearSearch}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              aria-label="Clear search"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-transparent text-muted-foreground hover:text-foreground"
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
+              <X className="w-4 h-4" />
+            </Button>
           )}
         </div>
       </div>
     );
   },
 );
+
+FilterContent.displayName = 'FilterContent';
 
 export default FilterContent;
