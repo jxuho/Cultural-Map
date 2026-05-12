@@ -71,7 +71,7 @@ const queryOverpass = async (query) => {
         'Content-Type': 'text/plain',
         'User-Agent': 'CulturalHeritageMap/2.0 (jxuholee@gmail.com)',
       },
-      timeout: 60000, // Set timeout to 60 seconds
+      timeout: 120000, // Set timeout to 120 seconds
     });
     return response.data;
   } catch (error) {

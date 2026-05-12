@@ -6,6 +6,7 @@ const {
   processOsmElementForCulturalSite,
 } = require('../utils/osmDataProcessor');
 const { default: mongoose } = require('mongoose');
+const { log } = require('console');
 
 /**
  * Import GeoJSON /OSM data into MongoDB
@@ -162,29 +163,25 @@ async function runScript() {
   const shouldPerformReverseGeocoding = !args.includes('--no-reverse-geocode');
 
   try {
-    // 1. 환경 변수로부터 URI 가져오기
     const mongoUri = process.env.MONGO_URI;
     console.log(`📡 Connecting to MongoDB: ${mongoUri}`);
 
-    // 2. 명시적 연결 수행 (중요!)
     await mongoose.connect(mongoUri);
     console.log('✅ Connected to MongoDB successfully.');
 
-    // 3. 임포트 로직 실행
     await importGeojson(shouldPerformReverseGeocoding, cityName);
 
     console.log('🎉 Data import process finished.');
   } catch (err) {
     console.error('❌ Critical error during script execution:', err);
   } finally {
-    // 4. 프로세스 종료를 위해 연결 닫기
     await mongoose.connection.close();
     console.log('👋 MongoDB connection closed.');
     process.exit(0);
   }
 }
 
-// 스크립트 직접 실행 시
+// When executing the script directly (e.g., node importGeojson.js), run the main function
 if (require.main === module) {
   runScript();
 }

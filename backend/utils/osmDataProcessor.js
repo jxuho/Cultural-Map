@@ -194,42 +194,55 @@ const determineCulturalSiteAddressFromTags = (tags) => {
   return address;
 };
 
-/**
- * Map CulturalSite categories based on OSM element tags.
- * @param {object} tags -tags object of OSM element.
- * @returns {string} Mapped Category.
- * @throws {AppError} -When a valid category cannot be determined.
- */
+// Map OSM tags to our defined cultural heritage categories
 const mapCulturalSiteCategory = (tags) => {
-  // Category mapping (adapted to your desired category list) -new logic applied
-  let mappedCategory = 'other';
-  const amenity = tags.amenity;
-  const tourism = tags.tourism;
-
-  if (amenity && tourism) {
-    // When both amenity and tourism fields exist
-    if (amenity === 'restaurant' || amenity === 'Restaurant') {
-      mappedCategory = 'restaurant'; // First when amenity='restaurant'
-    } else if (tourism === 'artwork' || tourism === 'Artwork') {
-      mappedCategory = 'artwork';
-    }
-  } else if (amenity) {
-    // When only amenity exists
-    mappedCategory = amenity.toLowerCase();
-  } else if (tourism) {
-    // When only tourism exists
-    mappedCategory = tourism.toLowerCase();
+  if (tags['lda:criteria'] === "Ensemble" || tags['lda:criteria'] === "Gesamtanlage" || tags['lda:criteria'] === "Flächendenkmal") {
+    return 'historic_ensemble';
   }
-
-  const allowedCategories = CULTURAL_CATEGORY; // Use CULTURAL_CATEGORY imported from culturalSiteConfig
-  if (!allowedCategories.includes(mappedCategory)) {
-    mappedCategory = 'other';
+  if (tags.tourism === 'museum' || tags.tourism === 'gallery') {
+    return 'museums_galleries';
   }
-
-  // In this part, we removed the logic that throws an AppError in case of an invalid category.
-  // Changed to map to 'other' instead.
-  return mappedCategory;
+  if (tags.historic === 'monument' || tags.attraction === 'monument') {
+    return 'monument';
+  }
+  if (tags.historic === 'memorial') {
+    return 'memorial';
+  }
+  if (tags.historic === 'castle') {
+    return 'castle';
+  }
+  if (
+    ['church', 'cathedral', 'chapel', 'monastery', 'temple', 'shrine', 'mosque'].includes(tags.building) ||
+    ['monastery', 'church'].includes(tags.historic) || tags.amenity === 'place_of_worship'
+  ) {
+    return 'religious_heritage';
+  }
+  if (
+    ['theatre', 'arts_centre'].includes(tags.amenity) ||
+    tags.attraction === 'cultural'
+  ) {
+    return 'cultural_venues';
+  }
+  if (tags.tourism === 'artwork') {
+    return 'public_art';
+  }
+  if (tags.historic === "archaeological_site" || tags.historic === "ruins" || tags['lda:criteria'] === "Bodendenkmal") {
+    return 'archaeological_sites';
+  }
+  if (tags.highway === 'street_lamp' || tags.amenity === 'street_lamp') {
+    return 'industrial_heritage';
+  }
+  if (tags['lda:criteria'] === "Baudenkmal" || tags['heritage:description'] === "Baudenkmal" ||
+    tags.building || tags['lda:criteria'] === "Ensembleteil") {
+    return 'heritage_buildings';
+  }
+  if (tags['lda:criteria'] === 'Gartendenkmal' || tags.leisure === 'garden' || tags.leisure === 'park') {
+    return 'gardens_parks';
+  }
+  return 'other';
 };
+
+
 
 /**
  * Converts the OSM element object to a data format suitable for the CulturalSite schema.
@@ -314,9 +327,9 @@ const processOsmElementForCulturalSite = async (
   //   )
   //   : determineCulturalSiteAddressFromTags(tags); // New helper to only get address from tags
   const address = performReverseGeocoding
-  ? await determineCulturalSiteAddress(tags, parsedLat, parsedLon, name, sourceId)
-  : { 
-      fullAddress: determineCulturalSiteAddressFromTags(tags), 
+    ? await determineCulturalSiteAddress(tags, parsedLat, parsedLon, name, sourceId)
+    : {
+      fullAddress: determineCulturalSiteAddressFromTags(tags),
       street: tags['addr:street'] || '',
       houseNumber: tags['addr:housenumber'] || '',
       postcode: tags['addr:postcode'] || '',

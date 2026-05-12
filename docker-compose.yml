@@ -2,9 +2,10 @@ services:
   mongodb:
     image: mongo:latest
     container_name: mongodb_dev
+    hostname: localhost
     ports:
-      - "27018:27017"
-    command: ["--replSet", "rs0"]
+      - "27017:27017"
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
     volumes:
       - mongo_data:/data/db
 volumes:
