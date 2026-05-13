@@ -76,7 +76,7 @@ const getAllCulturalSites = asyncHandler(async (req, res, next) => {
     .sort(sortStr)
     .skip(skip)
     .limit(limit)
-    .select('_id name category location averageRating reviewCount imageUrl');
+    .select('_id name category location address averageRating reviewCount imageUrl');
 
   // 4. 전체 개수 확인 (페이지네이션용)
   const totalResults = await CulturalSite.countDocuments(queryFilter);

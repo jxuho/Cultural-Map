@@ -201,15 +201,40 @@ const MapComponent = () => {
     });
   }, [culturalSites, selectedCategories, searchQuery]);
 
-  // 데이터 로드 완료 시 아이콘 사전 생성
+  const filteredDistrictStats = useMemo(() => {
+    const statsMap: Record<string, number> = {};
+
+    memoizedFilteredSites.forEach((site) => {
+      const district = site.address?.district;
+      if (district) {
+        statsMap[district] = (statsMap[district] || 0) + 1;
+      }
+    });
+    return Object.entries(statsMap).map(([districtName, count]) => ({
+      _id: districtName,
+      count: count,
+    }));
+  }, [memoizedFilteredSites]);
+
+  const displayDistrictStats = useMemo(() => {
+    const isFiltering = selectedCategories.length > 0 || searchQuery.length > 0;
+
+    if (isFiltering) {
+      console.log(filteredDistrictStats);
+
+      return filteredDistrictStats;
+    }
+    return districtStats;
+  }, [districtStats, filteredDistrictStats, selectedCategories, searchQuery]);
+
+  // Create icon dictionary when data load is complete
   useEffect(() => {
     if (isSuccess && culturalSites.length > 0) {
-      // CPU가 비교적 한가한 백그라운드 시점에 무거운 renderToString 작업을 미리 마칩니다.
+      // Heavy renderToString work is pre-finished at a time in the background when the CPU is relatively free.
       preloadIcons();
       setIsWarmupCompleted(true);
     }
   }, [isSuccess, culturalSites.length]);
-
 
   useEffect(() => {
     if (!canStartWarmup || isWarmupEnabled || isWarmupCompleted) {
@@ -233,29 +258,30 @@ const MapComponent = () => {
     setZoomLevel(zoom);
   }, []);
 
-  const handleDistrictClick = useCallback((feature: DistrictBoundaryFeature) => {
-    const map = mapRef.current as unknown as L.Map | null;
-    if (!map) {
-      return;
-    }
+  const handleDistrictClick = useCallback(
+    (feature: DistrictBoundaryFeature) => {
+      const map = mapRef.current as unknown as L.Map | null;
+      if (!map) {
+        return;
+      }
 
-    const tempLayer = L.geoJSON(feature as any);
-    const featureBounds = tempLayer.getBounds();
-    if (featureBounds.isValid()) {
-      map.fitBounds(featureBounds, {
-        padding: [20, 20],
-        maxZoom: CLUSTER_LOD_ZOOM,
-        animate: true,
-      });
-    }
-  }, []);
+      const tempLayer = L.geoJSON(feature as any);
+      const featureBounds = tempLayer.getBounds();
+      if (featureBounds.isValid()) {
+        map.fitBounds(featureBounds, {
+          padding: [20, 20],
+          maxZoom: CLUSTER_LOD_ZOOM,
+          animate: true,
+        });
+      }
+    },
+    [],
+  );
 
   const shouldShowClusterLoadingOverlay =
     shouldShowCluster &&
-    (
-      (!isWarmupCompleted && culturalSites.length === 0) ||
-      (isLoading && culturalSites.length === 0)
-    );
+    ((!isWarmupCompleted && culturalSites.length === 0) ||
+      (isLoading && culturalSites.length === 0));
   const shouldShowClusterUpdatingBadge =
     shouldShowCluster && isFetching && culturalSites.length > 0;
   const shouldShowClusterErrorOverlay = shouldShowCluster && isError;
@@ -307,13 +333,15 @@ const MapComponent = () => {
         <MapCenterUpdater />
         <ViewportTracker onZoomChanged={handleZoomChanged} />
 
-        {!shouldShowCluster && districtBoundaries && !isDistrictBoundaryLoading && (
-          <DistrictMarkers
-            boundaries={districtBoundaries}
-            stats={districtStats}
-            onDistrictClick={handleDistrictClick}
-          />
-        )}
+        {!shouldShowCluster &&
+          districtBoundaries &&
+          !isDistrictBoundaryLoading && (
+            <DistrictMarkers
+              boundaries={districtBoundaries}
+              stats={displayDistrictStats}
+              onDistrictClick={handleDistrictClick}
+            />
+          )}
 
         {shouldShowCluster && (
           <CulturalSiteMarkers
