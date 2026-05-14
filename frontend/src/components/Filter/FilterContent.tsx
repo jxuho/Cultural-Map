@@ -7,6 +7,7 @@ import { categoryBorderColors } from '../../config/colors.ts';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { RotateCcw, Search, X } from 'lucide-react';
+import { useAllCulturalSites } from '@/hooks/data/useCulturalSitesQueries.ts';
 
 interface FilterContentProps extends React.HTMLAttributes<HTMLDivElement> {
   isOpen: boolean;
@@ -18,11 +19,17 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
     const selectedCategories = useFilterStore(
       (state) => state.selectedCategories,
     );
+    const { data: culturalSites = [] } = useAllCulturalSites();
+    const getFilteredSites = useFilterStore((state) => state.getFilteredSites);
     const toggleCategory = useFilterStore((state) => state.toggleCategory);
     const setSearchQuery = useFilterStore((state) => state.setSearchQuery);
     const searchQuery = useFilterStore((state) => state.searchQuery);
     const resetFilters = useFilterStore((state) => state.resetFilters);
     const [localSearchInput, setLocalSearchInput] = useState(searchQuery);
+
+    const filteredCount = useMemo(() => {
+      return getFilteredSites(culturalSites).length;
+    }, [culturalSites, getFilteredSites, selectedCategories, searchQuery]);
 
     const debouncedSetSearchQuery = useMemo(
       () => debounce((value) => setSearchQuery(value), 300),
@@ -60,21 +67,32 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
         {...props}
       >
         {/* Top header area: title and reset button */}
-        <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-sm font-semibold text-muted-foreground">
-            Filters
-          </h3>
-          {isFiltered && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleResetAll}
-              className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <RotateCcw className="w-3 h-3 mr-1" />
-              Reset All
-            </Button>
-          )}
+
+        {/* Top header area */}
+        <div className="flex items-center justify-between mb-4 px-1 min-h-[32px]">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-muted-foreground">
+              Filters
+            </h3>
+            <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+              {filteredCount} sites found
+            </span>
+          </div>
+          <div className="flex items-center">
+            {isFiltered ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetAll}
+                className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <RotateCcw className="w-3 h-3 mr-1" />
+                Reset All
+              </Button>
+            ) : (
+              <div className="h-8 w-[80px]" />
+            )}
+          </div>
         </div>
         {/* Category filter area */}
         <div className="flex flex-wrap gap-2 mb-4">
