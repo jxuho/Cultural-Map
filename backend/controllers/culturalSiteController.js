@@ -168,6 +168,7 @@ const getCulturalSiteById = asyncHandler(async (req, res, next) => {
         registeredBy: { $first: '$registeredBy' },
         createdAt: { $first: '$createdAt' },
         updatedAt: { $first: '$updatedAt' },
+        originalTags: { $first: '$originalTags' },
         // Re-arrange review information (before sorting options)
         reviews: {
           $push: {
@@ -251,6 +252,7 @@ const getCulturalSiteById = asyncHandler(async (req, res, next) => {
         reviews: 1, // Review data is also returned
         averageRating: 1,
         reviewCount: 1,
+        originalTags: 1,
       },
     },
   );

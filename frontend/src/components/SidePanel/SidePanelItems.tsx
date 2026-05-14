@@ -312,14 +312,47 @@ const SidePanelItems = ({
             </div>
           )}
 
-          {/* Message if no additional info */}
-          {!selectedPlaceData.description &&
-            !selectedPlaceData.website &&
-            !selectedPlaceData.openingHours &&
-            selectedPlaceData.reviewCount === 0 && (
-              <p className="text-gray-600 text-center py-8 text-md">
-                No additional information available.
-              </p>
+          {selectedPlaceData.originalTags &&
+            Object.keys(selectedPlaceData.originalTags).length > 0 && (
+              <div className="mb-6 bg-white p-5 rounded-lg shadow-md border border-gray-100">
+                <h3 className="text-lg font-bold text-gray-800 mb-3 pb-2 border-b-2 border-blue-100">
+                  Additional Info (Tags)
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(selectedPlaceData.originalTags).map(
+                    ([key, value]) => {
+                      if (key === 'name') return null;
+
+                      const stringValue = String(value);
+                      const isUrl = stringValue.startsWith('http');
+
+                      return (
+                        <div
+                          key={key}
+                          className="flex items-start px-3 py-1 bg-gray-50 text-gray-600 text-xs font-medium rounded-md border border-gray-200 max-w-full"
+                        >
+                          <span className="text-blue-500 mr-1.5 font-bold shrink-0">
+                            {key}:
+                          </span>
+
+                          {isUrl ? (
+                            <a
+                              href={stringValue}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:underline break-all transition-colors duration-200"
+                            >
+                              {stringValue}
+                            </a>
+                          ) : (
+                            <span className="break-all">{stringValue}</span>
+                          )}
+                        </div>
+                      );
+                    },
+                  )}
+                </div>
+              </div>
             )}
         </div>
       )}

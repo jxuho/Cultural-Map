@@ -18,7 +18,7 @@ const FilterButton = React.forwardRef<HTMLButtonElement, FilterButtonProps>(
         {...props}
       >
         <span className="mr-2">
-          {isOpen ? 'Close Filters' : 'Open Filters'}
+          {isOpen ? 'Close Filter' : 'Search & Filter'}
         </span>
         <svg
           className={`w-4 h-4 transform transition-transform duration-300 ${
