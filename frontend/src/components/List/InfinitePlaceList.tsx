@@ -7,13 +7,12 @@ interface InfinitePlaceListProps {
   onItemClick: (site: Place) => void;
 }
 
-const ITEMS_PER_PAGE = 20; // 한 번에 추가할 개수
+const ITEMS_PER_PAGE = 20; 
 
 const InfinitePlaceList: React.FC<InfinitePlaceListProps> = ({ items, onItemClick }) => {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const observerTarget = useRef<HTMLDivElement>(null);
 
-  // 검색어나 필터가 바뀌어 items가 변경되면 노출 개수 초기화
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
   }, [items]);
@@ -41,7 +40,6 @@ const InfinitePlaceList: React.FC<InfinitePlaceListProps> = ({ items, onItemClic
         ))}
       </div>
       
-      {/* 스크롤 감지 타겟 */}
       <div ref={observerTarget} className="h-20 flex items-center justify-center">
         {visibleCount < items.length && (
           <p className="text-gray-500 animate-pulse">Loading more sites...</p>

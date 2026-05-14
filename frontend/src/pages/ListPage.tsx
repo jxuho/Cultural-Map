@@ -16,38 +16,22 @@ const ListPage: React.FC = () => {
     error,
   } = useAllCulturalSites();
 
-  const selectedCategories = useFilterStore(
-    (state) => state.selectedCategories,
-  );
-  const searchQuery = useFilterStore((state) => state.searchQuery);
-  const sortBy = useFilterStore((state) => state.sortBy);
   const setSortBy = useFilterStore((state) => state.setSortBy);
+  const { searchQuery, selectedCategories, sortBy, getFilteredSites } =
+    useFilterStore();
 
   const openSidePanel = useUiStore((state) => state.openSidePanel);
   const setJumpToPlace = useUiStore((state) => state.setJumpToPlace);
 
-  // 데이터 필터링 및 정렬 로직을 useMemo로 감싸 성능 최적화
   const processedSites = useMemo(() => {
-    const query = searchQuery.toLowerCase();
-    let filtered = culturalSites.filter((site) => {
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(site.category);
-      const matchesSearch =
-        site.name.toLowerCase().includes(query) ||
-        site.description?.toLowerCase().includes(query);
-      return matchesCategory && matchesSearch;
-    });
-
-    return filtered.sort((a, b) => {
-      if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);
-      if (sortBy === 'reviews')
-        return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
-      if (sortBy === 'favorites')
-        return (b.favoritesCount ?? 0) - (a.favoritesCount ?? 0);
-      return 0;
-    });
-  }, [culturalSites, selectedCategories, searchQuery, sortBy]);
+    return getFilteredSites(culturalSites);
+  }, [
+    culturalSites,
+    searchQuery,
+    selectedCategories,
+    sortBy,
+    getFilteredSites,
+  ]);
 
   const handleCardClick = (site: any) => {
     navigate('/');

@@ -10,11 +10,12 @@ interface FilterState {
   setSearchQuery: (query: string) => void;
   setSortBy: (sortOption: 'alphabetical' | 'favorites' | 'reviews') => void;
   resetFilters: () => void;
+  getFilteredSites: (sites: any[]) => any[];
 }
 
 // Create a store to manage filter and sort-related state
 const useFilterStore = create<FilterState>()(
-  devtools((set) => ({
+  devtools((set, get) => ({
     selectedCategories: [],
     searchQuery: '',
     sortBy: 'alphabetical',
@@ -36,6 +37,30 @@ const useFilterStore = create<FilterState>()(
         searchQuery: '',
         sortBy: 'alphabetical',
       }),
+
+    getFilteredSites: (sites) => {
+      const { searchQuery, selectedCategories, sortBy } = get();
+      const query = searchQuery.toLowerCase();
+
+      const filtered = sites.filter((site) => {
+        const matchesCategory =
+          selectedCategories.length === 0 ||
+          selectedCategories.includes(site.category);
+        const matchesSearch =
+          site.name.toLowerCase().includes(query) ||
+          site.description?.toLowerCase().includes(query);
+        return matchesCategory && matchesSearch;
+      });
+
+      return [...filtered].sort((a, b) => {
+        if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);
+        if (sortBy === 'reviews')
+          return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
+        if (sortBy === 'favorites')
+          return (b.favoritesCount ?? 0) - (a.favoritesCount ?? 0);
+        return 0;
+      });
+    },
   })),
 );
 
