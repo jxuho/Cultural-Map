@@ -8,6 +8,7 @@ import {
 import StarIcon from '../StarIcon';
 import { Review } from '../../types/review';
 import { User } from '../../types/user';
+import { Trash2, Send, Edit3 } from 'lucide-react'; // 아이콘 추가
 
 interface ReviewFormProps {
   placeId: string;
@@ -45,10 +46,7 @@ const ReviewForm = ({
 
   const handleStarClick = useCallback(
     (clickedIndex: number) => {
-      if (!currentUser) {
-        alert('Please sign in to write down a review!');
-        return;
-      }
+      if (!currentUser) return;
       setRating(clickedIndex + 1);
     },
     [currentUser],
@@ -57,25 +55,11 @@ const ReviewForm = ({
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
       e.preventDefault();
-
-      if (!currentUser) {
-        alert('You can write down a review after signin.');
-        return;
-      }
-
-      if (rating === 0) {
-        alert('Please choose your rating!');
-        return;
-      }
+      if (!currentUser || rating === 0) return;
 
       try {
         if (userReview) {
-          await onReviewActionCompleted(
-            'update',
-            rating,
-            userReview.rating,
-            comment,
-          );
+          await onReviewActionCompleted('update', rating, userReview.rating, comment);
         } else {
           await onReviewActionCompleted('create', rating, null, comment);
         }
@@ -87,14 +71,8 @@ const ReviewForm = ({
   );
 
   const handleDelete = useCallback(async () => {
-    if (!currentUser) {
-      alert('You can delete your review after signin.');
-      return;
-    }
-
-    if (!userReview || !window.confirm('Do you want to delete this review?')) {
-      return;
-    }
+    if (!currentUser || !userReview) return;
+    if (!window.confirm('Archive records for this entry will be removed. Continue?')) return;
 
     try {
       await onReviewActionCompleted('delete', null, userReview.rating);
@@ -104,87 +82,81 @@ const ReviewForm = ({
   }, [userReview, onReviewActionCompleted, currentUser]);
 
   return (
-    <div className="p-4 border-b border-gray-200 bg-white">
-      {currentUser ? (
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">
-          {userReview ? 'My Review' : 'Write Review'}
+    <div className="p-6 bg-white border-b border-black">
+      {/* Label & Error */}
+      <div className="flex justify-between items-baseline mb-6">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-black">
+          {userReview ? 'Edit Contribution' : 'New Contribution'}
         </h3>
-      ) : (
-        <h3 className="text-lg font-semibold text-gray-600 mb-3">
-          Please sign in to write down a review.
-        </h3>
-      )}
-
-      {submitError && (
-        <p className="text-red-600 text-sm mb-3">{submitError}</p>
-      )}
-
-      <div className="flex flex-wrap items-center mb-3">
-        <span className="font-medium text-gray-700 mr-2">Rating:</span>
-        <div className="flex">
-          {[...Array(5)].map((_, i) => (
-            <StarIcon
-              key={i}
-              rating={rating}
-              index={i}
-              className={`w-6 h-6 ${currentUser ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-              onClick={() => handleStarClick(i)}
-            />
-          ))}
-        </div>
-        {rating > 0 && (
-          <span className="ml-2 text-gray-700 font-bold">
-            {rating.toFixed(1)}
+        {submitError && (
+          <span className="text-[10px] font-bold text-red-500 uppercase animate-pulse">
+            Error: {submitError}
           </span>
         )}
       </div>
 
-      <div className="mb-3">
-        <label htmlFor="reviewComment" className="sr-only">
-          Review message
-        </label>
-        <textarea
-          id="reviewComment"
-          className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-800 resize-y"
-          rows={3}
-          placeholder={
-            currentUser
-              ? 'Please write down your review...'
-              : 'You can write down a review after signin.'
-          }
-          value={comment}
-          onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-            setComment(e.target.value)
-          }
-          disabled={isSubmitting || !currentUser}
-        ></textarea>
+      {/* Rating System */}
+      <div className="mb-6 p-4 border border-black bg-[#fdfdfd]">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-tighter text-gray-400">Score</span>
+          <div className="flex gap-1">
+            {[...Array(5)].map((_, i) => (
+              <StarIcon
+                key={i}
+                rating={rating}
+                index={i}
+                className={`w-5 h-5 transition-transform ${currentUser ? 'cursor-pointer hover:scale-110 active:scale-95' : 'opacity-30 cursor-not-allowed'}`}
+                onClick={() => handleStarClick(i)}
+              />
+            ))}
+          </div>
+          <span className="font-mono text-xs font-bold w-6 text-right">
+            {rating > 0 ? rating : '--'}
+          </span>
+        </div>
       </div>
 
+      {/* Comment Input */}
+      <div className="mb-6 relative">
+        <textarea
+          id="reviewComment"
+          className="w-full p-4 border border-black rounded-none focus:ring-0 focus:border-black text-sm text-gray-800 placeholder:text-gray-300 bg-white min-h-[120px] resize-none font-serif leading-relaxed"
+          placeholder={currentUser ? "Share your archival findings..." : "Authentication required to contribute."}
+          value={comment}
+          onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
+          disabled={isSubmitting || !currentUser}
+        />
+        <div className="absolute bottom-[-1px] right-[-1px] w-4 h-4 bg-black border-t border-l border-white" />
+      </div>
+
+      {/* Action Buttons */}
       {currentUser && (
-        <div className="flex justify-end space-x-2">
+        <div className="flex gap-2 h-12">
           {userReview && (
             <button
               type="button"
               onClick={handleDelete}
-              className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors disabled:bg-red-300 disabled:cursor-not-allowed"
               disabled={isSubmitting}
+              className="flex-1 flex items-center justify-center gap-2 border border-black text-black hover:bg-red-500 hover:text-white transition-all duration-300 disabled:opacity-30"
             >
-              {isSubmitting ? 'Deleting...' : 'Delete'}
+              <Trash2 size={16} />
+              <span className="text-[11px] font-black uppercase tracking-widest">Remove</span>
             </button>
           )}
           <button
             type="submit"
             onClick={handleSubmit}
-            className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
-            disabled={isSubmitting}
+            disabled={isSubmitting || rating === 0}
+            className={`flex-[2] flex items-center justify-center gap-2 bg-black text-white hover:bg-gray-800 transition-all duration-300 disabled:bg-gray-200 disabled:text-gray-400`}
           >
-            {isSubmitting
-              ? userReview
-                ? 'Modifying...'
-                : 'Submitting...'
-              : userReview
-                ? 'Modify'
-                : 'Submit'}
+            {isSubmitting ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white animate-spin rounded-full" />
+            ) : (
+              userReview ? <Edit3 size={16} /> : <Send size={16} />
+            )}
+            <span className="text-[11px] font-black uppercase tracking-widest">
+              {isSubmitting ? 'Syncing...' : userReview ? 'Update Entry' : 'Post Entry'}
+            </span>
           </button>
         </div>
       )}

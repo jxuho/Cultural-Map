@@ -6,6 +6,7 @@ import MainLayout from './layouts/MainLayout';
 import LoadingSpinner from './components/LoadingSpinner';
 import ProtectedRoute from './components/ProtectedRoute';
 import Modal from './components/Modal';
+import DashboardPage from './pages/DashboardPage';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const SignInPage = lazy(() => import('./pages/SignInPage'));
@@ -52,8 +53,8 @@ const App = () => {
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
             <Route path="list" element={<ListPage />} />
-
             <Route element={<ProtectedRoute />}>
+              <Route path="dashboard/*" element={<DashboardPage />} />
               <Route path="my-account" element={<MyAccountPage />}>
                 <Route index element={<ProfileView />} />
                 <Route path="update-profile" element={<UpdateProfile />} />

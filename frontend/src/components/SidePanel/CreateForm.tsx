@@ -1,4 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
+import { X, ArrowRight, Loader2, AlertCircle, Info } from 'lucide-react';
 import useUiStore from '../../store/uiStore';
 import useAuthStore from '../../store/authStore';
 import { useCreateCulturalSite } from '../../hooks/data/useCulturalSitesQueries';
@@ -18,7 +19,7 @@ interface FormData {
   category: string;
   imageUrl: string;
   openingHours: string;
-  address: string; // UI 입력 및 관리를 위해 string 유지
+  address: string;
   website: string;
   proposalMessage: string;
   location: LocationData | null;
@@ -64,13 +65,13 @@ const CreateForm: React.FC = () => {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [submissionError, setSubmissionError] = useState<string | null>(null);
 
-  // --- Effects ---
+  // --- Effects (기존 로직 보존) ---
   useEffect(() => {
     if (createFormData) {
-      // 주소 데이터가 객체인지 문자열인지 확인하여 안전하게 로드
-      const initialAddress = typeof createFormData.address === 'object' 
-        ? createFormData.address.fullAddress 
-        : (createFormData.address || '');
+      const initialAddress =
+        typeof createFormData.address === 'object'
+          ? createFormData.address.fullAddress
+          : createFormData.address || '';
 
       setFormData({
         name: createFormData.name || '',
@@ -96,12 +97,8 @@ const CreateForm: React.FC = () => {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
 
-    // Reset error state
     if (formErrors[name as keyof FormErrors]) {
       setFormErrors((prevErrors) => ({ ...prevErrors, [name]: undefined }));
     }
@@ -137,7 +134,6 @@ const CreateForm: React.FC = () => {
       return;
     }
 
-    // 백엔드 Address 스키마에 맞게 데이터 구조화
     const commonSiteData = {
       name: formData.name,
       description: formData.description,
@@ -148,11 +144,11 @@ const CreateForm: React.FC = () => {
       },
       address: {
         fullAddress: formData.address,
-        district: "", // 필요 시 추출 로직 추가 가능
-        street: "",
-        houseNumber: "",
-        postcode: "",
-        city: "",
+        district: '',
+        street: '',
+        houseNumber: '',
+        postcode: '',
+        city: '',
       },
       website: formData.website,
       imageUrl: formData.imageUrl,
@@ -165,7 +161,6 @@ const CreateForm: React.FC = () => {
     try {
       if (role === 'admin') {
         await createCulturalSiteMutation.mutateAsync(commonSiteData);
-        alert('New cultural site added successfully by admin!');
       } else {
         const proposalBody = {
           proposalType: 'create' as const,
@@ -173,7 +168,6 @@ const CreateForm: React.FC = () => {
           ...commonSiteData,
         };
         await submitProposalMutation.mutateAsync(proposalBody);
-        alert('Proposal submitted successfully!');
       }
       closeCreateForm();
       closeSidePanel();
@@ -191,287 +185,322 @@ const CreateForm: React.FC = () => {
     role === 'admin'
       ? createCulturalSiteMutation.isPending
       : submitProposalMutation.isPending;
-
   const categories = CULTURAL_CATEGORY;
 
-  // --- Rendering ---
+  // --- UI Styling Helper ---
+  const inputBase = (hasError?: string) => `
+    mt-1.5 block w-full bg-white border ${hasError ? 'border-red-500 shadow-[0_0_0_1px_rgba(239,68,68,1)]' : 'border-gray-200'} 
+    px-4 py-3 text-[13px] transition-all duration-200
+    placeholder:text-gray-300 focus:border-black focus:ring-0 outline-none
+  `;
+  const labelBase =
+    'block text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 ml-1';
+
   if (isSubmitting) {
     return (
-      <div className="p-4 text-gray-600 text-center relative">
-        <div className="absolute top-4 right-4">
-          <button
-            className="text-gray-500 hover:text-gray-700 text-4xl font-bold hover:cursor-pointer p-1"
-            onClick={() => {
-              closeCreateForm();
-              closeSidePanel();
-            }}
-            aria-label="Close proposal form"
-          >
-            &times;
-          </button>
-        </div>
-        <p className="mt-10">Submitting...</p>
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto mt-4"></div>
+      <div className="h-full flex flex-col items-center justify-center p-8 bg-white border-l border-black">
+        <Loader2 className="w-10 h-10 animate-spin text-black mb-4" />
+        <p className="text-[11px] font-black uppercase tracking-widest text-gray-500">
+          Syncing with Archive...
+        </p>
       </div>
     );
   }
 
   if (!createFormData) {
     return (
-      <div className="p-4 text-gray-600 text-center">
-        Loading cultural site information to propose...
+      <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-gray-50 border-l border-black">
+        <p className="text-[11px] font-black uppercase tracking-widest text-gray-400 italic">
+          Fetching metadata...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="grow overflow-y-auto p-4 relative">
-      <div className="absolute top-4 right-4 z-10">
+    <div className="h-full flex flex-col bg-white overflow-hidden border-l border-black">
+      {/* Header */}
+      <div className="px-6 py-8 border-b border-black flex items-start justify-between bg-white sticky top-0 z-20">
+        <div>
+          <h2 className="text-2xl font-black tracking-tight leading-none text-black">
+            {role === 'admin' ? 'REGISTRY' : 'CONTRIBUTION'}
+          </h2>
+          <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-gray-400 mt-2">
+            {role === 'admin'
+              ? 'Administrative Entry Mode'
+              : 'Digital Archive Proposal'}
+          </p>
+        </div>
         <button
-          className="text-gray-500 hover:text-gray-700 text-4xl font-bold hover:cursor-pointer p-1"
           onClick={() => {
             closeCreateForm();
             closeSidePanel();
           }}
-          aria-label="Close proposal form"
+          className="p-2 hover:bg-black hover:text-white transition-all duration-300"
         >
-          &times;
+          <X size={20} />
         </button>
       </div>
 
-      <h2 className="text-xl font-bold mb-4 pr-10">
-        {role === 'admin'
-          ? 'Add New Cultural Site (Admin)'
-          : 'Propose New Cultural Site'}
-      </h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {Object.keys(formErrors).length > 0 && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-            role="alert"
-          >
-            <strong className="font-bold">Validation Error!</strong>
-            <span className="block sm:inline">
-              {' '}
-              Please correct the highlighted fields.
-            </span>
-          </div>
-        )}
-
-        {submissionError && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-            role="alert"
-          >
-            <strong className="font-bold">Submission Failed!</strong>
-            <span className="block sm:inline"> {submissionError}</span>
-          </div>
-        )}
-
-        {/* Name */}
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-            Name *
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          {formErrors.name && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.name}</p>
+      {/* Main Form Body */}
+      <div className="flex-1 overflow-y-auto px-6 py-8 custom-scrollbar">
+        <form onSubmit={handleSubmit} className="space-y-10 max-w-2xl mx-auto">
+          {/* Error Feedback */}
+          {(Object.keys(formErrors).length > 0 || submissionError) && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 flex items-center gap-3 animate-in fade-in slide-in-from-left-2">
+              <AlertCircle className="text-red-500 shrink-0" size={18} />
+              <div className="text-[11px] font-bold text-red-700 uppercase tracking-wider">
+                {submissionError ||
+                  'Validation failed. Please review highlighted fields.'}
+              </div>
+            </div>
           )}
-        </div>
 
-        {/* Description */}
-        <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={3}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-          ></textarea>
-        </div>
+          {/* 01. Essential Metadata */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-4 mb-2">
+              <span className="text-[12px] font-black font-mono">01</span>
+              <div className="h-[1px] grow bg-gray-100" />
+            </div>
 
-        {/* Category */}
-        <div>
-          <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-            Category *
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.replace(/_/g, ' ')}
-              </option>
-            ))}
-          </select>
-          {formErrors.category && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.category}</p>
-          )}
-        </div>
+            <div>
+              <label htmlFor="name" className={labelBase}>
+                Site Name *
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={inputBase(formErrors.name)}
+                placeholder="Official Name"
+              />
+              {formErrors.name && (
+                <p className="text-[9px] font-bold text-red-500 mt-1 uppercase">
+                  {formErrors.name}
+                </p>
+              )}
+            </div>
 
-        {/* Image URL */}
-        <div>
-          <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
-            Image URL
-          </label>
-          <input
-            type="url"
-            id="imageUrl"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., http://example.com/image.jpg"
-          />
-        </div>
+            <div>
+              <label htmlFor="category" className={labelBase}>
+                Classification *
+              </label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className={inputBase(formErrors.category)}
+              >
+                <option value="">Choose Category</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat.replace(/_/g, ' ')}
+                  </option>
+                ))}
+              </select>
+              {formErrors.category && (
+                <p className="text-[9px] font-bold text-red-500 mt-1 uppercase">
+                  {formErrors.category}
+                </p>
+              )}
+            </div>
 
-        {/* Opening Hours */}
-        <div>
-          <label htmlFor="openingHours" className="block text-sm font-medium text-gray-700">
-            Opening Hours
-          </label>
-          <input
-            type="text"
-            id="openingHours"
-            name="openingHours"
-            value={formData.openingHours}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., Mo-Fr 09:00-17:00"
-          />
-        </div>
+            <div>
+              <label htmlFor="description" className={labelBase}>
+                Brief History / Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows={3}
+                className={`${inputBase()} resize-none`}
+                placeholder="Key historical facts..."
+              />
+            </div>
+          </section>
 
-        {/* Address */}
-        <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-            Address *
-          </label>
-          <input
-            type="text"
-            id="address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          {formErrors.address && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.address}</p>
-          )}
-        </div>
+          {/* 02. Spatial Records */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-4 mb-2">
+              <span className="text-[12px] font-black font-mono">02</span>
+              <div className="h-[1px] grow bg-gray-100" />
+            </div>
 
-        {/* Website */}
-        <div>
-          <label htmlFor="website" className="block text-sm font-medium text-gray-700">
-            Website
-          </label>
-          <input
-            type="url"
-            id="website"
-            name="website"
-            value={formData.website}
-            onChange={handleChange}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="e.g., https://example.com"
-          />
-        </div>
+            <div>
+              <label htmlFor="address" className={labelBase}>
+                Address *
+              </label>
+              <input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className={inputBase(formErrors.address)}
+              />
+              {formErrors.address && (
+                <p className="text-[9px] font-bold text-red-500 mt-1 uppercase">
+                  {formErrors.address}
+                </p>
+              )}
+            </div>
 
-        {/* Location Info (Read-Only) */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Latitude (Read-Only)
-            </label>
-            <input
-              type="text"
-              value={formData.location?.coordinates[1] || ''}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Longitude (Read-Only)
-            </label>
-            <input
-              type="text"
-              value={formData.location?.coordinates[0] || ''}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
-              readOnly
-            />
-          </div>
-        </div>
-        {formErrors.location && (
-          <p className="text-red-500 text-xs mt-1">{formErrors.location}</p>
-        )}
-
-        {/* Source ID */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Original OSM ID (Read-Only)
-          </label>
-          <input
-            type="text"
-            value={formData.sourceId}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 bg-gray-100 cursor-not-allowed"
-            readOnly
-          />
-        </div>
-
-        {/* Proposal Message */}
-        {role !== 'admin' && (
-          <div>
-            <label
-              htmlFor="proposalMessage"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Proposal Message *
-            </label>
-            <textarea
-              id="proposalMessage"
-              name="proposalMessage"
-              value={formData.proposalMessage}
-              onChange={handleChange}
-              rows={4}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Please provide a detailed reason for proposing this cultural site."
-            ></textarea>
-            {formErrors.proposalMessage && (
-              <p className="text-red-500 text-xs mt-1">
-                {formErrors.proposalMessage}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelBase}>Latitude</label>
+                <input
+                  type="text"
+                  value={formData.location?.coordinates[1] || ''}
+                  className={`${inputBase()} bg-gray-50 text-gray-400 border-dashed cursor-not-allowed`}
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className={labelBase}>Longitude</label>
+                <input
+                  type="text"
+                  value={formData.location?.coordinates[0] || ''}
+                  className={`${inputBase()} bg-gray-50 text-gray-400 border-dashed cursor-not-allowed`}
+                  readOnly
+                />
+              </div>
+            </div>
+            {formErrors.location && (
+              <p className="text-[9px] font-bold text-red-500 mt-1 uppercase">
+                {formErrors.location}
               </p>
             )}
-          </div>
-        )}
+          </section>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 transition-colors"
-          disabled={isSubmitting}
-        >
-          {isSubmitting
-            ? 'Submitting...'
-            : role === 'admin'
-              ? 'Add New Cultural Site'
-              : 'Submit Proposal'}
-        </button>
-      </form>
+          {/* 03. Technical Context */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-4 mb-2">
+              <span className="text-[12px] font-black font-mono">03</span>
+              <div className="h-[1px] grow bg-gray-100" />
+            </div>
+
+            <div>
+              <label htmlFor="openingHours" className={labelBase}>
+                Opening Hours
+              </label>
+              <input
+                type="text"
+                id="openingHours"
+                name="openingHours"
+                value={formData.openingHours}
+                onChange={handleChange}
+                className={inputBase()}
+                placeholder="e.g., Mo-Fr 10:00-18:00"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="imageUrl" className={labelBase}>
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  id="imageUrl"
+                  name="imageUrl"
+                  value={formData.imageUrl}
+                  onChange={handleChange}
+                  className={inputBase()}
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <label htmlFor="website" className={labelBase}>
+                  Website
+                </label>
+                <input
+                  type="url"
+                  id="website"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  className={inputBase()}
+                  placeholder="https://..."
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className={labelBase}>Source ID (OSM)</label>
+              <input
+                type="text"
+                value={formData.sourceId}
+                className={`${inputBase()} bg-gray-50 text-gray-400 border-dashed cursor-not-allowed`}
+                readOnly
+              />
+            </div>
+          </section>
+
+          {/* 04. Proposal Statement (If not admin) */}
+          {role !== 'admin' && (
+            <section className="pt-6 border-t-2 border-black">
+              <div className="bg-black text-white px-3 py-1.5 inline-block text-[10px] font-black uppercase tracking-widest mb-4">
+                Statement of Significance
+              </div>
+              <div>
+                <label htmlFor="proposalMessage" className={labelBase}>
+                  Reason for Proposal *
+                </label>
+                <textarea
+                  id="proposalMessage"
+                  name="proposalMessage"
+                  value={formData.proposalMessage}
+                  onChange={handleChange}
+                  rows={4}
+                  className={`${inputBase(formErrors.proposalMessage)} bg-gray-50`}
+                  placeholder="Explain why this site is a valuable addition to Berlin Heritage..."
+                />
+                {formErrors.proposalMessage && (
+                  <p className="text-[9px] font-bold text-red-500 mt-1 uppercase">
+                    {formErrors.proposalMessage}
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Action Footer */}
+          <div className="pt-8 pb-12 border-t border-gray-100">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="group w-full bg-black text-white py-5 px-8 flex items-center justify-between hover:bg-zinc-800 transition-all duration-300 disabled:bg-gray-200 disabled:cursor-not-allowed"
+            >
+              <span className="text-[12px] font-black uppercase tracking-[0.3em]">
+                {isSubmitting
+                  ? 'Processing...'
+                  : role === 'admin'
+                    ? 'Add To Archive'
+                    : 'Submit Proposal'}
+              </span>
+              {!isSubmitting && (
+                <ArrowRight
+                  size={18}
+                  className="group-hover:translate-x-2 transition-transform"
+                />
+              )}
+            </button>
+            <div className="mt-6 p-4 bg-gray-50 flex items-start gap-3">
+              <Info size={14} className="text-gray-400 mt-0.5" />
+              <p className="text-[9px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                All submissions are reviewed by the registry board. <br />
+                Accuracy is essential for maintaining the digital collection
+                standards.
+              </p>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

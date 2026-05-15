@@ -8,9 +8,9 @@ import SidePanelItems from './SidePanelItems';
 import CreateForm from './CreateForm';
 import UpdateForm from './UpdateForm';
 import UserProfileDisplay from './UserProfileDisplay';
+import { X } from 'lucide-react'; 
 
 const SidePanelContent = () => {
-  // Directly access UI state from store
   const isCreateFormOpen = useUiStore((state) => state.isCreateFormOpen);
   const isUpdateFormOpen = useUiStore((state) => state.isUpdateFormOpen);
   const nearbySites = useUiStore((state) => state.nearbySites);
@@ -19,19 +19,30 @@ const SidePanelContent = () => {
   const uiSelectedPlace = useUiStore((state) => state.selectedPlace);
   const handleCloseAndCancel = useUiStore(
     (state) => state.handleCloseAndCancel,
-  ); // Action from store
+  );
   const isUserProfileOpen = useUiStore((state) => state.isUserProfileOpen);
 
-  // Local state for reviews expansion
   const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
 
-  // Fetch cultural site detail directly in this component
   const {
     data: selectedPlaceData,
     isLoading: isPlaceLoading,
     isError: isPlaceError,
     error: placeError,
   } = useCulturalSiteDetail(uiSelectedPlace?._id);
+
+  const CloseButton = ({ onClick }: { onClick: () => void }) => (
+    <button
+      onClick={onClick}
+      className="group absolute top-6 right-6 z-[60] flex items-center justify-center w-10 h-10 border border-black bg-white hover:bg-black transition-all duration-300 cursor-pointer"
+      aria-label="Close panel"
+    >
+      <X
+        size={18}
+        className="text-black group-hover:text-white group-hover:rotate-90 transition-all duration-500"
+      />
+    </button>
+  );
 
   let panelContent;
 
@@ -82,50 +93,53 @@ const SidePanelContent = () => {
         isReviewsExpanded={isReviewsExpanded}
         toggleReviewsExpansion={() => setIsReviewsExpanded((prev) => !prev)}
         onClose={() => handleCloseAndCancel(null)}
-        // SidePanelItems should ideally also fetch its own data (e.g., reviews)
-        // selectedPlaceData prop might still be useful for initial display if not refetching
         selectedPlaceData={selectedPlaceData}
       />
     );
   } else {
     panelContent = (
-      <div className="p-4 text-gray-600 text-center relative">
-        <div className="absolute top-4 right-4">
-          <button
-            className="text-gray-500 hover:text-gray-700 text-4xl font-bold hover:cursor-pointer p-1"
-            onClick={() => handleCloseAndCancel(null)}
-            aria-label="Close panel"
-          >
-            &times;
-          </button>
-        </div>
-        No information available.
+      <div className="relative h-full flex flex-col items-center justify-center p-12 text-center bg-white">
+        <CloseButton onClick={() => handleCloseAndCancel(null)} />
+        <div className="w-12 h-[1px] bg-gray-200 mb-6" />
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-300">
+          No Archive Selected
+        </p>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="relative h-full bg-white border-l border-black overflow-y-auto overflow-x-hidden custom-scrollbar">
       {panelContent}
-      {/* Loading overlay for cultural site detail */}
+
+      {/* Loading Overlay: 베를린 미니멀리즘 스타일 */}
       {isPlaceLoading &&
         !selectedPlaceData &&
         !isCreateFormOpen &&
         !isUpdateFormOpen && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
-            <div className="absolute top-4 right-4">
-              <button
-                className="text-gray-500 hover:text-gray-700 text-4xl font-bold hover:cursor-pointer p-1"
-                onClick={() => handleCloseAndCancel('culturalSiteDetail')}
-                aria-label="Close panel"
-              >
-                &times;
-              </button>
+          <div className="absolute inset-0 bg-white/90 backdrop-blur-[2px] flex flex-col items-center justify-center z-[100]">
+            <CloseButton
+              onClick={() => handleCloseAndCancel('culturalSiteDetail')}
+            />
+
+            <div className="flex flex-col items-center gap-6">
+              {/* 고정된 높이의 추상적 로더 */}
+              <div className="relative w-8 h-8">
+                <div className="absolute inset-0 border-2 border-gray-100" />
+                <div className="absolute inset-0 border-t-2 border-black animate-spin" />
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[9px] font-black uppercase tracking-[0.5em] text-black animate-pulse">
+                  Loading Entry
+                </span>
+                <span className="text-[8px] font-mono text-gray-400 mt-2">
+                  Retrieving from Digital Archive...
+                </span>
+              </div>
             </div>
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
           </div>
         )}
-    </>
+    </div>
   );
 };
 

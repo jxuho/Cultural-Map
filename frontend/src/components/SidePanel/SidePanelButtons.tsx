@@ -1,13 +1,13 @@
 import React from 'react';
 import useAuthStore from '../../store/authStore';
 import useUiStore from '../../store/uiStore';
+import { Edit3, Trash2, HelpCircle, AlertTriangle } from 'lucide-react'; // 아이콘 추가
 import {
   useCulturalSiteDetail,
   useDeleteCulturalSite,
 } from '../../hooks/data/useCulturalSitesQueries';
 
 const SidePanelButtons: React.FC = () => {
-  // --- Zustand (Auth & UI State) ---
   const user = useAuthStore((state) => state.user);
   const role = user?.role;
 
@@ -22,70 +22,51 @@ const SidePanelButtons: React.FC = () => {
     isUserProfileOpen,
   } = useUiStore();
 
-  // --- TanStack Query: Mutation ---
   const deleteCulturalSiteMutation = useDeleteCulturalSite();
+  const { data: selectedPlaceData } = useCulturalSiteDetail(uiSelectedPlace?._id);
 
-  // --- TanStack Query: Data Fetching ---
-  const { data: selectedPlaceData } = useCulturalSiteDetail(
-    uiSelectedPlace?._id,
-  );
-
-  // Handler for admin's "Edit" button
   const editThisSiteButtonClickHandler = (): void => {
-    if (selectedPlaceData) {
-      openUpdateForm(selectedPlaceData);
-    }
+    if (selectedPlaceData) openUpdateForm(selectedPlaceData);
   };
 
-  // Handler for non-admin's "Suggest an edit" button
   const suggestEditButtonClickHandler = (): void => {
-    if (selectedPlaceData) {
-      openUpdateForm(selectedPlaceData);
-    }
+    if (selectedPlaceData) openUpdateForm(selectedPlaceData);
   };
 
-  // Handler for admin's "Delete" button
   const deleteThisSiteButtonClickHandler = (): void => {
-    if (!selectedPlaceData || !selectedPlaceData._id) {
-      console.error('No site selected for deletion or missing ID.');
-      return;
-    }
-
-    const confirmDelete = async (): Promise<void> => {
-      try {
-        await deleteCulturalSiteMutation.mutateAsync(selectedPlaceData._id);
-        alert('Cultural site deleted successfully!');
-        closeModal();
-        handleCloseAndCancel(null);
-      } catch (error: any) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.message ||
-          'Unknown error occurred during deletion.';
-        console.error('Deletion error:', errorMessage);
-        alert(`Error deleting site: ${errorMessage}`);
-        closeModal();
-      }
-    };
+    if (!selectedPlaceData?._id) return;
 
     openModal(
-      <div className="text-center p-4">
-        <h3 className="text-xl font-bold mb-4">Confirm Deletion</h3>
-        <p className="mb-6">
-          Are you sure you want to delete "
-          <span className="font-semibold">{selectedPlaceData.name}</span>"? This
-          action cannot be undone.
+      <div className="bg-white border-2 border-black p-8 max-w-sm">
+        <div className="flex justify-center mb-4">
+          <div className="bg-red-600 text-white p-3">
+            <AlertTriangle size={32} />
+          </div>
+        </div>
+        <h3 className="text-lg font-black uppercase tracking-tighter text-center mb-4">
+          Permanent Deletion
+        </h3>
+        <p className="text-[13px] text-gray-500 leading-relaxed text-center mb-8 font-serif italic">
+          Are you sure you want to remove "<span className="text-black font-bold not-italic">{selectedPlaceData.name}</span>" from the digital archive? This operation is irreversible.
         </p>
-        <div className="flex justify-center space-x-4">
+        <div className="flex flex-col gap-2">
           <button
-            onClick={confirmDelete}
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            onClick={async () => {
+              try {
+                await deleteCulturalSiteMutation.mutateAsync(selectedPlaceData._id);
+                closeModal();
+                handleCloseAndCancel(null);
+              } catch (error) {
+                alert('Deletion failed. Please check permissions.');
+              }
+            }}
+            className="w-full bg-black text-white py-3 text-[11px] font-black uppercase tracking-widest hover:bg-red-700 transition-colors"
           >
-            Yes, Delete It
+            Confirm Deletion
           </button>
           <button
             onClick={closeModal}
-            className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            className="w-full bg-white text-black border border-gray-200 py-3 text-[11px] font-black uppercase tracking-widest hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>
@@ -94,42 +75,45 @@ const SidePanelButtons: React.FC = () => {
     );
   };
 
-  // Calculate UI exposure conditions
-  const showButtons =
-    !!selectedPlaceData &&
-    !isCreateFormOpen &&
-    !isUpdateFormOpen &&
-    !isUserProfileOpen;
+  const showButtons = !!selectedPlaceData && !isCreateFormOpen && !isUpdateFormOpen && !isUserProfileOpen;
 
-  if (!showButtons) {
-    return null;
-  }
+  if (!showButtons) return null;
 
   return (
-    <div className="flex justify-end p-4 border-t border-gray-200">
-      {role === 'admin' ? (
-        <>
+    <div className="flex flex-col gap-0 border-t-2 border-black">
+      {/* 관리 도구 레이블 */}
+      <div className="bg-black text-white py-1 px-4 self-start text-[9px] font-black uppercase tracking-[0.3em]">
+        Entry Operations
+      </div>
+
+      <div className="flex w-full divide-x divide-black border-b border-black">
+        {role === 'admin' ? (
+          <>
+            <button
+              onClick={editThisSiteButtonClickHandler}
+              className="flex-1 flex items-center justify-center gap-3 py-4 bg-white hover:bg-gray-50 text-black transition-all group"
+            >
+              <Edit3 size={14} className="group-hover:rotate-12 transition-transform" />
+              <span className="text-[11px] font-black uppercase tracking-widest">Update Record</span>
+            </button>
+            <button
+              onClick={deleteThisSiteButtonClickHandler}
+              className="flex-1 flex items-center justify-center gap-3 py-4 bg-white hover:bg-red-50 text-red-600 transition-all group"
+            >
+              <Trash2 size={14} className="group-hover:scale-110 transition-transform" />
+              <span className="text-[11px] font-black uppercase tracking-widest">Delete Entry</span>
+            </button>
+          </>
+        ) : (
           <button
-            onClick={editThisSiteButtonClickHandler}
-            className="hover:bg-gray-200 text-blue-500 hover:cursor-pointer py-1 px-4 rounded text-xs"
+            onClick={suggestEditButtonClickHandler}
+            className="w-full flex items-center justify-center gap-3 py-5 bg-white hover:bg-gray-50 text-black transition-all group"
           >
-            Edit
+            <HelpCircle size={14} />
+            <span className="text-[11px] font-black uppercase tracking-widest">Suggest Revision</span>
           </button>
-          <button
-            onClick={deleteThisSiteButtonClickHandler}
-            className="hover:bg-gray-200 text-red-500 hover:cursor-pointer py-1 px-4 rounded text-xs"
-          >
-            Delete
-          </button>
-        </>
-      ) : (
-        <button
-          onClick={suggestEditButtonClickHandler}
-          className="hover:bg-gray-200 text-black hover:cursor-pointer py-1 px-4 rounded text-xs"
-        >
-          Suggest an edit
-        </button>
-      )}
+        )}
+      </div>
     </div>
   );
 };

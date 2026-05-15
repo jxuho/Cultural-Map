@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import useFilterStore from '../../store/filterStore.ts';
 import { CULTURAL_CATEGORY } from '../../config/culturalSiteConfig.ts';
 import debounce from 'lodash.debounce';
-import { categoryBorderColors } from '../../config/colors.ts';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -53,6 +52,7 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
       resetFilters();
       setLocalSearchInput('');
     };
+
     const isFiltered = selectedCategories.length > 0 || searchQuery.length > 0;
 
     return (
@@ -60,91 +60,97 @@ const FilterContent = React.forwardRef<HTMLDivElement, FilterContentProps>(
         ref={ref}
         style={floatingStyles}
         className={`
-          z-50 bg-popover text-popover-foreground shadow-xl rounded-xl p-4 border
-          w-[95vw] sm:w-[600px] max-w-[calc(100vw-32px)]
-          ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
+          z-50 bg-white text-black border-2 border-black p-0
+          w-[95vw] sm:w-[550px] overflow-hidden 
+          ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}
         `}
         {...props}
       >
-        {/* Top header area: title and reset button */}
-
-        {/* Top header area */}
-        <div className="flex items-center justify-between mb-4 px-1 min-h-[32px]">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-muted-foreground">
-              Filters
+        {/* 1. Header Area */}
+        <div className="bg-black text-white px-6 py-4 flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.4em] leading-none">
+              Filter Criteria
             </h3>
-            <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-              {filteredCount} sites found
-            </span>
+            <p className="text-[9px] font-mono opacity-60 uppercase">
+              Current selection yields {filteredCount} matching records
+            </p>
           </div>
-          <div className="flex items-center">
-            {isFiltered ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleResetAll}
-                className="h-8 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-              >
-                <RotateCcw className="w-3 h-3 mr-1" />
-                Reset All
-              </Button>
-            ) : (
-              <div className="h-8 w-[80px]" />
-            )}
-          </div>
-        </div>
-        {/* Category filter area */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {CULTURAL_CATEGORY.map((category) => {
-            const isSelected = selectedCategories.includes(category);
-            const color = categoryBorderColors[category] || '#64748b';
-
-            return (
-              <Button
-                key={category}
-                variant={isSelected ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => toggleCategory(category)}
-                style={isSelected ? { backgroundColor: color } : {}}
-                className={`
-                  rounded-full transition-all text-xs h-8 px-4
-                  ${isSelected ? 'hover:opacity-90 border-none shadow-md' : 'hover:bg-accent'}
-                `}
-              >
-                {category
-                  .replace(/_/g, ' ')
-                  .replace(/\b\w/g, (c) => c.toUpperCase())}
-              </Button>
-            );
-          })}
-        </div>
-
-        {/* Search area */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={localSearchInput}
-            onChange={handleSearchInputChange}
-            placeholder="Search for place name"
-            className="pl-9 pr-10 h-10 bg-muted/50 border-none focus-visible:ring-1 focus-visible:bg-background"
-          />
-          {localSearchInput && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleClearSearch}
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-transparent text-muted-foreground hover:text-foreground"
+          {isFiltered && (
+            <button
+              onClick={handleResetAll}
+              className="text-[10px] font-bold uppercase tracking-widest hover:underline flex items-center gap-2"
             >
-              <X className="w-4 h-4" />
-            </Button>
+              <RotateCcw className="w-3 h-3" />
+              Reset
+            </button>
           )}
         </div>
+
+        <div className="p-8">
+          {/* 2. Category Selection Area */}
+          <div className="mb-8">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-gray-400">
+              By Classification
+            </h4>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {CULTURAL_CATEGORY.map((category) => {
+                const isSelected = selectedCategories.includes(category);
+                return (
+                  <button
+                    key={category}
+                    onClick={() => toggleCategory(category)}
+                    className={`
+                      px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-left border transition-all
+                      ${
+                        isSelected
+                          ? 'bg-black text-white border-black'
+                          : 'bg-white text-black border-gray-100 hover:border-black'
+                      }
+                    `}
+                  >
+                    {category.replace(/_/g, ' ')}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Search Area */}
+          <div className="relative">
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-gray-400">
+              Keyword Search
+            </h4>
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black group-focus-within:scale-110 transition-transform" />
+              <Input
+                value={localSearchInput}
+                onChange={handleSearchInputChange}
+                placeholder="ENTER SEARCH TERMS..."
+                className={`
+                  pl-12 pr-12 h-14 bg-transparent border-black border-2 rounded-none
+                  font-mono text-sm placeholder:text-gray-200 focus-visible:ring-0
+                  transition-all duration-300
+                `}
+              />
+              {localSearchInput && (
+                <button
+                  onClick={handleClearSearch}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-black hover:scale-125 transition-transform"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Footer Decorative Bar */}
+        <div className="h-2 bg-black w-full" />
       </div>
     );
   },
 );
 
 FilterContent.displayName = 'FilterContent';
-
 export default FilterContent;

@@ -4,205 +4,188 @@ import UserProfileCard from './UserProfileCard';
 import { useState, useMemo } from 'react';
 import BackButton from '../BackButton';
 import useAuthStore from '../../store/authStore';
+import { Users, SortAsc, ChevronDown, ChevronUp, Loader2, Search, UserCheck } from 'lucide-react';
 
 const UsersManagementPage = () => {
   const { data: users, isLoading, isError, error } = useAllUsers();
-  const { user: currentUser } = useAuthStore(); // Get the current logged-in user
+  const { user: currentUser } = useAuthStore();
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<
-    'username' | 'role' | 'createdAt' | 'updatedAt'
-  >('username'); // Default sort by username
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Default sort order
+  const [sortBy, setSortBy] = useState<'username' | 'role' | 'createdAt' | 'updatedAt'>('username');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const handleViewProfile = (userId: string) => {
-    setSelectedUserId((prev) => (prev === userId ? null : userId)); // Toggle
+    setSelectedUserId((prev) => (prev === userId ? null : userId));
   };
 
-  // Memoize the sorted and filtered users list
   const sortedUsers = useMemo(() => {
     if (!users || users.length === 0) return [];
 
-    // Separate current user
     const otherUsers = users.filter((user) => user._id !== currentUser?._id);
     const loggedInUser = users.find((user) => user._id === currentUser?._id);
 
-    // Create a mutable copy for sorting
     const sortableUsers = [...otherUsers];
 
     sortableUsers.sort((a, b) => {
-      let valA: string | number, valB: string | number;
+      let valA: string | number = '';
+      let valB: string | number = '';
 
       switch (sortBy) {
-        case 'role':
-          valA = a.role;
-          valB = b.role;
-          break;
-        case 'createdAt':
-          valA = new Date(a.createdAt).getTime();
-          valB = new Date(b.createdAt).getTime();
-          break;
-        case 'updatedAt':
-          valA = new Date(a.updatedAt).getTime();
-          valB = new Date(b.updatedAt).getTime();
-          break;
-        case 'username': // Default sort
-        default:
-          valA = a.username || '';
-          valB = b.username || '';
-          break;
+        case 'role': valA = a.role; valB = b.role; break;
+        case 'createdAt': valA = new Date(a.createdAt).getTime(); valB = new Date(b.createdAt).getTime(); break;
+        case 'updatedAt': valA = new Date(a.updatedAt).getTime(); valB = new Date(b.updatedAt).getTime(); break;
+        default: valA = a.username || ''; valB = b.username || ''; break;
       }
 
       if (typeof valA === 'string' && typeof valB === 'string') {
-        return sortOrder === 'asc'
-          ? valA.localeCompare(valB)
-          : valB.localeCompare(valA);
-      } else {
-        // For numbers (dates converted to timestamps)
-        return sortOrder === 'asc'
-          ? new Date(valA).getTime() - new Date(valB).getTime()
-          : new Date(valB).getTime() - new Date(valA).getTime();
+        return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
+      return sortOrder === 'asc' ? (valA as number) - (valB as number) : (valB as number) - (valA as number);
     });
 
-    // Place the current user at the top if they exist
     return loggedInUser ? [loggedInUser, ...sortableUsers] : sortableUsers;
-  }, [users, sortBy, sortOrder, currentUser]); // Re-run memoization when these dependencies change
+  }, [users, sortBy, sortOrder, currentUser]);
 
-  const handleSortChange = (
-    criteria: 'username' | 'role' | 'createdAt' | 'updatedAt',
-  ) => {
+  const handleSortChange = (criteria: typeof sortBy) => {
     if (sortBy === criteria) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); // Toggle order if same criteria
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(criteria);
-      setSortOrder('asc'); // Default to ascending for new criteria
+      setSortOrder('asc');
     }
   };
 
-  const getSortIndicator = (
-    criteria: 'username' | 'role' | 'createdAt' | 'updatedAt',
-  ) => {
-    if (sortBy === criteria) {
-      return sortOrder === 'asc' ? ' ↑' : ' ↓';
-    }
-    return '';
+  const getSortIndicator = (criteria: typeof sortBy) => {
+    if (sortBy !== criteria) return null;
+    return sortOrder === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />;
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-100">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-        <p className="ml-4 text-gray-700">Loading users...</p>
-      </div>
-    );
-  }
+  if (isLoading) return (
+    <div className="flex flex-col items-center justify-center h-screen bg-white gap-4">
+      <Loader2 className="w-12 h-12 animate-spin text-black" strokeWidth={3} />
+      <p className="font-black uppercase tracking-[0.3em] text-[10px]">Accessing Personnel Records...</p>
+    </div>
+  );
 
-  if (isError) {
-    return (
-      <div className="p-6 text-center text-red-600 bg-red-50 border border-red-200 rounded-lg shadow-md m-4">
-        <h2 className="text-xl font-bold mb-2">Error</h2>
-        <p>{error.message || 'Failed to load users.'}</p>
+  if (isError) return (
+    <div className="p-12 text-center h-screen flex flex-col items-center justify-center">
+      <div className="border-4 border-black p-8 bg-red-50 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <h2 className="text-2xl font-black uppercase mb-2">Access_Denied</h2>
+        <p className="font-mono text-sm">{error.message || 'Failed to load user database.'}</p>
       </div>
-    );
-  }
-
-  if (sortedUsers.length === 0) {
-    // Check sortedUsers for empty state
-    return (
-      <div className="p-6 text-center text-gray-600 bg-white rounded-lg shadow-md m-4">
-        <h2 className="text-xl font-bold mb-2">No Users Found</h2>
-        <p>There are currently no registered users.</p>
-      </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 bg-gray-100 shadow-md min-h-screen">
-      <div className="flex justify-start mb-4">
-        <BackButton />
-      </div>
+    <div className="min-h-screen bg-zinc-50 p-6 md:p-12">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-12">
+          <BackButton />
+        </div>
 
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 border-b pb-4">
-        Manage Users
-      </h1>
+        <header className="mb-16 border-b-8 border-black pb-8 flex flex-col md:flex-row justify-between items-end gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 bg-black text-white px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+              <Users size={14} /> Global Administration
+            </div>
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter uppercase leading-[0.8]">
+              User<br />Registry
+            </h1>
+          </div>
+          <div className="text-right hidden md:block font-mono text-[10px] text-zinc-400 font-bold uppercase tracking-widest leading-relaxed">
+            Total_Entries: {users?.length || 0}<br />
+            Security_Level: Level_4
+          </div>
+        </header>
 
-      {/* Sort Buttons */}
-      <div className="mb-6 flex flex-wrap gap-2 sm:gap-4 justify-start">
-        <button
-          onClick={() => handleSortChange('username')}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'username' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
-        >
-          Sort by Username{getSortIndicator('username')}
-        </button>
-        <button
-          onClick={() => handleSortChange('role')}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'role' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
-        >
-          Sort by Role{getSortIndicator('role')}
-        </button>
-        <button
-          onClick={() => handleSortChange('createdAt')}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'createdAt' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
-        >
-          Sort by Registered Date{getSortIndicator('createdAt')}
-        </button>
-        <button
-          onClick={() => handleSortChange('updatedAt')}
-          className={`px-4 py-2 rounded-md transition-colors ${sortBy === 'updatedAt' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 cursor-pointer'}`}
-        >
-          Sort by Last Updated{getSortIndicator('updatedAt')}
-        </button>
-      </div>
-      <div className="space-y-6 md:space-y-8">
-        {sortedUsers.map(
-          (
-            user, // Use sortedUsers here
-          ) => (
-            <div
-              key={user._id}
-              className={`bg-white rounded-lg shadow-md p-4 sm:p-6 flex flex-col ${currentUser && user._id === currentUser._id ? 'border-2 border-blue-500' : ''}`} // Highlight current user
-            >
-              <div className="flex items-center justify-between flex-wrap sm:flex-nowrap gap-4">
-                <div className="flex items-center space-x-3 sm:space-x-4 grow break-all">
-                  <img
-                    src={user.profileImage || defaultProfileImg}
-                    alt={`${user.username}'s profile`}
-                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border shrink-0"
-                  />
-                  <div>
-                    <h2 className="text-base sm:text-lg font-semibold text-gray-800 wrap-break-words">
-                      {user.username || 'N/A'}
-                      {currentUser && user._id === currentUser._id && (
-                        <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                          (You)
-                        </span>
+        {/* Sort Controls - Tab Style */}
+        <div className="mb-12">
+          <div className="flex items-center gap-2 mb-4">
+            <SortAsc size={16} />
+            <span className="text-[10px] font-black uppercase tracking-widest">Sort_Logic:</span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { id: 'username', label: 'Username' },
+              { id: 'role', label: 'Authority' },
+              { id: 'createdAt', label: 'Join Date' },
+              { id: 'updatedAt', label: 'Last Sync' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleSortChange(tab.id as any)}
+                className={`flex items-center gap-2 px-6 py-3 border-2 border-black font-black text-[11px] uppercase tracking-widest transition-all
+                  ${sortBy === tab.id 
+                    ? 'bg-black text-white translate-x-1 -translate-y-1 shadow-[-4px_4px_0px_0px_rgba(253,224,71,1)]' 
+                    : 'bg-white text-black hover:bg-zinc-100'}`}
+              >
+                {tab.label} {getSortIndicator(tab.id as any)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* User List */}
+        <div className="grid gap-6">
+          {sortedUsers.map((user) => {
+            const isMe = currentUser && user._id === currentUser._id;
+            const isOpen = selectedUserId === user._id;
+
+            return (
+              <div 
+                key={user._id} 
+                className={`border-2 border-black transition-all ${
+                  isOpen ? 'bg-white' : 'bg-white hover:bg-zinc-100'
+                } ${isMe ? 'ring-4 ring-yellow-400 ring-offset-2' : ''}`}
+              >
+                <div className="p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-center gap-6 w-full md:w-auto">
+                    <div className="relative shrink-0">
+                      <img
+                        src={user.profileImage || defaultProfileImg}
+                        alt={user.username}
+                        className="w-16 h-16 border-2 border-black grayscale-[0.5]"
+                      />
+                      {isMe && (
+                        <div className="absolute -top-2 -right-2 bg-yellow-400 border border-black p-1">
+                          <UserCheck size={12} />
+                        </div>
                       )}
-                    </h2>
-                    <p className="text-xs sm:text-sm text-gray-600 wrap-break-words">
-                      {user.email || 'N/A'}
-                    </p>
+                    </div>
+                    
+                    <div className="grow min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h2 className="text-xl font-black uppercase tracking-tight truncate">{user.username || 'N/A'}</h2>
+                        {isMe && <span className="text-[9px] font-black bg-black text-white px-1.5 py-0.5">CURRENT_ADMIN</span>}
+                      </div>
+                      <p className="text-xs font-mono text-zinc-500 truncate">{user.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 w-full md:w-auto border-t md:border-t-0 pt-4 md:pt-0">
+                    <div className="hidden sm:block text-right">
+                      <p className="text-[9px] font-black uppercase text-zinc-400">Security_Role</p>
+                      <p className="text-xs font-bold uppercase tracking-widest">{user.role}</p>
+                    </div>
+                    <button
+                      onClick={() => handleViewProfile(user._id)}
+                      className={`grow md:grow-0 px-6 py-3 font-black text-[10px] uppercase tracking-[0.2em] transition-all border-2 border-black
+                        ${isOpen ? 'bg-black text-white' : 'bg-white text-black hover:bg-yellow-400 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'}`}
+                    >
+                      {isOpen ? 'Close_File' : 'Open_Record'}
+                    </button>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleViewProfile(user._id)}
-                  className="px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none text-sm sm:text-base shrink-0 cursor-pointer"
-                >
-                  {selectedUserId === user._id
-                    ? 'Hide Profile'
-                    : 'View Profile'}
-                </button>
-              </div>
 
-              {selectedUserId === user._id && (
-                <div className="mt-4 sm:mt-6 border-t pt-4">
-                  {/* Pass currentUser to UserProfileCard */}
-                  <UserProfileCard user={user} currentUser={currentUser} />
-                </div>
-              )}
-            </div>
-          ),
-        )}
+                {isOpen && (
+                  <div className="p-4 md:p-8 bg-zinc-50 border-t-2 border-black animate-in slide-in-from-top-2 duration-200">
+                    <UserProfileCard user={user} currentUser={currentUser} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

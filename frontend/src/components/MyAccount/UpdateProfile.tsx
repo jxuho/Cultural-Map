@@ -17,7 +17,6 @@ const UpdateProfile = () => {
 
   const [userName, setUserName] = useState<string>(user?.username ?? '');
   const [nameMessage, setNameMessage] = useState('');
-
   const [bio, setBio] = useState<string>(user?.bio ?? '');
   const [bioMessage, setBioMessage] = useState('');
 
@@ -34,277 +33,178 @@ const UpdateProfile = () => {
   const nameInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     setUserName(inputValue);
-    setShowMessage((prevState) => ({ ...prevState, showNameMessage: false }));
-    setNameMessage('');
-
+    setShowMessage((p) => ({ ...p, showNameMessage: false }));
     if (inputValue.trim() === '') {
-      setNameMessage('Please type username.');
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
-      return;
-    }
-
-    if (inputValue.length > USERNAME_MAX_LENGTH) {
-      setNameMessage(
-        `Username muse be under ${USERNAME_MAX_LENGTH} characters.`,
-      );
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
-      return;
-    }
-
-    if (!nameRegex.test(inputValue)) {
-      setNameMessage(
-        "Username must start with a letter and can only contain letters, numbers, spaces, periods (.), apostrophes ('), hyphens (-), and cannot consist solely of numbers.",
-      );
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
-      return;
+      setNameMessage('Username is required.');
+      setShowMessage((p) => ({ ...p, showNameMessage: true }));
     }
   };
 
   const bioInputHandler = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const inputValue = e.target.value;
     setBio(inputValue);
-    setShowMessage((prevState) => ({ ...prevState, showBioMessage: false }));
-    setBioMessage('');
-
+    setShowMessage((p) => ({ ...p, showBioMessage: false }));
     if (inputValue.length > BIO_MAX_LENGTH) {
-      setBioMessage(`Bio must be less than ${BIO_MAX_LENGTH} characters.`);
-      setShowMessage((prevState) => ({ ...prevState, showBioMessage: true }));
+      setBioMessage(`Bio must be under ${BIO_MAX_LENGTH} characters.`);
+      setShowMessage((p) => ({ ...p, showBioMessage: true }));
     }
   };
 
-  const submitUpdateProfileHandler = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const submitUpdateProfileHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     let isValid = true;
-    setShowMessage((prevState) => ({
-      ...prevState,
-      apiError: false,
-      apiErrorMessage: '',
-    }));
 
-    // ---Username validation (when submitting) ---
-    if (userName.trim() === '') {
-      setNameMessage('Please tye username.');
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
+    // Validation Logic (Username)
+    if (userName.trim() === '' || !nameRegex.test(userName)) {
+      setNameMessage("Invalid username format.");
+      setShowMessage((p) => ({ ...p, showNameMessage: true }));
       isValid = false;
-    } else if (userName.length > USERNAME_MAX_LENGTH) {
-      setNameMessage(
-        `Username must be under ${USERNAME_MAX_LENGTH} characters.`,
-      );
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
-      isValid = false;
-    } else if (!nameRegex.test(userName)) {
-      setNameMessage(
-        "Username must start with a letter and can only contain letters, numbers, spaces, periods (.), apostrophes ('), hyphens (-), and cannot consist solely of numbers.",
-      );
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: true }));
-      isValid = false;
-    } else {
-      setShowMessage((prevState) => ({ ...prevState, showNameMessage: false }));
-      setNameMessage('');
     }
 
-    // ---Self-introduction validation (when submitting) ---
-    if (bio.length > BIO_MAX_LENGTH) {
-      setBioMessage(`bio must be less than ${BIO_MAX_LENGTH} characters.`);
-      setShowMessage((prevState) => ({ ...prevState, showBioMessage: true }));
-      isValid = false;
-    } else {
-      setShowMessage((prevState) => ({ ...prevState, showBioMessage: false }));
-      setBioMessage('');
-    }
-
-    if (!isValid) {
-      return;
-    }
+    if (!isValid) return;
 
     const updateData: Partial<User> = {};
-    if (userName !== user?.username) {
-      // Sent only when name has changed
-      updateData.username = userName;
-    }
-    if (bio !== user?.bio) {
-      // Sent only when self-introduction changes
-      updateData.bio = bio;
-    }
+    if (userName !== user?.username) updateData.username = userName;
+    if (bio !== user?.bio) updateData.bio = bio;
 
-    // Do not call API if no fields have changed
     if (Object.keys(updateData).length === 0) {
-      setShowMessage((prevState) => ({ ...prevState, changeSuccess: true }));
+      setShowMessage((p) => ({ ...p, changeSuccess: true }));
       return;
     }
 
     try {
       const data = await updateProfileMutation.mutateAsync(updateData);
       updateUser(data.data.user);
-      setShowMessage((prevState) => ({
-        ...prevState,
-        changeSuccess: true,
-        apiError: false,
-      }));
-    } catch (error: unknown) {
-      console.error('Profile update failed:', error);
-      let errorMessage = 'An unexpected error occurred';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
-      setShowMessage((prevState) => ({
-        ...prevState,
-        apiError: true,
-        apiErrorMessage: errorMessage,
+      setShowMessage((p) => ({ ...p, changeSuccess: true, apiError: false }));
+    } catch (error: any) {
+      setShowMessage((p) => ({ 
+        ...p, 
+        apiError: true, 
+        apiErrorMessage: error.message || 'Update failed.' 
       }));
     }
   };
 
-  // ---Success message display ---
+  const inputBase = "w-full p-3 border-2 border-black font-mono text-sm focus:bg-zinc-50 outline-none transition-colors rounded-none";
+  const labelBase = "block text-[10px] font-black uppercase tracking-[0.2em] mb-2 text-black";
+
+  // --- Success State ---
   if (showMessage.changeSuccess) {
     return (
-      <div className="w-full h-full flex justify-center items-center">
-        <div
-          className="p-8 bg-white rounded w-full md:max-w-xl lg:max-w-2xl"
-          style={{
-            boxShadow:
-              '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
-          }}
-        >
-          <form className="flex flex-col m-6">
-            {/* Add BackButton to success message screen */}
-            <div className="flex justify-start mb-4">
-              <BackButton />
-            </div>
-            <h1 className="text-xl font-normal mb-10">
-              Your profile has been updated!
-            </h1>
-
-            <div className="flex justify-center items-center">
-              <button
-                className="py-1.5 px-8 rounded-sm border bg-blue text-white hover:bg-blue-hover transition-colors hover:cursor-pointer"
-                onClick={() => navigate('/my-account')}
-              >
-                Ok
-              </button>
-            </div>
-          </form>
+      <div className="min-h-[70vh] flex items-center justify-center p-6">
+        <div className="max-w-md w-full border-2 border-black bg-white p-8 animate-in fade-in zoom-in duration-300">
+          <div className="inline-block bg-black text-white px-2 py-0.5 text-[8px] font-bold uppercase tracking-[0.2em] mb-6">
+            System Message
+          </div>
+          <h1 className="text-3xl font-black uppercase tracking-tighter mb-4">Update <br/>Complete</h1>
+          <p className="font-mono text-xs text-gray-500 mb-8">
+            User records for <span className="text-black font-bold">@{userName}</span> have been successfully synchronized with the archive.
+          </p>
+          <button
+            className="w-full py-4 bg-black text-white font-black uppercase text-xs tracking-[0.3em] hover:bg-zinc-800 transition-colors cursor-pointer"
+            onClick={() => navigate('/my-account')}
+          >
+            Acknowledge & Return
+          </button>
         </div>
       </div>
     );
   }
 
-  // ---Main Update Profile Form ---
+  // --- Main Form State ---
   return (
-    <div className="w-full h-full flex justify-center items-center">
-      <div
-        className="p-8 bg-white rounded w-full md:max-w-xl lg:max-w-2xl"
-        style={{
-          boxShadow:
-            '0px 5px 10px rgba(0,0,0,0.1), 0px 1.6px 3.6px rgba(0,0,0,0.1)',
-        }}
-      >
-        <form className="flex flex-col" onSubmit={submitUpdateProfileHandler}>
-          {/* Add BackButton to the main form */}
-          <div className="flex justify-start mb-4">
-            <BackButton />
-          </div>
-          <h1 className="text-2xl font-normal mb-6">Profile Update</h1>
-          <div className="mb-6">
-            <p className="text-xs text-light-text">
-              Update your personal information
-            </p>
-          </div>
+    <div className="max-w-4xl mx-auto p-6 md:p-12">
+      <div className="mb-12 flex items-center justify-between">
+        <BackButton />
+        <div className="text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+          Auth_Ref: {user?._id?.slice(-8) ?? 'NULL'}
+        </div>
+      </div>
 
-          <div className="mb-6 flex flex-col items-center">
-            <div className="w-20 h-20 m-5 overflow-hidden rounded-full">
-              {user?.profileImage ? (
-                <img
-                  src={user.profileImage}
-                  alt="Profile image"
-                  referrerPolicy="no-referrer"
-                  className="rounded-full"
-                />
-              ) : (
-                <img
-                  src={defaultProfileImg}
-                  alt="empty profile image"
-                  className="rounded-full"
-                />
-              )}
+      <header className="mb-12">
+        <div className="inline-block bg-black text-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
+          Record Modification
+        </div>
+        <h1 className="text-5xl md:text-6xl font-black tracking-tighter uppercase leading-none">
+          Edit <br /> Profile
+        </h1>
+      </header>
+
+      <form onSubmit={submitUpdateProfileHandler} className="grid grid-cols-1 md:grid-cols-12 gap-12">
+        {/* Left: Avatar */}
+        <div className="md:col-span-4 flex flex-col items-center">
+          <div className="w-32 h-32 border-2 border-black p-1 bg-white relative group">
+            <img
+              src={user?.profileImage || defaultProfileImg}
+              alt="Avatar"
+              className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all"
+            />
+            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-[8px] font-black text-white uppercase bg-black px-1">Static</span>
             </div>
           </div>
-          {/* Username Input Field */}
-          <div className="mb-6">
-            <label
-              htmlFor="userName"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Username
-            </label>
+          <p className="mt-4 font-mono text-[9px] text-gray-400 text-center uppercase tracking-tighter">
+            Profile images are <br/>managed via provider
+          </p>
+        </div>
+
+        {/* Right: Fields */}
+        <div className="md:col-span-8 space-y-8">
+          {/* Username */}
+          <div>
+            <label htmlFor="userName" className={labelBase}>Username ID</label>
             <input
-              value={userName}
-              type="text"
-              placeholder="Please type your username"
               id="userName"
-              className={`
-                                w-full p-2 border rounded-md shadow-sm
-                                focus:ring-blue-500 focus:border-blue-500
-                                ${showMessage.showNameMessage ? 'border-red-500' : 'border-gray-300'}
-                                text-gray-900 bg-white placeholder-gray-400
-                            `}
+              value={userName}
               onChange={nameInputHandler}
+              className={`${inputBase} ${showMessage.showNameMessage ? 'border-red-500 bg-red-50' : ''}`}
+              placeholder="ENTRY_NAME"
             />
             {showMessage.showNameMessage && (
-              <p className="mt-1 text-sm text-red-600">{nameMessage}</p>
+              <p className="mt-2 text-[10px] font-bold text-red-500 uppercase font-mono italic">! {nameMessage}</p>
             )}
           </div>
 
-          {/* Bio Input Field */}
-          <div className="mb-6">
-            <label
-              htmlFor="bio"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Bio
-            </label>
+          {/* Bio */}
+          <div>
+            <label htmlFor="bio" className={labelBase}>User Biography</label>
             <textarea
-              value={bio}
-              placeholder="Please introduce about yourself"
               id="bio"
-              rows={4}
-              className={`
-                                w-full p-2 border rounded-md shadow-sm
-                                focus:ring-blue-500 focus:border-blue-500
-                                ${showMessage.showBioMessage ? 'border-red-500' : 'border-gray-300'}
-                                text-gray-900 bg-white placeholder-gray-400 resize-y
-                            `}
+              value={bio}
               onChange={bioInputHandler}
+              rows={5}
+              className={`${inputBase} ${showMessage.showBioMessage ? 'border-red-500 bg-red-50' : ''} resize-none`}
+              placeholder="Tell us about your connection to Berlin culture..."
             />
-            <p className="mt-1 text-xs text-gray-500 text-right">
-              {bio.length}/{BIO_MAX_LENGTH} character(s)
-            </p>
-            {showMessage.showBioMessage && (
-              <p className="mt-1 text-sm text-red-600">{bioMessage}</p>
-            )}
+            <div className="flex justify-between mt-2">
+              <p className="text-[10px] font-mono text-gray-400 uppercase">
+                {showMessage.showBioMessage ? (
+                  <span className="text-red-500 font-bold">Overflow Error</span>
+                ) : (
+                  "Data String Length"
+                )}
+              </p>
+              <p className={`text-[10px] font-mono ${bio.length > BIO_MAX_LENGTH ? 'text-red-500' : 'text-gray-400'}`}>
+                {bio.length}/{BIO_MAX_LENGTH}
+              </p>
+            </div>
           </div>
 
           {showMessage.apiError && (
-            <p className="mb-4 text-sm text-red-600 text-center">
-              {showMessage.apiErrorMessage}
-            </p>
+            <div className="p-4 border-2 border-red-500 bg-red-50 text-red-600 font-mono text-[10px] uppercase">
+              CRITICAL_API_ERROR: {showMessage.apiErrorMessage}
+            </div>
           )}
 
-          <div className="flex">
-            <button
-              className="mr-6 py-1.5 px-8 rounded-sm border bg-blue text-white hover:bg-blue-hover transition-colors hover:cursor-pointer"
-              type="submit"
-              disabled={updateProfileMutation.isPending} // Disable button while mutation is in progress (TanStack Query v5 uses isPending instead of isLoading)
-            >
-              {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
-            </button>
-          </div>
-        </form>
-      </div>
+          <button
+            type="submit"
+            disabled={updateProfileMutation.isPending}
+            className="w-full md:w-auto px-12 py-4 bg-black text-white font-black uppercase text-xs tracking-[0.3em] hover:bg-zinc-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all"
+          >
+            {updateProfileMutation.isPending ? 'Syncing...' : 'Save Changes'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
